@@ -13,14 +13,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from fed3.fed import align
+
+from fed3.lightcycle import LIGHTCYCLE
+
 from fed3.metrics import metricsdict
-from fed3.plotting import (format_xaxis_datetime,
-                           format_xaxis_time,
-                           _plot_line_data)
+
+from fed3.plotting import _plot_line_data
 
 def determine_alignment(feds):
     alignments = set(f._alignment for f in feds)
     return 'datetime' if len(alignments) > 1 else list(alignments)[0]
+
+def set_lightcycle(on, off):
+    LIGHTCYCLE['on'] = on
+    LIGHTCYCLE['off'] = off
 
 class FED3Analysis(metaclass=ABCMeta):
     def __init__(self):
@@ -52,12 +58,10 @@ class SimpleLine(FED3Analysis):
     def runfor(self, feds, plot=False):
         self.feds = self._handle_feds(feds)
         if self.align is not None:
-            feds = [align(f, self.align) for f in self.feds]
-        else:
-            feds = self.feds
+            self.feds = [align(f, self.align) for f in self.feds]
         self.data = pd.DataFrame()
         self._metric = metricsdict[self.y]
-        for fed in feds:
+        for fed in self.feds:
             y = self._metric(fed, self.cumulative)
             y.name = fed.name
             self.data = self.data.join(y, how='outer')
@@ -76,6 +80,9 @@ class SimpleLine(FED3Analysis):
 
         if xaxis == 'auto':
             xaxis = determine_alignment(self.feds)
+
+        if xaxis == 'elapsed':
+            shadedark=False
 
         _plot_line_data(data=self.data,
                         ax=ax,

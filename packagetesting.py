@@ -11,7 +11,9 @@ import fed3
 p = '/Users/earnestt1234/Documents/fedviz/refed3vizworkshop/FED001_110920_02.CSV'
 r = '/Users/earnestt1234/Documents/fedviz/refed3vizworkshop/FED002_110920_02.CSV'
 
-fed1 = fed3.load(p)
-fed2 = fed3.load(r)
+a = fed3.load(p)
+b = fed3.load(r)
 
-analysis = fed3.SimpleLine().runfor([fed1, fed2], plot=True)
+b = fed3.align(b, 'time')
+
+a = fed3.SimpleLine().runfor([a, b], plot=True)
