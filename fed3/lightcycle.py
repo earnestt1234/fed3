@@ -13,6 +13,10 @@ import pandas as pd
 
 LIGHTCYCLE = {'on': 7, 'off': 19}
 
+def set_lightcycle(on, off):
+    LIGHTCYCLE['on'] = on
+    LIGHTCYCLE['off'] = off
+
 def convert_dt64_to_dt(dt64):
     """Converts numpy datetime to standard datetime (needed for shade_darkness
     function in most cases)."""
@@ -41,26 +45,23 @@ def hours_between(start, end, convert=True):
         start = convert_dt64_to_dt(start)
         end = convert_dt64_to_dt(end)
     rounded_start = datetime.datetime(year=start.year,
-                                month=start.month,
-                                day=start.day,
-                                hour=start.hour)
+                                      month=start.month,
+                                      day=start.day,
+                                      hour=start.hour)
     rounded_end = datetime.datetime(year=end.year,
-                                month=end.month,
-                                day=end.day,
-                                hour=end.hour)
-    return pd.date_range(rounded_start,rounded_end,freq='1H')
+                                    month=end.month,
+                                    day=end.day,
+                                    hour=end.hour)
+    return pd.date_range(rounded_start, rounded_end, freq='1H')
 
-def is_day_or_night(time, period, lights_on=7, lights_off=19):
+def is_at_night(time, lights_on=7, lights_off=19):
     """
-    Check if a datetime occured at day or night
+    Check if a datetime occured at night based on light cycle.
 
     Parameters
     ----------
     time : datetime or pandas.Timestamp
         time to check
-    period : str
-        'day' or 'night', which period to check if the date is part of,
-        based on the lights_on and lights_off arguments
     lights_on : int, optional
         Hour of the day (0-23) when lights turn on. The default is 7.
     lights_off : int, optional
@@ -78,8 +79,7 @@ def is_day_or_night(time, period, lights_on=7, lights_off=19):
         val = time.time() >= lights_off or time.time() < lights_on
     elif lights_off < lights_on:
         val = time.time() >= lights_off and time.time() < lights_on
-    #reverses if period='day'
-    return val if period=='night' else not val
+    return val
 
 def night_intervals(array, lights_on, lights_off, instead_days=False):
     """
@@ -104,10 +104,10 @@ def night_intervals(array, lights_on, lights_off, instead_days=False):
     l_on = datetime.time(hour=lights_on)
     l_off = datetime.time(hour=lights_off)
     if l_on == l_off:
-            night_intervals = []
-            return night_intervals
+        night_intervals = []
+        return night_intervals
     else:
-        at_night = [is_day_or_night(i, 'night', lights_on=lights_on, lights_off=lights_off) for i in array]
+        at_night = [is_at_night(i, lights_on=lights_on, lights_off=lights_off) for i in array]
     if instead_days:
         at_night = [not i for i in at_night]
     night_starts = []

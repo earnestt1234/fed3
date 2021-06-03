@@ -2,7 +2,7 @@
 
 #imports for package namespace
 
-from .analyze import SimpleLine, set_lightcycle
+from .analyze import SimpleLine
 
 from .fed import (FED,
                   align,
@@ -10,3 +10,5 @@ from .fed import (FED,
                   concat,
                   load,
                   split,)
+
+from .lightcycle import set_lightcycle

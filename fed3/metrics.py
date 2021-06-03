@@ -39,8 +39,17 @@ def get_pellets(fed):
 def get_binary_pellets(fed):
     y = fed.binary_pellets()
     y = filterout(y, dropzero=True)
+    return y
+
+def get_ipi(fed):
+    y = fed.interpellet_intervals()
+    y = filterout(y, dropna=True)
+    return y
 
 pellets = Metric('pellets', 'Pellets', 'mean',
                  get_pellets, get_binary_pellets)
+ipi = Metric('ipi', 'Interpellet Intervals', 'mean',
+             cumulative=None, noncumulative=get_ipi)
 
-metricsdict = {'pellets': pellets}
+metricsdict = {'pellets': pellets,
+               'ipi': ipi}

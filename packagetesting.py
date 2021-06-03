@@ -14,6 +14,13 @@ r = '/Users/earnestt1234/Documents/fedviz/refed3vizworkshop/FED002_110920_02.CSV
 a = fed3.load(p)
 b = fed3.load(r)
 
-b = fed3.align(b, 'time')
+metrics = 'pellets',
+alignments = 'datetime', 'time', 'elapsed'
 
-a = fed3.SimpleLine().runfor([a, b], plot=True)
+for metric in metrics:
+    for align in alignments:
+        for cumulative in True, False:
+            print(metric, align, cumulative)
+            c = fed3.SimpleLine(y=metric,
+                                align=align,
+                                cumulative=cumulative).runfor([a, b], plot=True)

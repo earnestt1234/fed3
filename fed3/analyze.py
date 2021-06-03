@@ -14,39 +14,32 @@ import pandas as pd
 
 from fed3.fed import align
 
-from fed3.lightcycle import LIGHTCYCLE
-
 from fed3.metrics import metricsdict
 
 from fed3.plotting import _plot_line_data
 
-def determine_alignment(feds):
+def determine_alignment(feds, mixed='datetime'):
     alignments = set(f._alignment for f in feds)
-    return 'datetime' if len(alignments) > 1 else list(alignments)[0]
-
-def set_lightcycle(on, off):
-    LIGHTCYCLE['on'] = on
-    LIGHTCYCLE['off'] = off
+    return mixed if len(alignments) > 1 else list(alignments)[0]
 
 class FED3Analysis(metaclass=ABCMeta):
     def __init__(self):
-        self.data = None
-        self.feds = None
+        self.data = pd.DataFrame()
+        self.feds = []
 
     @abstractmethod
     def runfor(self, feds):
         pass
 
     @abstractmethod
-    def rerun(self):
-        pass
-
-    @abstractmethod
     def plot(self):
         pass
 
+    def rerun(self):
+        self.runfor(self.feds)
+
 class SimpleLine(FED3Analysis):
-    def __init__(self, y='pellets', align=None, cumulative='auto'):
+    def __init__(self, y, align=None, cumulative='auto'):
         super().__init__()
         self.y = y
         self.align = align
@@ -55,10 +48,19 @@ class SimpleLine(FED3Analysis):
         self.cumulative = cumulative
         self._metric = None
 
-    def runfor(self, feds, plot=False):
+    def runfor(self, feds, plot=False, mixed_align='raise'):
         self.feds = self._handle_feds(feds)
         if self.align is not None:
             self.feds = [align(f, self.align) for f in self.feds]
+        if determine_alignment(self.feds, 'mixed') == 'mixed':
+            if mixed_align == 'raise':
+                raise ValueError('The passed feds have mixed alignment; '
+                                 'you can either align them with the `align` argument '
+                                 'or force plotting by setting the `mixed_align` argument.')
+            if mixed_align == 'warn':
+                print("PLACE A REAL WARNING HERE")
+            elif mixed_align != 'ignore':
+                raise ValueError('`mixed_align` must be "ignore", "warn", or "raise"')
         self.data = pd.DataFrame()
         self._metric = metricsdict[self.y]
         for fed in self.feds:
@@ -72,11 +74,11 @@ class SimpleLine(FED3Analysis):
         return self
 
     def rerun(self):
-        return self.run(self.feds)
+        return self.runfor(self.feds)
 
     def plot(self, xaxis='auto', shadedark=True, ax=None, legend=True):
         if ax is None:
-            ax = plt.gca()
+            fig, ax = plt.subplots()
 
         if xaxis == 'auto':
             xaxis = determine_alignment(self.feds)
@@ -95,6 +97,10 @@ class SimpleLine(FED3Analysis):
         if not isinstance(feds, Iterable):
             feds = [feds]
         return feds
+
+class Histogram(FED3Analysis):
+    def __init__(self, y='ipi', logx=False,):
+        super().__init__()
 
 
 

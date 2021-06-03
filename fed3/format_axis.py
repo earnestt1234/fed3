@@ -80,7 +80,25 @@ def format_xaxis_time(ax, start, end):
         hours_start = hours_start[1:]
     ax.set_xlabel(f'Hours since startpoint ({hours_start})')
 
+def format_xaxis_elapsed(ax, start, end):
+    start = start.floor('1H')
+    end = end.ceil('1H')
+    diff = (end - start).total_seconds() / 3600
 
+    if diff <= 3:
+        ticks = pd.date_range(start, end, freq='30T')
+    else:
+        freq = 1
+        while (diff // freq) > 5:
+            freq += 1
+        ticks = pd.date_range(start, end, freq=f'{freq}H')
+
+    ticklabels = ((ticks - ticks[0]).total_seconds() / 3600).astype(int)
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(ticklabels)
+
+    ax.set_xlabel('Elapsed time (h)')
 
 FORMAT_XAXIS_OPTS = {'datetime': format_xaxis_datetime,
-                     'time': format_xaxis_time}
+                     'time': format_xaxis_time,
+                     'elapsed': format_xaxis_elapsed}
