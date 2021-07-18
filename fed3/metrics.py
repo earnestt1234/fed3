@@ -32,7 +32,7 @@ def filterout(series, dropna=False, dropzero=False, deduplicate=False):
     return series
 
 def get_pellets(fed):
-    y = fed.data['Pellet_Count']
+    y = fed['Pellet_Count']
     y = filterout(y, deduplicate=True)
     return y
 

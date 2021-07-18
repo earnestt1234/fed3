@@ -19,10 +19,10 @@ alignments = 'datetime', 'time', 'elapsed'
 
 a.meals()
 
-# for metric in metrics:
-#     for align in alignments:
-#         for cumulative in True, False:
-#             print(metric, align, cumulative)
-#             c = fed3.SimpleLine(y=metric,
-#                                 align=align,
-#                                 cumulative=cumulative).runfor([a, b], plot=True)
+for metric in metrics:
+    for align in alignments:
+        for cumulative in True, False:
+            print(metric, align, cumulative)
+            c = fed3.SimpleLine(y=metric,
+                                align=align,
+                                cumulative=cumulative).runfor([a, b], plot=True)
