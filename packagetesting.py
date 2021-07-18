@@ -17,10 +17,12 @@ b = fed3.load(r)
 metrics = 'pellets',
 alignments = 'datetime', 'time', 'elapsed'
 
-for metric in metrics:
-    for align in alignments:
-        for cumulative in True, False:
-            print(metric, align, cumulative)
-            c = fed3.SimpleLine(y=metric,
-                                align=align,
-                                cumulative=cumulative).runfor([a, b], plot=True)
+a.meals()
+
+# for metric in metrics:
+#     for align in alignments:
+#         for cumulative in True, False:
+#             print(metric, align, cumulative)
+#             c = fed3.SimpleLine(y=metric,
+#                                 align=align,
+#                                 cumulative=cumulative).runfor([a, b], plot=True)
