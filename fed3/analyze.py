@@ -16,7 +16,8 @@ from fed3.fedframe import align
 
 from fed3.metrics import metricsdict
 
-from fed3.plotting import _plot_line_data
+from fed3.plotting import (plot_line_data,
+                           plot_hist_data)
 
 def determine_alignment(feds, mixed='datetime'):
     alignments = set(f._alignment for f in feds)
@@ -35,10 +36,10 @@ class FED3Analysis(metaclass=ABCMeta):
     def plot(self):
         pass
 
-    def rerun(self):
-        self.runfor(self.feds)
+    def rerun(self, *args, **kwargs):
+        self.runfor(self.feds, *args, **kwargs)
 
-class SimpleLine(FED3Analysis):
+class TimestampsByFEDs(FED3Analysis):
     def __init__(self, y, align=None, cumulative='auto'):
         super().__init__()
         self.y = y
@@ -73,10 +74,13 @@ class SimpleLine(FED3Analysis):
 
         return self
 
-    def rerun(self):
-        return self.runfor(self.feds)
+    def _handle_feds(self, feds):
+        if isinstance(feds, pd.DataFrame):
+            feds = [feds]
+        return feds
 
-    def plot(self, xaxis='auto', shadedark=True, ax=None, legend=True):
+class SimpleLine(TimestampsByFEDs):
+    def plot(self, xaxis='auto', shadedark=True, ax=None, legend=True, **kwargs):
         if ax is None:
             fig, ax = plt.subplots()
 
@@ -86,21 +90,29 @@ class SimpleLine(FED3Analysis):
         if xaxis == 'elapsed':
             shadedark=False
 
-        _plot_line_data(data=self.data,
-                        ax=ax,
-                        shadedark=shadedark,
-                        legend=legend,
-                        xaxis=xaxis,
-                        ylabel=self._metric.nicename)
+        plot_line_data(ax=ax,
+                       data=self.data,
+                       shadedark=shadedark,
+                       legend=legend,
+                       xaxis=xaxis,
+                       ylabel=self._metric.nicename,
+                       **kwargs)
 
-    def _handle_feds(self, feds):
-        if not isinstance(feds, Iterable):
-            feds = [feds]
-        return feds
+class IPI(TimestampsByFEDs):
+    def __init__(self):
+        super().__init__(y='ipi')
 
-class Histogram(FED3Analysis):
-    def __init__(self, y='ipi', logx=False,):
-        super().__init__()
+    def plot(self, logx=False, kde=True, ax=None, **kwargs):
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        plot_hist_data(ax=ax,
+                       data=self.data,
+                       logx=logx,
+                       kde=kde,
+                       xlabel=self._metric.nicename,
+                       **kwargs)
+
 
 
 

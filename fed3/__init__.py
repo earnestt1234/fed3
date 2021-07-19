@@ -2,7 +2,7 @@
 
 #imports for package namespace
 
-from .analyze import SimpleLine
+from .analyze import *
 
 from .fedframe import (FEDFrame,
                        align,

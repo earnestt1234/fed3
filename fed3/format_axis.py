@@ -57,6 +57,7 @@ def format_xaxis_datetime(ax, start, end):
     ax.xaxis.set_major_locator(major)
     ax.xaxis.set_major_formatter(xfmt)
     ax.xaxis.set_minor_locator(minor)
+    ax.set_xlabel('Time')
 
 def format_xaxis_time(ax, start, end):
     start = start.floor('1H')

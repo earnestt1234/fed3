@@ -6,6 +6,8 @@ Created on Fri Apr 30 18:27:07 2021
 @author: earnestt1234
 """
 
+import numpy as np
+
 class Metric:
     def __init__(self, key, nicename, defaultagg='mean',
                  cumulative=None, noncumulative=None,):
@@ -42,14 +44,19 @@ def get_binary_pellets(fed):
     return y
 
 def get_ipi(fed):
-    y = fed.interpellet_intervals()
+    y = fed.ipi()
     y = filterout(y, dropna=True)
     return y
 
+def get_log_ipi(fed):
+    y = fed.ipi()
+    y = filterout(y, dropna=True)
+    return np.log10(y)
+
 pellets = Metric('pellets', 'Pellets', 'mean',
                  get_pellets, get_binary_pellets)
-ipi = Metric('ipi', 'Interpellet Intervals', 'mean',
+ipi = Metric('ipi', 'Interpellet Intervals (min)', 'mean',
              cumulative=None, noncumulative=get_ipi)
 
 metricsdict = {'pellets': pellets,
-               'ipi': ipi}
+               'ipi': ipi,}
