@@ -4,11 +4,11 @@
 
 from .analyze import SimpleLine
 
-from .fed import (FED,
-                  align,
-                  can_concat,
-                  concat,
-                  load,
-                  split,)
+from .fedframe import (FEDFrame,
+                       align,
+                       can_concat,
+                       concat,
+                       load,
+                       split,)
 
 from .lightcycle import set_lightcycle

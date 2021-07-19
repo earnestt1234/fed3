@@ -12,7 +12,7 @@ from collections import Iterable
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from fed3.fed import align
+from fed3.fedframe import align
 
 from fed3.metrics import metricsdict
 

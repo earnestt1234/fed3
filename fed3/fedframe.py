@@ -35,13 +35,13 @@ data_dict = {'pellets': 'Pellet_Count',
 
 zero_date = pd.Timestamp(year=1980, month=1, day=1)
 
-class FED(pd.DataFrame):
+class FEDFrame(pd.DataFrame):
     _metadata = ('name', 'path', 'foreign_columns', 'missing_columns',
                  '_alignment', '_current_offset')
 
     @property
     def _constructor(self):
-        return FED
+        return FEDFrame
 
     @property
     def mode(self):
@@ -286,8 +286,7 @@ def concat(feds, name=None, add_concat_number=True):
 
     return newfed
 
-def load(path, index_col='MM:DD:YYYY hh:mm:ss', add_columns=True,
-         add_columns_errors='skip', dropna=True):
+def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True):
     # read the path
     name, ext = os.path.splitext(path)
     ext = ext.lower()
@@ -301,7 +300,7 @@ def load(path, index_col='MM:DD:YYYY hh:mm:ss', add_columns=True,
         feddata = feddata.dropna(how='all')
 
     name = os.path.basename(name)
-    f = FED(feddata)
+    f = FEDFrame(feddata)
     f._load_init(name=name, path=path)
 
     return f
