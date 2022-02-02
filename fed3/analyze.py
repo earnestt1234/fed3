@@ -7,65 +7,52 @@ Created on Fri Apr 30 18:06:53 2021
 """
 
 from abc import ABCMeta, abstractmethod
-from collections import Iterable
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from fed3.fedframe import align
+from fed3.fedfuncs import determine_alignment, screen_mixed_alignment
 
 from fed3.metrics import metricsdict
 
 from fed3.plotting import (plot_line_data,
                            plot_hist_data)
 
-def determine_alignment(feds, mixed='datetime'):
-    alignments = set(f._alignment for f in feds)
-    return mixed if len(alignments) > 1 else list(alignments)[0]
-
 class FED3Analysis(metaclass=ABCMeta):
     def __init__(self):
         self.data = pd.DataFrame()
-        self.feds = []
 
     @abstractmethod
-    def runfor(self, feds):
+    def run(self, feds):
         pass
 
     @abstractmethod
     def plot(self):
         pass
 
-    def rerun(self, *args, **kwargs):
-        self.runfor(self.feds, *args, **kwargs)
-
 class TimestampsByFEDs(FED3Analysis):
-    def __init__(self, y, align=None, cumulative='auto'):
+    def __init__(self, y):
         super().__init__()
         self.y = y
-        self.align = align
-        if cumulative == 'auto':
-            cumulative = True
-        self.cumulative = cumulative
         self._metric = None
 
-    def runfor(self, feds, plot=False, mixed_align='raise'):
-        self.feds = self._handle_feds(feds)
-        if self.align is not None:
-            self.feds = [align(f, self.align) for f in self.feds]
-        if determine_alignment(self.feds, 'mixed') == 'mixed':
-            if mixed_align == 'raise':
-                raise ValueError('The passed feds have mixed alignment; '
-                                 'you can either align them with the `align` argument '
-                                 'or force plotting by setting the `mixed_align` argument.')
-            if mixed_align == 'warn':
-                print("PLACE A REAL WARNING HERE")
-            elif mixed_align != 'ignore':
-                raise ValueError('`mixed_align` must be "ignore", "warn", or "raise"')
+    def _set_metric(self, y):
+        if isinstance(y, str):
+            self._metric = metricsdict[y]
+        else:
+            self._metric = y
+
+    def _handle_feds(self, feds):
+        if isinstance(feds, pd.DataFrame):
+            feds = [feds]
+        return feds
+
+    def run(self, feds, plot=False, mixed_align='raise'):
+        screen_mixed_alignment(feds, option=mixed_align)
         self.data = pd.DataFrame()
-        self._metric = metricsdict[self.y]
+        self._set_metric(self.y)
         for fed in self.feds:
-            y = self._metric(fed, self.cumulative)
+            y = self._metric(fed)
             y.name = fed.name
             self.data = self.data.join(y, how='outer')
 
@@ -73,11 +60,6 @@ class TimestampsByFEDs(FED3Analysis):
             self.plot()
 
         return self
-
-    def _handle_feds(self, feds):
-        if isinstance(feds, pd.DataFrame):
-            feds = [feds]
-        return feds
 
 class SimpleLine(TimestampsByFEDs):
     def plot(self, xaxis='auto', shadedark=True, ax=None, legend=True, **kwargs):

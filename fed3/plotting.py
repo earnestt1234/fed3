@@ -7,7 +7,6 @@ Created on Sun May  9 12:42:13 2021
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
 
 from fed3.format_axis import (FORMAT_XAXIS_OPTS,)
