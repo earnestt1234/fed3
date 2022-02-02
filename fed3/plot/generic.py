@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun May  9 12:42:13 2021
+Created on Wed Feb  2 12:31:45 2022
 
 @author: earnestt1234
 """
@@ -9,9 +9,9 @@ Created on Sun May  9 12:42:13 2021
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from fed3.format_axis import (FORMAT_XAXIS_OPTS,)
+from fed3.plot.format_axis import (FORMAT_XAXIS_OPTS,)
 
-from fed3.lightcycle import (LIGHTCYCLE,
+from fed3.plot.lightcycle import (LIGHTCYCLE,
                              shade_darkness)
 
 prop_cycle = plt.rcParams['axes.prop_cycle']

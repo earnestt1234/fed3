@@ -2,4 +2,5 @@
 
 #imports for package namespace
 
-from fed3.fedframe import *
+from .ipi import *
+from .simple import *
