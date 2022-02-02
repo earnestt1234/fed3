@@ -115,17 +115,24 @@ def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True):
     return f
 
 def screen_mixed_alignment(feds, option='raise'):
+
     alignment = determine_alignment(feds)
+
     if alignment != 'mixed':
-        return True
+        return alignment
+
     if option == 'raise':
         raise ValueError('The passed feds have mixed alignment; '
                          'you can either align them with the `align` argument '
                          'or force plotting by setting the `mixed_align` argument.')
+
     elif option == 'warn':
         print("PLACE A REAL WARNING HERE")
+
     elif option != 'ignore':
         raise ValueError('Mixed alignment option must be "ignore", "warn", or "raise"')
+
+    return alignment
 
 def split(fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'),
           return_empty=False):

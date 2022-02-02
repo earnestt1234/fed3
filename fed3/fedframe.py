@@ -11,7 +11,7 @@ from difflib import SequenceMatcher
 import numpy as np
 import pandas as pd
 
-fixed_cols = ['Device_Number',
+FIXED_COLS = ['Device_Number',
               'Battery_Voltage',
               'Motor_Turns',
               'Session_Type',
@@ -22,7 +22,7 @@ fixed_cols = ['Device_Number',
               'Pellet_Count',
               'Retrieval_Time',]
 
-needed_cols = ['Pellet_Count',
+NEEDED_COLS = ['Pellet_Count',
                'Left_Poke_Count',
                'Right_Poke_Count',]
 
@@ -65,13 +65,13 @@ class FEDFrame(pd.DataFrame):
     def fix_column_names(self):
         self.foreign_columns = []
         for col in self.columns:
-            for fix in fixed_cols:
+            for fix in FIXED_COLS:
                 likeness = SequenceMatcher(a=col, b=fix).ratio()
                 if likeness > 0.85:
                     self.rename(columns={col:fix}, inplace=True)
                     break
                 self.foreign_columns.append(col)
-        self.missing_columns = [col for col in needed_cols if
+        self.missing_columns = [col for col in NEEDED_COLS if
                                 col not in self.columns]
 
     def determine_mode(self):

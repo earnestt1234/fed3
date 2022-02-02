@@ -4,8 +4,9 @@
 
 from .analyze import *
 
-from .fedframe import (FEDFrame,
-                       align,
+from .fedframe import FEDFrame
+
+from .fedfuncs import (align,
                        can_concat,
                        concat,
                        load,

@@ -8,22 +8,7 @@ Created on Fri Apr 30 18:27:07 2021
 
 import numpy as np
 
-class Metric:
-    def __init__(self, key, nicename, defaultagg='mean',
-                 cumulative=None, noncumulative=None,):
-        self.key = key
-        self.nicename = nicename
-        self.cumulative = cumulative
-        self.noncumulative = noncumulative
-        self.defaultagg = defaultagg
-
-    def __call__(self, fed, cumulative=True, use_other=True):
-        options = {True: self.cumulative, False: self.noncumulative}
-        func = options[cumulative]
-        if func is None and use_other:
-            func = options[not cumulative]
-        return func(fed)
-
+# helper function
 def filterout(series, dropna=False, dropzero=False, deduplicate=False):
     if dropna:
         series = series.dropna()
@@ -33,6 +18,7 @@ def filterout(series, dropna=False, dropzero=False, deduplicate=False):
         series = series[~series.duplicated()]
     return series
 
+# metric functions
 def get_pellets(fed):
     y = fed['Pellet_Count']
     y = filterout(y, deduplicate=True)
@@ -53,10 +39,12 @@ def get_log_ipi(fed):
     y = filterout(y, dropna=True)
     return np.log10(y)
 
-pellets = Metric('pellets', 'Pellets', 'mean',
-                 get_pellets, get_binary_pellets)
-ipi = Metric('ipi', 'Interpellet Intervals (min)', 'mean',
-             cumulative=None, noncumulative=get_ipi)
+METRICS = {'pellets': get_pellets,
+           'bpellets': get_binary_pellets,
+           'cpellets': get_pellets,
+           'ipi': get_ipi}
 
-metricsdict = {'pellets': pellets,
-               'ipi': ipi,}
+METRICNAMES = {'pellets': 'Pellets',
+               'bpellets': 'Pellets',
+               'cpellets': 'Pellets',
+               'ipi': 'Interpellet Intervals'}
