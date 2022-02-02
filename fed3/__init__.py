@@ -2,7 +2,7 @@
 
 #imports for package namespace
 
-from .analyze import *
+from .plots import *
 
 from .fedframe import FEDFrame
 
