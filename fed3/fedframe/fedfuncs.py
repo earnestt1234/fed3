@@ -122,9 +122,7 @@ def screen_mixed_alignment(feds, option='raise'):
         return alignment
 
     if option == 'raise':
-        raise ValueError('The passed feds have mixed alignment; '
-                         'you can either align them with the `align` argument '
-                         'or force plotting by setting the `mixed_align` argument.')
+        raise ValueError('The passed FEDS have mixed alignment.')
 
     elif option == 'warn':
         print("PLACE A REAL WARNING HERE")

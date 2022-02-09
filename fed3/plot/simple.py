@@ -12,14 +12,13 @@ import pandas as pd
 from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
 from fed3.plot.generic import (plot_line_data,
-                          plot_scatter_data)
+                               plot_scatter_data)
 
-from fed3.plot.helpers import (_get_return_value,
-                          _handle_feds)
-
-from fed3.plot.metrics import (_create_metric_df,
-                          _get_metric,
-                          _get_metricname)
+from fed3.plot.helpers import (_create_metric_df,
+                               _get_metric,
+                               _get_metricname,
+                               _get_return_value,
+                               _handle_feds,)
 
 # ---- low level plotting
 def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='plot',
@@ -73,9 +72,9 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
 # ---- public plotting functions
-def line_plot(feds, y='pellets', mixed_align='raise', output='plot',
-              xaxis='auto', shadedark=True, ax=None, legend=True,
-              fed_styles=None, **kwargs):
+def line(feds, y='pellets', mixed_align='raise', output='plot',
+         xaxis='auto', shadedark=True, ax=None, legend=True,
+         fed_styles=None, **kwargs):
 
     return _simple_plot(kind='line',
                         feds=feds,
@@ -89,9 +88,9 @@ def line_plot(feds, y='pellets', mixed_align='raise', output='plot',
                         fed_styles=fed_styles,
                         **kwargs)
 
-def scatter_plot(feds, y='pellets', mixed_align='raise', output='plot',
-                 xaxis='auto', shadedark=True, ax=None, legend=True,
-                 fed_styles=None, **kwargs):
+def scatter(feds, y='pellets', mixed_align='raise', output='plot',
+            xaxis='auto', shadedark=True, ax=None, legend=True,
+            fed_styles=None, **kwargs):
 
     return _simple_plot(kind='scatter',
                         feds=feds,

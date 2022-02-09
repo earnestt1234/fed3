@@ -13,15 +13,14 @@ from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
 from fed3.plot.generic import (plot_hist_data)
 
-from fed3.plot.helpers import (_get_return_value,
-                          _handle_feds)
+from fed3.plot.helpers import (_create_metric_df,
+                               _get_metric,
+                               _get_metricname,
+                               _get_return_value,
+                               _handle_feds,)
 
-from fed3.plot.metrics import (_create_metric_df,
-                          _get_metric,
-                          _get_metricname)
-
-def ipi_plot(feds, logx=True, kde=True, mixed_align='raise', output='plot',
-             ax=None, legend=True, fed_styles=None, **kwargs):
+def ipi(feds, logx=True, kde=True, mixed_align='raise', output='plot',
+        ax=None, legend=True, fed_styles=None, **kwargs):
     # set the outputs
     FIG = None
     DATA = pd.DataFrame()

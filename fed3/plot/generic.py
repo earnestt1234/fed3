@@ -7,12 +7,14 @@ Created on Wed Feb  2 12:31:45 2022
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
-from fed3.plot.format_axis import (FORMAT_XAXIS_OPTS,)
+from fed3.lightcycle import LIGHTCYCLE
 
-from fed3.plot.lightcycle import (LIGHTCYCLE,
-                             shade_darkness)
+from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
+
+from fed3.plot.shadedark import shade_darkness
 
 prop_cycle = plt.rcParams['axes.prop_cycle']
 COLORCYCLE = prop_cycle.by_key()['color']

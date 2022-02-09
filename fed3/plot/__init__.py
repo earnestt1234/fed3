@@ -2,5 +2,5 @@
 
 #imports for package namespace
 
-from .ipi import *
-from .simple import *
+from .ipi import (ipi)
+from .simple import (line, scatter)
