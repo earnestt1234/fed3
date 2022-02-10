@@ -8,6 +8,7 @@ Created on Wed Feb  2 12:31:45 2022
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
 from fed3.lightcycle import LIGHTCYCLE
@@ -30,23 +31,14 @@ def _apply_fed_styles(style_func, fedname, plot_kwargs):
 def plot_hist_data(ax, data, logx, kde, xlabel, fed_styles=None, legend=True,
                    **kwargs):
 
-    for i, col in enumerate(data.columns):
+    data = pd.melt(data,
+                   value_vars=data.columns,
+                   var_name="FED",
+                   value_name='ipi').dropna()
 
-        plot_kwargs = kwargs.copy()
-        plot_kwargs['color'] = COLORCYCLE[i]
-        plot_kwargs['kde'] = kde
-        plot_kwargs['label'] = col
-        plot_kwargs['log_scale'] = logx
-        if fed_styles is not None:
-            _apply_fed_styles(fed_styles, fedname=col, plot_kwargs=plot_kwargs)
-
-        y = data[col].dropna()
-        sns.histplot(y, **plot_kwargs)
-
+    sns.histplot(data=data, x='ipi', hue='FED', log_scale=logx, kde=kde,
+                 legend=legend, **kwargs)
     ax.set_xlabel(xlabel)
-
-    if legend:
-        ax.legend()
 
     return ax.get_figure()
 
