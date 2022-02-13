@@ -3,4 +3,4 @@
 #imports for package namespace
 
 from .ipi import (ipi)
-from .simple import (line, scatter)
+from .simple import (line, scatter, _simple_group_plot)

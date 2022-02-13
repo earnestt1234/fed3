@@ -14,7 +14,8 @@ from fed3.fedframe.fedfuncs import screen_mixed_alignment
 from fed3.plot.generic import (plot_line_data,
                                plot_scatter_data)
 
-from fed3.plot.helpers import (_create_metric_df,
+from fed3.plot.helpers import (_create_group_metric_df,
+                               _create_metric_df,
                                _get_metric,
                                _get_metricname,
                                _get_return_value,
@@ -68,6 +69,63 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
                        ylabel=metricname,
                        fed_styles=fed_styles,
                        **kwargs)
+
+    return _get_return_value(FIG=FIG, DATA=DATA, output=output)
+
+def _simple_group_plot(feds, y='pellets', freq='1H', agg='mean', var='std',
+                       mixed_align='raise', output='plot',
+                       xaxis='auto', shadedark=True, ax=None, legend=True,
+                       fed_styles=None, **kwargs):
+
+    # set the outputs
+    FIG = None
+    DATA = pd.DataFrame()
+
+    # setup input arguments
+    feds_dict = {k:_handle_feds(v) for k, v in feds.items()}
+    feds_all = []
+    for l in feds.values():
+        feds_all += l
+
+    # screen issues alignment
+    alignment = screen_mixed_alignment(feds_all, option=mixed_align)
+
+    # get resample time
+    origin = min(f.start_time.floor('1H') for f in feds_all)
+
+    # compute data
+    metric = _get_metric(y)
+    metricname = _get_metricname(y)
+    AGGDATA, VARDATA = _create_group_metric_df(feds=feds_dict,
+                                               metric=metric,
+                                               agg=agg,
+                                               var=var,
+                                               freq=freq,
+                                               origin=origin)
+
+    # create return data
+    DATA = AGGDATA
+
+    # handle plot creation and returns
+    if output in ['plot', 'data', 'both']:
+
+        if ax is None:
+            ax = plt.gca()
+
+        if xaxis == 'auto':
+            xaxis = alignment
+
+        if xaxis == 'elapsed':
+            shadedark = False
+
+        FIG = plot_line_data(ax=ax,
+                             data=AGGDATA,
+                             shadedark=shadedark,
+                             legend=legend,
+                             xaxis=xaxis,
+                             ylabel=metricname,
+                             fed_styles=fed_styles,
+                             **kwargs)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
