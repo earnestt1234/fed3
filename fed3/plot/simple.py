@@ -12,6 +12,7 @@ import pandas as pd
 from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
 from fed3.plot.generic import (plot_line_data,
+                               plot_line_error,
                                plot_scatter_data)
 
 from fed3.plot.helpers import (_create_group_metric_df,
@@ -72,7 +73,7 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
-def _simple_group_plot(feds, y='pellets', freq='1H', agg='mean', var='std',
+def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
                        mixed_align='raise', output='plot',
                        xaxis='auto', shadedark=True, ax=None, legend=True,
                        fed_styles=None, **kwargs):
@@ -100,7 +101,7 @@ def _simple_group_plot(feds, y='pellets', freq='1H', agg='mean', var='std',
                                                metric=metric,
                                                agg=agg,
                                                var=var,
-                                               freq=freq,
+                                               bins=bins,
                                                origin=origin)
 
     # create return data
@@ -125,7 +126,10 @@ def _simple_group_plot(feds, y='pellets', freq='1H', agg='mean', var='std',
                              xaxis=xaxis,
                              ylabel=metricname,
                              fed_styles=fed_styles,
+                             drawstyle='default',
                              **kwargs)
+
+        plot_line_error(ax=ax, aggdata=AGGDATA, vardata=VARDATA)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 

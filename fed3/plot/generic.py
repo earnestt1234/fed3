@@ -72,6 +72,16 @@ def plot_line_data(ax, data, xaxis='datetime', shadedark=True,
 
     return ax.get_figure()
 
+def plot_line_error(ax, aggdata, vardata, alpha=.3):
+
+    for i, col in enumerate(vardata.columns):
+
+        y = aggdata[col]
+        yerr = vardata[col]
+        x = vardata.index
+        ax.fill_between(x=x, y1=y+yerr, y2=y-yerr, alpha=alpha)
+
+
 def plot_scatter_data(ax, data, xaxis='datetime', shadedark=True,
                       legend=True, drawstyle='steps', ylabel='',
                       fed_styles=None, **kwargs):

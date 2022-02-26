@@ -5,87 +5,59 @@ Created on Fri Apr 30 18:27:07 2021
 
 @author: earnestt1234
 """
-from abc import ABCMeta, abstractmethod
 
-import pandas as pd
-import numpy as np
+from fed3.metrics_helpers import (_default_metric,
+                                  get_binary_pellets,
+                                  get_cumulative_pellets,
+                                  get_ipi)
 
-# ---- helper functions
-def filterout(series, dropna=False, dropzero=False, deduplicate=False):
-    if dropna:
-        series = series.dropna()
-    if dropzero:
-        series = series[series != 0]
-    if deduplicate:
-        series = series[~series.duplicated()]
-    return series
+def binary_pellets(fed, bins=None, origin='start'):
 
-# # ---- Metric Class
+    return _default_metric(fed,
+                           nonbinned_func=get_binary_pellets,
+                           binned_func=get_binary_pellets,
+                           bins=bins,
+                           origin=origin,
+                           agg='sum')
 
-class Metric(metaclass=ABCMeta):
+def cumulative_pellets(fed, bins=None, origin='start'):
 
-    @classmethod
-    @abstractmethod
-    def cumulative(fed, **kwargs):
-        ...
+    return _default_metric(fed,
+                           nonbinned_func=get_cumulative_pellets,
+                           binned_func=get_cumulative_pellets,
+                           bins=bins,
+                           origin=origin,
+                           agg='mean')
 
-    @classmethod
-    @abstractmethod
-    def noncumulative(fed, **kwargs):
-        ...
+def pellets(fed, bins=None, origin='start'):
 
-    @classmethod
-    @abstractmethod
-    def binned(fed, bins, origin, **kwargs):
-        ...
+    return _default_metric(fed,
+                           nonbinned_func=get_cumulative_pellets,
+                           binned_func=get_binary_pellets,
+                           bins=bins,
+                           origin=origin,
+                           agg='sum')
 
-class Pellets(Metric):
+def ipi(fed, bins=None, origin='start'):
 
-    def cumulative(self, fed):
-        return get_pellets(fed)
+    return _default_metric(fed,
+                           nonbinned_func=get_ipi,
+                           binned_func=get_ipi,
+                           bins=bins,
+                           origin=origin,
+                           agg='mean')
 
-    def noncumulative(self, fed):
-        return get_binary_pellets(fed)
-
-    def binned(self, fed, bins, agg='sum', origin='start'):
-        G = pd.Grouper(freq=bins, origin=origin)
-        values = get_binary_pellets(fed).groupby(G).apply(agg)
-        return values
-
-    def __call__(self, fed):
-        return self.cumulative(fed)
-
-# ---- metric functions
-def get_pellets(fed):
-    y = fed['Pellet_Count']
-    y = filterout(y, deduplicate=True)
-    return y
-
-def get_binary_pellets(fed):
-    y = fed.binary_pellets()
-    y = filterout(y, dropzero=True)
-    return y
-
-def get_ipi(fed):
-    y = fed.ipi()
-    y = filterout(y, dropna=True)
-    return y
-
-def get_log_ipi(fed):
-    y = fed.ipi()
-    y = filterout(y, dropna=True)
-    return np.log10(y)
 
 # ---- module variables
 
 # link keywords to their default function
-METRICS = {'pellets': get_pellets,
-           'bpellets': get_binary_pellets,
-           'cpellets': get_pellets,
-           'ipi': get_ipi}
+METRICS = {'pellets': pellets,
+           'bpellets': binary_pellets,
+           'cpellets': cumulative_pellets,
+           'ipi': ipi}
 
-# link keywords to names
+# # link keywords to names
 METRICNAMES = {'pellets': 'Pellets',
-               'bpellets': 'Pellets',
-               'cpellets': 'Pellets',
-               'ipi': 'Interpellet Intervals'}
+                'bpellets': 'Pellets',
+                'cpellets': 'Pellets',
+                'ipi': 'Interpellet Intervals'}
