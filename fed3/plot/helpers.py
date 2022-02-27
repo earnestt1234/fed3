@@ -10,10 +10,10 @@ import pandas as pd
 
 from fed3.metrics import METRICS, METRICNAMES
 
-def _create_metric_df(feds, metric):
+def _create_metric_df(feds, metric, bins=None, origin='start'):
     df = pd.DataFrame()
     for fed in feds:
-        y = metric(fed)
+        y = metric(fed, bins=bins, origin=origin)
         y.name = fed.name
         df = df.join(y, how='outer')
 

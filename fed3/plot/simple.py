@@ -23,7 +23,8 @@ from fed3.plot.helpers import (_create_group_metric_df,
                                _handle_feds,)
 
 # ---- low level plotting
-def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='plot',
+def _simple_plot(feds, kind='line', y='pellets', bins=None,
+                 mixed_align='raise', output='plot',
                  xaxis='auto', shadedark=True, ax=None, legend=True,
                  fed_styles=None, **kwargs):
 
@@ -48,7 +49,7 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
     # compute data
     metric = _get_metric(y)
     metricname = _get_metricname(y)
-    DATA = _create_metric_df(feds=feds, metric=metric)
+    DATA = _create_metric_df(feds=feds, metric=metric, bins=bins)
 
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
@@ -68,7 +69,7 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
                        legend=legend,
                        xaxis=xaxis,
                        ylabel=metricname,
-                       fed_styles=fed_styles,
+                       line_styles=fed_styles,
                        **kwargs)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
@@ -137,21 +138,42 @@ def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
 # ---- public plotting functions
-def line(feds, y='pellets', mixed_align='raise', output='plot',
+def line(feds, y='pellets', bins='1H', agg='mean', var='std',
+         omit_na=False, mixed_align='raise', output='plot',
          xaxis='auto', shadedark=True, ax=None, legend=True,
          fed_styles=None, **kwargs):
 
-    return _simple_plot(kind='line',
-                        feds=feds,
-                        y=y,
-                        mixed_align=mixed_align,
-                        output=output,
-                        xaxis=xaxis,
-                        shadedark=shadedark,
-                        ax=ax,
-                        legend=legend,
-                        fed_styles=fed_styles,
-                        **kwargs)
+    if isinstance(feds, dict):
+
+        return _simple_group_plot(feds=feds,
+                                  y=y,
+                                  bins=bins,
+                                  agg=agg,
+                                  var=var,
+                                  omit_na=omit_na,
+                                  mixed_align=mixed_align,
+                                  output=output,
+                                  xaxis=xaxis,
+                                  shadedark=shadedark,
+                                  ax=ax,
+                                  legend=legend,
+                                  fed_styles=fed_styles,
+                                  **kwargs)
+
+    else:
+
+        return _simple_plot(kind='line',
+                            feds=feds,
+                            y=y,
+                            bins=bins,
+                            mixed_align=mixed_align,
+                            output=output,
+                            xaxis=xaxis,
+                            shadedark=shadedark,
+                            ax=ax,
+                            legend=legend,
+                            fed_styles=fed_styles,
+                            **kwargs)
 
 def scatter(feds, y='pellets', mixed_align='raise', output='plot',
             xaxis='auto', shadedark=True, ax=None, legend=True,
