@@ -74,7 +74,7 @@ def _simple_plot(feds, kind='line', y='pellets', mixed_align='raise', output='pl
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
 def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
-                       mixed_align='raise', output='plot',
+                       omit_na=False, mixed_align='raise', output='plot',
                        xaxis='auto', shadedark=True, ax=None, legend=True,
                        fed_styles=None, **kwargs):
 
@@ -102,10 +102,13 @@ def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
                                                agg=agg,
                                                var=var,
                                                bins=bins,
-                                               origin=origin)
+                                               origin=origin,
+                                               omit_na=omit_na)
 
     # create return data
-    DATA = AGGDATA
+    lsuffix = f"_{agg}" if isinstance(agg, str) else "_agg"
+    rsuffix = f"_{var}" if isinstance(var, str) else "_var"
+    DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
 
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
@@ -125,7 +128,7 @@ def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
                              legend=legend,
                              xaxis=xaxis,
                              ylabel=metricname,
-                             fed_styles=fed_styles,
+                             line_styles=fed_styles,
                              drawstyle='default',
                              **kwargs)
 

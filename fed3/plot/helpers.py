@@ -20,7 +20,7 @@ def _create_metric_df(feds, metric):
     return df
 
 def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
-                            origin='start'):
+                            origin='start', omit_na=False):
     all_agg = pd.DataFrame()
     all_var = pd.DataFrame()
     for group, fedlist in feds.items():
@@ -29,6 +29,8 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
             y = metric(fed, bins=bins, origin=origin)
             y.name = fed.name
             fed_values = fed_values.join(y, how='outer')
+        if omit_na:
+            fed_values = fed_values.dropna()
         group_agg = fed_values.agg(agg, axis=1)
         group_var = fed_values.agg(var, axis=1)
         group_agg.name = group
