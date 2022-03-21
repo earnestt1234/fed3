@@ -6,7 +6,7 @@ Setup for `fed3`.
 @author: Tom Earnest
 """
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 requirements = []
 
@@ -17,6 +17,6 @@ setup(name='fed3',
       author='Tom Earnest',
       author_email='earnestt1234@gmail.com',
       license='CC',
-      packages=['fed3'],
+      packages=find_packages(),
       install_requires=requirements,
 	 )
