@@ -49,7 +49,8 @@ def plot_line_data(ax, data, xaxis='datetime', shadedark=True,
     for i, col in enumerate(data.columns):
 
         plot_kwargs = kwargs.copy()
-        plot_kwargs['color'] = COLORCYCLE[i]
+        plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
+                                else plot_kwargs.get("color"))
         plot_kwargs['drawstyle'] = drawstyle
         plot_kwargs['label'] = col
         if line_styles is not None:
@@ -60,7 +61,7 @@ def plot_line_data(ax, data, xaxis='datetime', shadedark=True,
         ax.plot(x, y, **plot_kwargs)
 
     if shadedark:
-        shade_darkness(ax, x.min(), x.max(),
+        shade_darkness(ax, data.index.min(), data.index.max(),
                        lights_on=LIGHTCYCLE['on'],
                        lights_off=LIGHTCYCLE['off'])
 
@@ -79,7 +80,7 @@ def plot_line_error(ax, aggdata, vardata, alpha=.3):
         y = aggdata[col]
         yerr = vardata[col]
         x = vardata.index
-        ax.fill_between(x=x, y1=y+yerr, y2=y-yerr, alpha=alpha)
+        ax.fill_between(x=x, y1=y+yerr, y2=y-yerr, alpha=alpha, color=COLORCYCLE[i])
 
 
 def plot_scatter_data(ax, data, xaxis='datetime', shadedark=True,
@@ -92,7 +93,7 @@ def plot_scatter_data(ax, data, xaxis='datetime', shadedark=True,
         plot_kwargs['color'] = COLORCYCLE[i]
         plot_kwargs['label'] = col
         if fed_styles is not None:
-            _apply_fed_styles(fed_styles, fedname=col, plot_kwargs=plot_kwargs)
+            _apply_line_styles(fed_styles, fedname=col, plot_kwargs=plot_kwargs)
 
         y = data[col].dropna()
         x = y.index

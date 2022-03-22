@@ -138,12 +138,14 @@ def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
 # ---- public plotting functions
-def line(feds, y='pellets', bins='1H', agg='mean', var='std',
+def line(feds, y='pellets', bins=None, agg='mean', var='std',
          omit_na=False, mixed_align='raise', output='plot',
          xaxis='auto', shadedark=True, ax=None, legend=True,
          fed_styles=None, **kwargs):
 
     if isinstance(feds, dict):
+
+        bins = '1H' if bins is None else bins
 
         return _simple_group_plot(feds=feds,
                                   y=y,
