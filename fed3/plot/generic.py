@@ -28,8 +28,7 @@ def _apply_line_styles(style_func, fedname, plot_kwargs):
         plot_kwargs.update(new_kwargs)
     return plot_kwargs
 
-def plot_hist_data(ax, data, logx, kde, xlabel, fed_styles=None, legend=True,
-                   **kwargs):
+def plot_hist_data(ax, data, logx, kde, xlabel, legend=True, **kwargs):
 
     data = pd.melt(data,
                    value_vars=data.columns,

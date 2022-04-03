@@ -37,3 +37,24 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
         all_var = all_var.join(group_var, how='outer')
 
     return all_agg, all_var
+
+def _stack_group_values(metric_df, feds_dict):
+
+    series = []
+
+    for group, feds in feds_dict.items():
+
+        group_vals = []
+
+        for fed in feds:
+
+            name = fed.name
+            vals = metric_df[name].dropna().to_list()
+            group_vals += vals
+
+        series.append(pd.Series(group_vals, name=group))
+
+    output = pd.concat(series, axis=1)
+
+    return output
+
