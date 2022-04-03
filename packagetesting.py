@@ -9,7 +9,6 @@ Created on Sat May  1 11:02:24 2021
 import fed3
 import fed3.plot as fplot
 
-import numpy as np
-
 # load FED data
-f = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED5Cat.csv")
+f = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED5Cat.csv')
+fplot.line(f, y='')

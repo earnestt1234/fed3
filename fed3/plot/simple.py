@@ -15,11 +15,12 @@ from fed3.plot.generic import (plot_line_data,
                                plot_line_error,
                                plot_scatter_data)
 
-from fed3.plot.helpers import (_create_group_metric_df,
-                               _create_metric_df,
-                               _get_metric,
-                               _get_metricname,
-                               _get_return_value,
+from fed3.metrics.tables import (_create_group_metric_df,
+                                 _create_metric_df,)
+
+from fed3.metrics.core import (_get_metric, _get_metricname,)
+
+from fed3.plot.helpers import (_get_return_value,
                                _handle_feds,)
 
 # ---- low level plotting

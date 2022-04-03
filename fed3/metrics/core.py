@@ -6,16 +6,16 @@ Created on Fri Apr 30 18:27:07 2021
 @author: earnestt1234
 """
 
-from fed3.metrics_helpers import (_default_metric,
-                                  get_binary_pellets,
-                                  get_cumulative_pellets,
-                                  get_ipi)
+from fed3.metrics.helpers import (_default_metric,
+                                  _get_binary_pellets,
+                                  _get_cumulative_pellets,
+                                  _get_ipi)
 
 def binary_pellets(fed, bins=None, origin='start'):
 
     return _default_metric(fed,
-                           nonbinned_func=get_binary_pellets,
-                           binned_func=get_binary_pellets,
+                           nonbinned_func=_get_binary_pellets,
+                           binned_func=_get_binary_pellets,
                            bins=bins,
                            origin=origin,
                            agg='sum')
@@ -23,8 +23,8 @@ def binary_pellets(fed, bins=None, origin='start'):
 def cumulative_pellets(fed, bins=None, origin='start'):
 
     return _default_metric(fed,
-                           nonbinned_func=get_cumulative_pellets,
-                           binned_func=get_cumulative_pellets,
+                           nonbinned_func=_get_cumulative_pellets,
+                           binned_func=_get_cumulative_pellets,
                            bins=bins,
                            origin=origin,
                            agg='mean')
@@ -32,8 +32,8 @@ def cumulative_pellets(fed, bins=None, origin='start'):
 def pellets(fed, bins=None, origin='start'):
 
     return _default_metric(fed,
-                           nonbinned_func=get_cumulative_pellets,
-                           binned_func=get_binary_pellets,
+                           nonbinned_func=_get_cumulative_pellets,
+                           binned_func=_get_binary_pellets,
                            bins=bins,
                            origin=origin,
                            agg='sum')
@@ -41,8 +41,8 @@ def pellets(fed, bins=None, origin='start'):
 def ipi(fed, bins=None, origin='start'):
 
     return _default_metric(fed,
-                           nonbinned_func=get_ipi,
-                           binned_func=get_ipi,
+                           nonbinned_func=_get_ipi,
+                           binned_func=_get_ipi,
                            bins=bins,
                            origin=origin,
                            agg='mean')
@@ -61,3 +61,19 @@ METRICNAMES = {'pellets': 'Pellets',
                 'bpellets': 'Pellets',
                 'cpellets': 'Pellets',
                 'ipi': 'Interpellet Intervals'}
+
+def _get_metric(y, kind=None):
+
+    key = y.lower()
+    try:
+        return METRICS[key]
+    except KeyError:
+        raise ValueError(f'y-value "{y}" is not recognized.')
+
+def _get_metricname(y):
+
+    key = y.lower()
+    try:
+        return METRICNAMES[key]
+    except KeyError:
+        raise ValueError(f'y-value "{y}" is not recognized.')
