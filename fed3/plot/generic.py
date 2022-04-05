@@ -42,15 +42,13 @@ def plot_hist_data(ax, data, logx, kde, xlabel, legend=True, **kwargs):
     return ax.get_figure()
 
 def plot_line_data(ax, data, xaxis='datetime', shadedark=True,
-                   legend=True, drawstyle='steps', ylabel='',
-                   line_styles=None, **kwargs):
+                   legend=True, ylabel='', line_styles=None, **kwargs):
 
     for i, col in enumerate(data.columns):
 
         plot_kwargs = kwargs.copy()
         plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
                                 else plot_kwargs.get("color"))
-        plot_kwargs['drawstyle'] = drawstyle
         plot_kwargs['label'] = col
         if line_styles is not None:
             _apply_line_styles(line_styles, fedname=col, plot_kwargs=plot_kwargs)
@@ -83,23 +81,23 @@ def plot_line_error(ax, aggdata, vardata, alpha=.3):
 
 
 def plot_scatter_data(ax, data, xaxis='datetime', shadedark=True,
-                      legend=True, drawstyle='steps', ylabel='',
-                      fed_styles=None, **kwargs):
+                      legend=True, ylabel='', line_styles=None, **kwargs):
 
     for i, col in enumerate(data.columns):
 
         plot_kwargs = kwargs.copy()
-        plot_kwargs['color'] = COLORCYCLE[i]
+        plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
+                                else plot_kwargs.get("color"))
         plot_kwargs['label'] = col
-        if fed_styles is not None:
-            _apply_line_styles(fed_styles, fedname=col, plot_kwargs=plot_kwargs)
+        if line_styles is not None:
+            _apply_line_styles(line_styles, fedname=col, plot_kwargs=plot_kwargs)
 
         y = data[col].dropna()
         x = y.index
         ax.scatter(x, y, **plot_kwargs)
 
     if shadedark:
-        shade_darkness(ax, x.min(), x.max(),
+        shade_darkness(ax, data.index.min(), data.index.max(),
                        lights_on=LIGHTCYCLE['on'],
                        lights_off=LIGHTCYCLE['off'])
 
@@ -110,3 +108,13 @@ def plot_scatter_data(ax, data, xaxis='datetime', shadedark=True,
     ax.set_ylabel(ylabel)
 
     return ax.get_figure()
+
+def plot_scatter_error(ax, aggdata, vardata):
+
+    for i, col in enumerate(vardata.columns):
+
+        y = aggdata[col]
+        yerr = vardata[col]
+        x = vardata.index
+        ax.errorbar(x=x, y=y, yerr=yerr, color=COLORCYCLE[i])
+

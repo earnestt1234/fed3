@@ -59,12 +59,6 @@ def cumulative_pellets(fed, bins=None, origin='start'):
                            origin=origin,
                            agg='mean')
 
-def pellets(fed, bins=None, origin='start'):
-
-    func = cumulative_pellets if bins is None else binary_pellets
-
-    return func(fed, bins=bins, origin=origin)
-
 def ipi(fed, bins=None, origin='start'):
 
     def _get_ipi(fed):
@@ -79,6 +73,25 @@ def ipi(fed, bins=None, origin='start'):
                            origin=origin,
                            agg='mean')
 
+def pellets(fed, bins=None, origin='start'):
+
+    func = cumulative_pellets if bins is None else binary_pellets
+
+    return func(fed, bins=bins, origin=origin)
+
+def retrival_time(fed, bins=None, origin='start'):
+
+    def _get_rt(fed):
+        y = fed['Retrieval_Time']
+        y = _filterout(y, dropna=True)
+        return y
+
+    return _default_metric(fed,
+                           nonbinned_func=_get_rt,
+                           binned_func=_get_rt,
+                           bins=bins,
+                           origin=origin,
+                           agg='mean')
 
 # ---- module variables
 
@@ -86,13 +99,15 @@ def ipi(fed, bins=None, origin='start'):
 METRICS = {'pellets': pellets,
            'bpellets': binary_pellets,
            'cpellets': cumulative_pellets,
-           'ipi': ipi}
+           'ipi': ipi,
+           'rt': retrival_time}
 
 # # link keywords to names
 METRICNAMES = {'pellets': 'Pellets',
                 'bpellets': 'Pellets',
                 'cpellets': 'Pellets',
-                'ipi': 'Interpellet Intervals'}
+                'ipi': 'Interpellet Intervals',
+                'rt': 'Retrieval Time (s)'}
 
 def _get_metric(y, kind=None):
 

@@ -12,12 +12,3 @@ import fed3.plot as fplot
 # load FED data
 a = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED5Cat.csv')
 b = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv')
-
-
-df = fplot.line(a)
-
-import pandas as pd
-
-x = pd.Series(range(10))
-y = pd.Series(range(20))
-z = pd.concat([x, y], axis=1)

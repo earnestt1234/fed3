@@ -13,7 +13,8 @@ from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
 from fed3.plot.generic import (plot_line_data,
                                plot_line_error,
-                               plot_scatter_data)
+                               plot_scatter_data,
+                               plot_scatter_error)
 
 from fed3.metrics.tables import (_create_group_metric_df,
                                  _create_metric_df,)
@@ -75,10 +76,19 @@ def _simple_plot(feds, kind='line', y='pellets', bins=None,
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
-def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
-                       omit_na=False, mixed_align='raise', output='plot',
+def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
+                       var='std', omit_na=False, mixed_align='raise', output='plot',
                        xaxis='auto', shadedark=True, ax=None, legend=True,
                        fed_styles=None, **kwargs):
+
+    # determine general plotting function
+    if kind == 'line':
+        plotfunc = plot_line_data
+        errorfunc = plot_line_error
+
+    elif kind == 'scatter':
+        plotfunc = plot_scatter_data
+        errorfunc = plot_scatter_error
 
     # set the outputs
     FIG = None
@@ -124,17 +134,16 @@ def _simple_group_plot(feds, y='pellets', bins='1H', agg='mean', var='std',
         if xaxis == 'elapsed':
             shadedark = False
 
-        FIG = plot_line_data(ax=ax,
-                             data=AGGDATA,
-                             shadedark=shadedark,
-                             legend=legend,
-                             xaxis=xaxis,
-                             ylabel=metricname,
-                             line_styles=fed_styles,
-                             drawstyle='default',
-                             **kwargs)
+        FIG = plotfunc(ax=ax,
+                       data=AGGDATA,
+                       shadedark=shadedark,
+                       legend=legend,
+                       xaxis=xaxis,
+                       ylabel=metricname,
+                       line_styles=fed_styles,
+                       **kwargs)
 
-        plot_line_error(ax=ax, aggdata=AGGDATA, vardata=VARDATA)
+        errorfunc(ax=ax, aggdata=AGGDATA, vardata=VARDATA)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
@@ -148,7 +157,8 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
 
         bins = '1H' if bins is None else bins
 
-        return _simple_group_plot(feds=feds,
+        return _simple_group_plot(kind='line',
+                                  feds=feds,
                                   y=y,
                                   bins=bins,
                                   agg=agg,
@@ -178,18 +188,42 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
                             fed_styles=fed_styles,
                             **kwargs)
 
-def scatter(feds, y='pellets', mixed_align='raise', output='plot',
+def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
+            omit_na=False, mixed_align='raise', output='plot',
             xaxis='auto', shadedark=True, ax=None, legend=True,
             fed_styles=None, **kwargs):
 
-    return _simple_plot(kind='scatter',
-                        feds=feds,
-                        y=y,
-                        mixed_align=mixed_align,
-                        output=output,
-                        xaxis=xaxis,
-                        shadedark=shadedark,
-                        ax=ax,
-                        legend=legend,
-                        fed_styles=fed_styles,
-                        **kwargs)
+    if isinstance(feds, dict):
+
+        bins = '1H' if bins is None else bins
+
+        return _simple_group_plot(kind='scatter',
+                                  feds=feds,
+                                  y=y,
+                                  bins=bins,
+                                  agg=agg,
+                                  var=var,
+                                  omit_na=omit_na,
+                                  mixed_align=mixed_align,
+                                  output=output,
+                                  xaxis=xaxis,
+                                  shadedark=shadedark,
+                                  ax=ax,
+                                  legend=legend,
+                                  fed_styles=fed_styles,
+                                  **kwargs)
+
+    else:
+
+        return _simple_plot(kind='scatter',
+                            feds=feds,
+                            y=y,
+                            bins=bins,
+                            mixed_align=mixed_align,
+                            output=output,
+                            xaxis=xaxis,
+                            shadedark=shadedark,
+                            ax=ax,
+                            legend=legend,
+                            fed_styles=fed_styles,
+                            **kwargs)
