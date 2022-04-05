@@ -14,7 +14,7 @@ a = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED5Cat.csv')
 b = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv')
 
 
-df = fplot.ipi({'A': [a,b]}, output='data')
+df = fplot.line(a)
 
 import pandas as pd
 
