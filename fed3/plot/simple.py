@@ -51,7 +51,7 @@ def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
     x = aggdata.index
     y = aggdata
     yerr = vardata
-    ax.errorbar(x=x, y=y, yerr=yerr, **kwargs)
+    ax.errorbar(x=x, y=y, yerr=yerr, ls='none', **kwargs)
 
 # ---- common function for scatter / line
 def _simple_plot(feds, kind='line', y='pellets', bins=None,
@@ -203,7 +203,8 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
             # plot error
             aggdata = AGGDATA[col]
             vardata = VARDATA[col]
-            errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=0.3)
+            alpha = 0.3 if kind == 'line' else 1
+            errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha)
 
         # axis level formatting
         if shadedark:
@@ -263,7 +264,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
 def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
             omit_na=False, mixed_align='raise', output='plot',
             xaxis='auto', shadedark=True, ax=None, legend=True,
-            fed_styles=None, **kwargs):
+            line_kwargs=None, **kwargs):
 
     if isinstance(feds, dict):
 
@@ -282,7 +283,7 @@ def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
                                   shadedark=shadedark,
                                   ax=ax,
                                   legend=legend,
-                                  fed_styles=fed_styles,
+                                  line_kwargs=line_kwargs,
                                   **kwargs)
 
     else:
@@ -297,5 +298,5 @@ def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
                             shadedark=shadedark,
                             ax=ax,
                             legend=legend,
-                            fed_styles=fed_styles,
+                            line_kwargs=line_kwargs,
                             **kwargs)
