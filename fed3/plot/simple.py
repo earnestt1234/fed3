@@ -209,7 +209,7 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
                 aggdata = AGGDATA[col]
                 vardata = VARDATA[col]
                 alpha = 0.3 if kind == 'line' else 1
-                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha)
+                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha, color=color)
 
             # plot individual lines
             if var == 'raw':
