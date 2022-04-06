@@ -22,20 +22,17 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
     all_agg = pd.DataFrame()
     all_var = pd.DataFrame()
     for group, fedlist in feds.items():
-        fed_values = pd.DataFrame()
-        for fed in fedlist:
-            y = metric(fed, bins=bins, origin=origin)
-            y.name = fed.name
-            fed_values = fed_values.join(y, how='outer')
+        metric_df = _create_metric_df(fedlist, metric=metric, bins=bins, origin=origin)
         if omit_na:
-            fed_values = fed_values.dropna()
-        group_agg = fed_values.agg(agg, axis=1)
+            metric_df = metric_df.dropna()
+
+        group_agg = metric_df.agg(agg, axis=1)
         group_agg.name = group
 
         if var is None or var == 'raw':
             group_var = pd.Series()
         else:
-            group_var = fed_values.agg(var, axis=1)
+            group_var = metric_df.agg(var, axis=1)
         group_var.name = group
 
         all_agg = all_agg.join(group_agg, how='outer')

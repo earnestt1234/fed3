@@ -18,3 +18,5 @@ c = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED2Cat.csv')
 
 d = fplot.scatter({'A': [a, b, c]}, bins='12H', var=None, output='data')
 d = fplot.line({'A': [a, b, c]}, bins='12H', output='data', shadedark=False)
+
+# def _chrono_table()
