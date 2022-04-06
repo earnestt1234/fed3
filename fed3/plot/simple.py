@@ -168,9 +168,12 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
                                                omit_na=omit_na)
 
     # create return data
-    lsuffix = f"_{agg}" if isinstance(agg, str) else "_agg"
-    rsuffix = f"_{var}" if isinstance(var, str) else "_var"
-    DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
+    if VARDATA.empty:
+        DATA = AGGDATA
+    else:
+        lsuffix = f"_{agg}" if isinstance(agg, str) else "_agg"
+        rsuffix = f"_{var}" if isinstance(var, str) else "_var"
+        DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
 
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
@@ -186,12 +189,13 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
         if xaxis == 'elapsed':
             shadedark = False
 
+        # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
             plot_kwargs = kwargs.copy()
-            plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
-                                    else plot_kwargs.get("color"))
+            color = (COLORCYCLE[i] if not plot_kwargs.get("color") else plot_kwargs.get("color"))
+            plot_kwargs['color'] = color
             plot_kwargs['label'] = col
 
             if line_kwargs.get(col):
@@ -200,11 +204,23 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
             # plot
             plotfunc(ax=ax, data=AGGDATA[col], **plot_kwargs)
 
-            # plot error
-            aggdata = AGGDATA[col]
-            vardata = VARDATA[col]
-            alpha = 0.3 if kind == 'line' else 1
-            errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha)
+            # plot error - errorbar / shade
+            if not VARDATA.empty:
+                aggdata = AGGDATA[col]
+                vardata = VARDATA[col]
+                alpha = 0.3 if kind == 'line' else 1
+                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha)
+
+            # plot individual lines
+            if var == 'raw':
+
+                group_feds = feds_dict[col]
+                metric_df = _create_metric_df(feds=group_feds,
+                                              metric=metric,
+                                              bins=bins,
+                                              origin=origin)
+                for col in metric_df.columns:
+                    plotfunc(ax=ax, data=metric_df[col], alpha=.3, color=color)
 
         # axis level formatting
         if shadedark:

@@ -30,9 +30,14 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
         if omit_na:
             fed_values = fed_values.dropna()
         group_agg = fed_values.agg(agg, axis=1)
-        group_var = fed_values.agg(var, axis=1)
         group_agg.name = group
+
+        if var is None or var == 'raw':
+            group_var = pd.Series()
+        else:
+            group_var = fed_values.agg(var, axis=1)
         group_var.name = group
+
         all_agg = all_agg.join(group_agg, how='outer')
         all_var = all_var.join(group_var, how='outer')
 
