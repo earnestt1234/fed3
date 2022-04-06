@@ -12,3 +12,5 @@ import fed3.plot as fplot
 # load FED data
 a = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED5Cat.csv')
 b = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv')
+
+fplot.ipi({'A': [a, b]})

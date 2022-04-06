@@ -8,18 +8,29 @@ Created on Wed Feb  2 12:38:40 2022
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
-from fed3.plot.generic import (plot_hist_data)
-
+from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_metric_df,
                                  _stack_group_values)
 
-from fed3.metrics.core import (_get_metric, _get_metricname,)
-
 from fed3.plot.helpers import (_get_return_value,
                                _handle_feds,)
+
+def _plot_hist_data(ax, data, logx, kde, legend=True, **kwargs):
+
+    data = pd.melt(data,
+                   value_vars=data.columns,
+                   var_name="FED",
+                   value_name='ipi').dropna()
+
+    sns.histplot(data=data, x='ipi', hue='FED', log_scale=logx, kde=kde,
+                 legend=legend, **kwargs)
+
+    return ax.get_figure()
+
 
 def _ipi(feds, logx=True, kde=True, mixed_align='ignore', output='plot',
          ax=None, legend=True, **kwargs):
@@ -44,14 +55,14 @@ def _ipi(feds, logx=True, kde=True, mixed_align='ignore', output='plot',
         if ax is None:
             ax = plt.gca()
 
-        FIG = plot_hist_data(ax=ax,
-                             data=DATA,
-                             logx=logx,
-                             kde=kde,
-                             xlabel=metricname,
-                             legend=legend,
-                             **kwargs)
+        FIG = _plot_hist_data(ax=ax,
+                              data=DATA,
+                              logx=logx,
+                              kde=kde,
+                              legend=legend,
+                              **kwargs)
 
+    ax.set_xlabel(metricname)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
@@ -86,13 +97,12 @@ def _group_ipi(feds, logx=True, kde=True, mixed_align='ignore', output='plot',
         if ax is None:
             ax = plt.gca()
 
-        FIG = plot_hist_data(ax=ax,
-                             data=DATA,
-                             logx=logx,
-                             kde=kde,
-                             xlabel=metricname,
-                             legend=legend,
-                             **kwargs)
+        FIG = _plot_hist_data(ax=ax,
+                              data=DATA,
+                              logx=logx,
+                              kde=kde,
+                              legend=legend,
+                              **kwargs)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 

@@ -11,31 +11,60 @@ import pandas as pd
 
 from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
-from fed3.plot.generic import (plot_line_data,
-                               plot_line_error,
-                               plot_scatter_data,
-                               plot_scatter_error)
+from fed3.lightcycle import LIGHTCYCLE
 
-from fed3.metrics.tables import (_create_group_metric_df,
-                                 _create_metric_df,)
+from fed3.metrics.tables import (_create_group_metric_df,  _create_metric_df,)
 
 from fed3.metrics.core import (_get_metric, _get_metricname,)
 
-from fed3.plot.helpers import (_get_return_value,
-                               _handle_feds,)
+from fed3.plot import COLORCYCLE
+from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
+from fed3.plot.helpers import (_get_return_value, _handle_feds,)
+from fed3.plot.shadedark import shade_darkness
 
 # ---- low level plotting
+
+def _plot_timeseries_line(ax, data, **kwargs):
+
+    y = data.dropna()
+    x = y.index
+    ax.plot(x, y, **kwargs)
+
+    return ax.get_figure()
+
+def _plot_timeseries_scatter(ax, data, **kwargs):
+
+    y = data.dropna()
+    x = y.index
+    ax.scatter(x, y, **kwargs)
+
+    return ax.get_figure()
+
+def _plot_timeseries_shade(ax, aggdata, vardata, **kwargs):
+    x = aggdata.index
+    y = aggdata
+    ymin = y - vardata
+    ymax = y + vardata
+    ax.fill_between(x=x, y1=ymin, y2=ymax, **kwargs)
+
+def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
+    x = aggdata.index
+    y = aggdata
+    yerr = vardata
+    ax.errorbar(x=x, y=y, yerr=yerr, **kwargs)
+
+# ---- common function for scatter / line
 def _simple_plot(feds, kind='line', y='pellets', bins=None,
                  mixed_align='raise', output='plot',
                  xaxis='auto', shadedark=True, ax=None, legend=True,
-                 fed_styles=None, **kwargs):
+                 line_kwargs=None, **kwargs):
 
     # determine general plotting function
     if kind == 'line':
-        plotfunc = plot_line_data
+        plotfunc = _plot_timeseries_line
 
     elif kind == 'scatter':
-        plotfunc = plot_scatter_data
+        plotfunc = _plot_timeseries_scatter
 
     else:
         raise ValueError(f'kind must be "line" or "scatter"; not {kind}')
@@ -56,6 +85,8 @@ def _simple_plot(feds, kind='line', y='pellets', bins=None,
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
 
+        line_kwargs = {} if line_kwargs is None else line_kwargs
+
         if ax is None:
             ax = plt.gca()
 
@@ -65,30 +96,49 @@ def _simple_plot(feds, kind='line', y='pellets', bins=None,
         if xaxis == 'elapsed':
             shadedark = False
 
-        FIG = plotfunc(ax=ax,
-                       data=DATA,
-                       shadedark=shadedark,
-                       legend=legend,
-                       xaxis=xaxis,
-                       ylabel=metricname,
-                       line_styles=fed_styles,
-                       **kwargs)
+        for i, col in enumerate(DATA.columns):
+
+            # set keyword args passed
+            plot_kwargs = kwargs.copy()
+            plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
+                                    else plot_kwargs.get("color"))
+            plot_kwargs['label'] = col
+
+            if line_kwargs.get(col):
+                plot_kwargs.update(line_kwargs[col])
+
+            # plot
+            plotfunc(ax=ax, data=DATA[col], **plot_kwargs)
+
+        # axis level formatting
+        if shadedark:
+            shade_darkness(ax, DATA.index.min(), DATA.index.max(),
+                           lights_on=LIGHTCYCLE['on'],
+                           lights_off=LIGHTCYCLE['off'])
+
+        if legend:
+            ax.legend()
+
+        FORMAT_XAXIS_OPTS[xaxis](ax, DATA.index.min(), DATA.index.max())
+        ax.set_ylabel(metricname)
+
+        FIG = ax.get_figure()
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
 def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
                        var='std', omit_na=False, mixed_align='raise', output='plot',
                        xaxis='auto', shadedark=True, ax=None, legend=True,
-                       fed_styles=None, **kwargs):
+                       line_kwargs=None, **kwargs):
 
     # determine general plotting function
     if kind == 'line':
-        plotfunc = plot_line_data
-        errorfunc = plot_line_error
+        plotfunc = _plot_timeseries_line
+        errorfunc = _plot_timeseries_shade
 
     elif kind == 'scatter':
-        plotfunc = plot_scatter_data
-        errorfunc = plot_scatter_error
+        plotfunc = _plot_timeseries_scatter
+        errorfunc = _plot_timeseries_errorbars
 
     # set the outputs
     FIG = None
@@ -125,6 +175,8 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
 
+        line_kwargs = {} if line_kwargs is None else line_kwargs
+
         if ax is None:
             ax = plt.gca()
 
@@ -134,16 +186,36 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
         if xaxis == 'elapsed':
             shadedark = False
 
-        FIG = plotfunc(ax=ax,
-                       data=AGGDATA,
-                       shadedark=shadedark,
-                       legend=legend,
-                       xaxis=xaxis,
-                       ylabel=metricname,
-                       line_styles=fed_styles,
-                       **kwargs)
+        for i, col in enumerate(AGGDATA.columns):
 
-        errorfunc(ax=ax, aggdata=AGGDATA, vardata=VARDATA)
+            # set keyword args passed
+            plot_kwargs = kwargs.copy()
+            plot_kwargs['color'] = (COLORCYCLE[i] if not plot_kwargs.get("color")
+                                    else plot_kwargs.get("color"))
+            plot_kwargs['label'] = col
+
+            if line_kwargs.get(col):
+                plot_kwargs.update(line_kwargs[col])
+
+            # plot
+            plotfunc(ax=ax, data=AGGDATA[col], **plot_kwargs)
+
+            # plot error
+            aggdata = AGGDATA[col]
+            vardata = VARDATA[col]
+            errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=0.3)
+
+        # axis level formatting
+        if shadedark:
+            shade_darkness(ax, DATA.index.min(), DATA.index.max(),
+                           lights_on=LIGHTCYCLE['on'],
+                           lights_off=LIGHTCYCLE['off'])
+
+        if legend:
+            ax.legend()
+
+        FORMAT_XAXIS_OPTS[xaxis](ax, DATA.index.min(), DATA.index.max())
+        ax.set_ylabel(metricname)
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
@@ -151,7 +223,7 @@ def _simple_group_plot(feds, kind='line', y='pellets', bins='1H', agg='mean',
 def line(feds, y='pellets', bins=None, agg='mean', var='std',
          omit_na=False, mixed_align='raise', output='plot',
          xaxis='auto', shadedark=True, ax=None, legend=True,
-         fed_styles=None, **kwargs):
+         line_kwargs=None, **kwargs):
 
     if isinstance(feds, dict):
 
@@ -170,7 +242,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
                                   shadedark=shadedark,
                                   ax=ax,
                                   legend=legend,
-                                  fed_styles=fed_styles,
+                                  line_kwargs=line_kwargs,
                                   **kwargs)
 
     else:
@@ -185,7 +257,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
                             shadedark=shadedark,
                             ax=ax,
                             legend=legend,
-                            fed_styles=fed_styles,
+                            line_kwargs=line_kwargs,
                             **kwargs)
 
 def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
