@@ -27,8 +27,8 @@ NEEDED_COLS = ['Pellet_Count',
                'Right_Poke_Count',]
 
 class FEDFrame(pd.DataFrame):
-    _metadata = ('name', 'path', 'foreign_columns', 'missing_columns',
-                 '_alignment', '_current_offset')
+    _metadata = ['name', 'path', 'foreign_columns', 'missing_columns',
+                 '_alignment', '_current_offset']
 
     @property
     def _constructor(self):

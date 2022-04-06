@@ -16,7 +16,7 @@ a = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED5Cat.csv')
 b = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv')
 c = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED2Cat.csv')
 
-d = fplot.scatter({'A': [a, b, c]}, bins='12H', var=None, output='data')
-d = fplot.line({'A': [a, b, c]}, bins='12H', output='data', shadedark=False)
+metric = fed3.metrics.core.METRICS['pellets']
+d = fed3.metrics.tables._chronogram_df([a, b, c], metric)
 
-# def _chrono_table()
+t = a.loc[a.index.hour == 0]

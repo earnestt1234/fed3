@@ -8,14 +8,17 @@ Created on Fri Feb 25 22:13:44 2022
 
 import pandas as pd
 
-def _create_metric_df(feds, metric, bins=None, origin='start'):
-    df = pd.DataFrame()
-    for fed in feds:
-        y = metric(fed, bins=bins, origin=origin)
-        y.name = fed.name
-        df = df.join(y, how='outer')
+def _chronogram_df(feds, metric, agg='mean', bins='1H'):
 
-    return df
+    n = pd.to_timedelta('24H') / pd.to_timedelta(bins)
+    rem = n % 1
+    if rem != 0:
+        raise ValueError("bins must evenly divide 24 hours.")
+
+    metric_df = _create_metric_df(feds, metric=metric, bins=bins, origin='start_day')
+    bytime = metric_df.groupby(metric_df.index.time).mean()
+
+    return bytime
 
 def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
                             origin='start', omit_na=False):
@@ -39,6 +42,15 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
         all_var = all_var.join(group_var, how='outer')
 
     return all_agg, all_var
+
+def _create_metric_df(feds, metric, bins=None, origin='start'):
+    df = pd.DataFrame()
+    for fed in feds:
+        y = metric(fed, bins=bins, origin=origin)
+        y.name = fed.name
+        df = df.join(y, how='outer')
+
+    return df
 
 def _stack_group_values(metric_df, feds_dict):
 
