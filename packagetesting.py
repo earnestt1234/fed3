@@ -17,6 +17,4 @@ b = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv')
 c = fed3.load('/Users/earnestt1234/Documents/fedviz/justin_data/FED2Cat.csv')
 
 metric = fed3.metrics.core.METRICS['pellets']
-d = fed3.metrics.tables._chronogram_df([a, b, c], metric)
-
-t = a.loc[a.index.hour == 0]
+d = fed3.metrics.tables._chronogram_df([a, b, c], metric, bins='1H')
