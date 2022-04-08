@@ -11,9 +11,8 @@ import pandas as pd
 
 from fed3.lightcycle import LIGHTCYCLE
 
-def _chronogram_df(feds, metric, agg='mean', bins='1H',
-                   origin_lightcycle=False, reorder_index=True,
-                   relative_index=True):
+def _chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
+                   reorder_index=True, relative_index=True):
 
     on = LIGHTCYCLE['on']
     t = pd.to_timedelta(bins)

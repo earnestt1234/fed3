@@ -9,6 +9,7 @@ COLORCYCLE = prop_cycle.by_key()['color']
 
 #imports for package namespace
 
+from .chronogram import chronogram_line
 from .ipi import (ipi)
 from .simple import (line, scatter)
 
