@@ -68,6 +68,9 @@ def _line_chronogram_single(feds, y='pellets', bins='1H',
 
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
+            off += (on > off) * 24
+            start = off - on
+            ax.axvspan(start, 24, color='gray', alpha=.2, zorder=0, label='lights off')
 
         if legend:
             ax.legend()
