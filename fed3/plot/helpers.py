@@ -26,3 +26,25 @@ def _handle_feds(feds):
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
     return feds
+
+def _parse_feds(feds, raise_name_clash=True):
+
+    if isinstance(feds, pd.DataFrame):
+        feds = [feds]
+
+    if not isinstance(feds, dict):
+
+        _raise_name_clash(feds) if raise_name_clash else None
+        feds = {f.name : [f] for f in feds}
+
+    if raise_name_clash:
+        for l in feds.values():
+            _raise_name_clash(l)
+
+    return feds
+
+def _raise_name_clash(feds):
+
+    names_okay = len(set(f.name for f in feds)) == len(feds)
+    if not names_okay:
+        raise ValueError("Some FEDFrames passed have conflicting names; set the `name` attribute uniquely to plot.")
