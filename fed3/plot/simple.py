@@ -55,10 +55,10 @@ def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
 
 # ---- common function for scatter / line
 
-def _new_simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
-                     var='std', omit_na=False, mixed_align='raise', output='plot',
-                     xaxis='auto', shadedark=True, ax=None, legend=True,
-                     line_kwargs=None, **kwargs):
+def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
+                 var='std', omit_na=False, mixed_align='raise', output='plot',
+                 xaxis='auto', shadedark=True, ax=None, legend=True,
+                 line_kwargs=None, **kwargs):
 
     # determine general plotting function
     if kind == 'line':
@@ -176,21 +176,21 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
     bins = '1H' if is_group and bins is None else bins
     var = var if is_group else None
 
-    return _new_simple_plot(kind='line',
-                            feds_dict=feds_dict,
-                            y=y,
-                            bins=bins,
-                            agg=agg,
-                            var=var,
-                            omit_na=omit_na,
-                            mixed_align=mixed_align,
-                            output=output,
-                            xaxis=xaxis,
-                            shadedark=shadedark,
-                            ax=ax,
-                            legend=legend,
-                            line_kwargs=line_kwargs,
-                            **kwargs)
+    return _simple_plot(kind='line',
+                        feds_dict=feds_dict,
+                        y=y,
+                        bins=bins,
+                        agg=agg,
+                        var=var,
+                        omit_na=omit_na,
+                        mixed_align=mixed_align,
+                        output=output,
+                        xaxis=xaxis,
+                        shadedark=shadedark,
+                        ax=ax,
+                        legend=legend,
+                        line_kwargs=line_kwargs,
+                        **kwargs)
 
 def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
             omit_na=False, mixed_align='raise', output='plot',
@@ -202,21 +202,21 @@ def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
     bins = '1H' if is_group and bins is None else bins
     var = var if is_group else None
 
-    return _new_simple_plot(kind='scatter',
-                            feds_dict=feds_dict,
-                            y=y,
-                            bins=bins,
-                            agg=agg,
-                            var=var,
-                            omit_na=omit_na,
-                            mixed_align=mixed_align,
-                            output=output,
-                            xaxis=xaxis,
-                            shadedark=shadedark,
-                            ax=ax,
-                            legend=legend,
-                            line_kwargs=line_kwargs,
-                            **kwargs)
+    return _simple_plot(kind='scatter',
+                        feds_dict=feds_dict,
+                        y=y,
+                        bins=bins,
+                        agg=agg,
+                        var=var,
+                        omit_na=omit_na,
+                        mixed_align=mixed_align,
+                        output=output,
+                        xaxis=xaxis,
+                        shadedark=shadedark,
+                        ax=ax,
+                        legend=legend,
+                        line_kwargs=line_kwargs,
+                        **kwargs)
 
 
 

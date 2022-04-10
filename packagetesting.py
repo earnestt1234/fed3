@@ -15,4 +15,4 @@ import numpy as np
 a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
 b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
 
-d = fplot.line({'A':[a], 'B':[a, b]}, output='data')
+d = fplot.chronogram_line({'B':[a, b]}, output='data', bins='1H', var='raw')

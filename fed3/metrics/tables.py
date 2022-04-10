@@ -11,8 +11,8 @@ import pandas as pd
 
 from fed3.lightcycle import LIGHTCYCLE
 
-def _chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
-                   reorder_index=True, relative_index=True):
+def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
+                          reorder_index=True, relative_index=True):
 
     on = LIGHTCYCLE['on']
     t = pd.to_timedelta(bins)
@@ -46,6 +46,34 @@ def _chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
         bytime.index = post_lights_on.round(4)
 
     return bytime
+
+def _create_group_chronogram_df(feds, metric, agg='mean', var='std', bins='1H',
+                                omit_na=False, origin_lightcycle=True,
+                                reorder_index=True, relative_index=True):
+    all_agg = pd.DataFrame()
+    all_var = pd.DataFrame()
+    for group, fedlist in feds.items():
+        metric_df = _create_chronogram_df(fedlist, metric=metric, bins=bins,
+                                          origin_lightcycle=origin_lightcycle,
+                                          reorder_index=reorder_index,
+                                          relative_index=relative_index)
+        if omit_na:
+            metric_df = metric_df.dropna()
+
+        group_agg = metric_df.agg(agg, axis=1)
+        group_agg.name = group
+
+        if var is None or var == 'raw':
+            group_var = pd.Series()
+        else:
+            group_var = metric_df.agg(var, axis=1)
+        group_var.name = group
+
+        all_agg = all_agg.join(group_agg, how='outer')
+        all_var = all_var.join(group_var, how='outer')
+
+    return all_agg, all_var
+
 
 def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
                             origin='start', omit_na=False):
