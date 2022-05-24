@@ -22,11 +22,6 @@ def _get_return_value(FIG, DATA, output):
     else:
         raise ValueError(f'output value "{output}" not recognized.')
 
-def _handle_feds(feds):
-    if isinstance(feds, pd.DataFrame):
-        feds = [feds]
-    return feds
-
 def _parse_feds(feds, raise_name_clash=True):
 
     if isinstance(feds, pd.DataFrame):

@@ -17,7 +17,7 @@ from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
 from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import (_get_return_value, _handle_feds, _parse_feds)
+from fed3.plot.helpers import (_get_return_value, _parse_feds)
 
 def chronogram_line(feds, y='pellets', bins='1H', agg='mean', var='std',
                     mixed_align='raise', output='plot',
