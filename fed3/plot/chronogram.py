@@ -18,7 +18,7 @@ from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
 from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import (_get_return_value, _parse_feds)
+from fed3.plot.helpers import (_get_return_value, _parse_feds, _raise_name_clash)
 
 def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
                       mixed_align='raise', output='plot',
@@ -129,7 +129,7 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
-def chronogram_line(feds, y='pellets', bins='1H', agg='mean', var='std',
+def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
                     mixed_align='raise', output='plot',
                     shadedark=True, ax=None, legend=True,
                     line_kwargs=None, **kwargs):
@@ -226,7 +226,94 @@ def chronogram_line(feds, y='pellets', bins='1H', agg='mean', var='std',
             ax.axvspan(start, 24, color='gray', alpha=.2, zorder=0, label='lights off')
 
         if legend:
-            ax.legend()
+            ax.legend(bbox_to_anchor=(1,1), loc='upper left')
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
 
+def _parse_feds_spiny_chronogram(feds, raise_name_clash=True):
+
+    if isinstance(feds, pd.DataFrame):
+        feds = [feds]
+
+    if not isinstance(feds, dict):
+
+        _raise_name_clash(feds) if raise_name_clash else None
+        feds = {'group' : feds}
+
+    if raise_name_clash:
+        for l in feds.values():
+            _raise_name_clash(l)
+
+    if len(feds) > 1:
+        raise ValueError("Spiny chronograms only plot the average values "
+                         "for one group; `feds` cannot be a dict with "
+                         "more than one entry.")
+
+    return feds
+
+def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
+                     mixed_align='raise', output='plot',
+                     shadedark=True, ax=None, legend=True, **kwargs):
+
+    # handle parsing here, to only accept single groups
+    feds_dict = _parse_feds_spiny_chronogram(feds)
+
+    # set the outputs
+    FIG = None
+    DATA = pd.DataFrame()
+
+    # setup input arguments
+    feds_all = []
+    for l in feds_dict.values():
+        feds_all += l
+
+    # screen issues alignment
+    alignment = screen_mixed_alignment(feds_all, option=mixed_align)
+
+    # compute data
+    metric = _get_metric(y)
+    metricname = _get_metricname(y)
+    DATA, _ = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+                                          agg=agg, var=None, origin_lightcycle=True,
+                                          reorder_index=True, relative_index=True)
+
+    # handle plot creation and returns
+    if output in ['plot', 'data', 'both']:
+
+        if ax is None:
+            fig, ax = plt.subplots(subplot_kw=dict(polar=True))
+        ax.set_theta_zero_location("N")
+        ax.set_theta_direction(-1)
+
+        # plot group level data
+
+        # set keyword args passed
+        plot_kwargs = kwargs.copy()
+        color = ('crimson' if not plot_kwargs.get("color") else plot_kwargs.get("color"))
+        plot_kwargs['color'] = color
+
+        # plot
+        y = DATA.iloc[:, 0]
+        x = np.linspace(0, 2*np.pi, len(y)+1)
+        for n, val in enumerate(y):
+            label = n * '_' + DATA.columns[0]
+            ax.plot([0, x[n]], [0, val], label=label, **plot_kwargs)
+
+        # axis level formatting
+        ax.set_xlabel("Hour of Light Cycle")
+        ax.set_xticks(np.linspace(0, 2*np.pi, 5))
+        ax.set_xticklabels([0, 6, 12, 18, None])
+        ax.set_title(metricname, pad=10)
+
+        if shadedark:
+            on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
+            off += (on > off) * 24
+            start = off - on
+            theta = (start / 24) * 2 * np.pi
+            ax.fill_between(np.linspace(theta, 2*np.pi, 100), 0, ax.get_rmax(),
+                            color='gray',alpha=.2,zorder=0,label='lights off')
+
+        if legend:
+            ax.legend(bbox_to_anchor=(1,1), loc='upper left')
+
+    return _get_return_value(FIG=FIG, DATA=DATA, output=output)

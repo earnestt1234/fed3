@@ -15,6 +15,7 @@ import numpy as np
 a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
 b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
 
-d = fplot.chronogram_circle({'B':[a, b]}, output='data')
-#%%
-d = fplot.chronogram_line({'B':[a, b]}, output='data')
+
+import matplotlib.pyplot as plt
+d = fplot.chronogram_spiny({'B':[a, b]}, output='data', bins='1H', color='green')
+plt.tight_layout()
