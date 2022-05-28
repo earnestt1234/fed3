@@ -12,7 +12,7 @@ import pandas as pd
 
 from fed3.fedframe.fedfuncs import screen_mixed_alignment
 
-from fed3.lightcycle import LIGHTCYCLE
+from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
 from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
@@ -118,6 +118,8 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
 
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
+            on = time_to_float(on)
+            off = time_to_float(off)
             off += (on > off) * 24
             start = off - on
             theta = (start / 24) * 2 * np.pi
@@ -221,6 +223,8 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
 
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
+            on = time_to_float(on)
+            off = time_to_float(off)
             off += (on > off) * 24
             start = off - on
             ax.axvspan(start, 24, color='gray', alpha=.2, zorder=0, label='lights off')
@@ -307,6 +311,8 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
 
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
+            on = time_to_float(on)
+            off = time_to_float(off)
             off += (on > off) * 24
             start = off - on
             theta = (start / 24) * 2 * np.pi

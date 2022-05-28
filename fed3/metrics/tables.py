@@ -9,12 +9,13 @@ Created on Fri Feb 25 22:13:44 2022
 import numpy as np
 import pandas as pd
 
-from fed3.lightcycle import LIGHTCYCLE
+from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
 def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
                           reorder_index=True, relative_index=True):
 
     on = LIGHTCYCLE['on']
+    on_f = time_to_float(on)
     t = pd.to_timedelta(bins)
     n = pd.to_timedelta('24H') / t
     rem = n % 1
@@ -23,7 +24,7 @@ def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
         raise ValueError("bins must evenly divide 24 hours.")
 
     if origin_lightcycle:
-        origin = pd.Timestamp(year=1970, month=1, day=1, hour=on)
+        origin = pd.Timestamp(year=1970, month=1, day=1, hour=on.hour, minute=on.minute)
     else:
         origin = 'start_day'
 
@@ -35,14 +36,14 @@ def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
 
     # orders so that the start of the light cycle is first
     if reorder_index:
-        idx = (float_index < on).argsort(kind='stable')
+        idx = (float_index < on_f).argsort(kind='stable')
         bytime = bytime.iloc[idx]
         float_index = float_index[idx]
 
     # replaces times with hours since lights on
     if relative_index:
-        post_lights_on = np.where(float_index < on, float_index + 24, float_index)
-        post_lights_on -= on
+        post_lights_on = np.where(float_index < on_f, float_index + 24, float_index)
+        post_lights_on -= on_f
         bytime.index = post_lights_on.round(4)
 
     return bytime
