@@ -56,7 +56,8 @@ def can_concat(feds):
             return False
     return True
 
-def concat(feds, name=None, add_concat_number=True):
+def concat(feds, name=None, add_concat_number=True,
+           reset_columns=('Pellet_Count', 'Left_Poke_Count','Right_Poke_Count')):
 
     if name is None:
         name = feds[0].name
@@ -75,7 +76,7 @@ def concat(feds, name=None, add_concat_number=True):
             df['Concat_#'] = i
 
         if i==0:
-            for col in['Pellet_Count', 'Left_Poke_Count','Right_Poke_Count']:
+            for col in reset_columns:
                 if col in df.columns:
                     offsets[col] = df[col].max()
 
@@ -133,15 +134,18 @@ def screen_mixed_alignment(feds, option='raise'):
     return alignment
 
 def split(fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'),
-          return_empty=False):
+          return_empty=False, tag_name=True):
     dates = _split_handle_dates(dates)
     output = []
     offsets = {col: 0 for col in reset_columns}
+    og_name = fed.name
     for i in range(len(dates[:-1])):
         start = dates[i]
         end = dates[i+1]
         subset = fed[(fed.index >= start) &
                      (fed.index < end)].copy()
+        if tag_name:
+            subset.name = f"{og_name}_{i}"
         if not return_empty and subset.empty:
             continue
         if offsets:
