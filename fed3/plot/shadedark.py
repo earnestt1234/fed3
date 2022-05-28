@@ -6,7 +6,28 @@ Created on Sun May  9 15:26:30 2021
 @author: earnestt1234
 """
 
-from fed3.lightcycle import (hours_between, night_intervals)
+# from fed3.lightcycle import (hours_between, night_intervals)
+
+def is_at_night(datetime, lights_on, lights_off):
+
+    ashour = datetime.hour + (1/60) * datetime.minute
+    if lights_on > lights_off:
+        return (lights_off <= ashour < lights_on)
+    else:
+        return (ashour < lights_on or ashour >= lights_off)
+
+def nighttime_intervals(start_date, end_date, lights_on, lights_off):
+
+    result = []
+    pair = []
+
+    if is_at_night(start_date):
+        pair.append(start_date)
+    else:
+        first_night = start_date.replace(hour=lights_on)
+        first_night += pd.Timedelta('24H') * (first_night < start_date)
+        pair.append(first_night)
+
 
 def shade_darkness(ax, min_date, max_date, lights_on, lights_off,
                    convert=True):
