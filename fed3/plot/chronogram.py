@@ -255,9 +255,16 @@ def _parse_feds_spiny_chronogram(feds, raise_name_clash=True):
 
     return feds
 
+def _spine_data_trick(x, y):
+    newx = np.repeat(x, 3)
+    newy = np.zeros(len(newx))
+    newy[1::3] = y
+    return newx, newy
+
 def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
                      mixed_align='raise', output='plot',
-                     shadedark=True, ax=None, legend=True, **kwargs):
+                     shadedark=True, ax=None, legend=True,
+                     plot_quick=True, **kwargs):
 
     # handle parsing here, to only accept single groups
     feds_dict = _parse_feds_spiny_chronogram(feds)
@@ -297,11 +304,17 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
         plot_kwargs['color'] = color
 
         # plot
-        y = DATA.iloc[:, 0]
-        x = np.linspace(0, 2*np.pi, len(y)+1)
-        for n, val in enumerate(y):
-            label = n * '_' + DATA.columns[0]
-            ax.plot([0, x[n]], [0, val], label=label, **plot_kwargs)
+        if plot_quick:
+            y = DATA.iloc[:, 0]
+            x = np.linspace(0, 2*np.pi, len(y))
+            x, y = _spine_data_trick(x, y)
+            ax.plot(x, y, **kwargs)
+        else:
+            y = DATA.iloc[:, 0]
+            x = np.linspace(0, 2*np.pi, len(y)+1)
+            for n, val in enumerate(y):
+                label = n * '_' + DATA.columns[0]
+                ax.plot([0, x[n]], [0, val], label=label, **plot_kwargs)
 
         # axis level formatting
         ax.set_xlabel("Hour of Light Cycle")

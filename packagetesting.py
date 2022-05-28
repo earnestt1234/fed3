@@ -15,7 +15,4 @@ import numpy as np
 a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
 b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
 
-
-import matplotlib.pyplot as plt
-
-d = fplot.chronogram_line(a, output='data', bins='1H', color='green')
+d = fplot.chronogram_spiny(a, output='data', bins='15T', color='green', plot_quick=True)
