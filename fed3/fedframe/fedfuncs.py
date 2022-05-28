@@ -133,6 +133,17 @@ def screen_mixed_alignment(feds, option='raise'):
 
     return alignment
 
+def _split_handle_dates(dates):
+    old = pd.Timestamp('01-01-1970')
+    future = pd.Timestamp('12-31-2200')
+    if not isinstance(dates, Iterable) or isinstance(dates, str):
+        dates = [old, pd.to_datetime(dates), future]
+    else:
+        dates = [pd.to_datetime(date) for date in dates]
+        dates = [old] + dates + [future]
+
+    return dates
+
 def split(fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'),
           return_empty=False, tag_name=True):
     dates = _split_handle_dates(dates)
@@ -155,14 +166,18 @@ def split(fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_P
         output.append(subset)
     return output
 
+def timecrop(fed, start, end,
+             reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'),
+             name=None):
 
-def _split_handle_dates(dates):
-    old = pd.Timestamp('01-01-1970')
-    future = pd.Timestamp('12-31-2200')
-    if not isinstance(dates, Iterable) or isinstance(dates, str):
-        dates = [old, pd.to_datetime(dates), future]
-    else:
-        dates = [pd.to_datetime(date) for date in dates]
-        dates = [old] + dates + [future]
+    prior = fed[(fed.index < start)]
+    newfed = fed[(fed.index >= start) &
+                 (fed.index < end)].copy()
+    for col in reset_columns:
+        if not prior.empty:
+            newfed[col] -= prior[col].max()
 
-    return dates
+    if name is not None:
+        newfed.name = name
+
+    return newfed

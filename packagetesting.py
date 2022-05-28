@@ -15,4 +15,6 @@ import numpy as np
 a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
 b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
 
-d = fplot.chronogram_spiny(a, output='data', bins='15T', color='green', plot_quick=True)
+# d = fplot.chronogram_spiny(a, output='data', bins='15T', color='green', plot_quick=True)
+
+c = fed3.timecrop(a, a.index[1000], a.index[1735])
