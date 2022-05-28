@@ -28,13 +28,17 @@ def is_at_night(datetime, lights_on, lights_off):
     else:
         return (ashour < lights_on or ashour >= lights_off)
 
-def night_intervals(start_date, end_date, lights_on, lights_off,
-                    pdconvert=True):
+def lightcycle_tuples(start_date, end_date, lights_on, lights_off, kind='nights',
+                      pdconvert=True):
+
+    if kind not in ['days', 'nights']:
+        raise ValueError(f"`kind` must be 'nights' or 'days', not {kind}")
 
     result = []
     t = start_date
-    lookfor = 'off'
     day = pd.Timedelta('24H')
+
+    lookfor = 'on' if kind == 'days' else 'off'
 
     if pdconvert:
         start_date = pd.to_datetime(start_date)
@@ -50,18 +54,18 @@ def night_intervals(start_date, end_date, lights_on, lights_off,
         elif lookfor == 'off':
             if is_at_night(t, lights_on, lights_off):
                 result.append(t)
-                new_t = t.replace(hour=lights_on.hour, minute=lights_on.minute)
+                new_t = t.replace(hour=lights_on.hour, minute=lights_on.minute).floor('1T')
                 lookfor = 'on'
             else:
-                new_t = t.replace(hour=lights_off.hour, minute=lights_off.minute)
+                new_t = t.replace(hour=lights_off.hour, minute=lights_off.minute).floor('1T')
 
         elif lookfor == 'on':
             if not is_at_night(t, lights_on, lights_off):
                 result.append(t)
-                new_t = t.replace(hour=lights_off.hour, minute=lights_off.minute)
+                new_t = t.replace(hour=lights_off.hour, minute=lights_off.minute).floor('1T')
                 lookfor = 'off'
             else:
-                new_t = t.replace(hour=lights_on.hour, minute=lights_on.minute)
+                new_t = t.replace(hour=lights_on.hour, minute=lights_on.minute).floor('1T')
 
         if new_t < t:
             new_t += day

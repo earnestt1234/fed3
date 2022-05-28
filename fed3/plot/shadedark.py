@@ -6,7 +6,7 @@ Created on Sun May  9 15:26:30 2021
 @author: earnestt1234
 """
 
-from fed3.lightcycle import night_intervals
+from fed3.lightcycle import lightcycle_tuples
 
 def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
     """
@@ -30,7 +30,11 @@ def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
     None.
     """
 
-    nights = night_intervals(min_date, max_date, lights_on, lights_off)
+    nights = lightcycle_tuples(start_date=min_date,
+                               end_date=max_date,
+                               lights_on=lights_on,
+                               lights_off=lights_off,
+                               kind='nights')
 
     for i, (start, end) in enumerate(nights):
         ax.axvspan(start,

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from fed3.fedframe.fedfuncs import screen_mixed_alignment
+from fed3.core.fedfuncs import screen_mixed_alignment
 
 from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_metric_df,

@@ -9,7 +9,7 @@ Created on Fri Apr 30 18:06:53 2021
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from fed3.fedframe.fedfuncs import screen_mixed_alignment
+from fed3.core.fedfuncs import screen_mixed_alignment
 
 from fed3.lightcycle import LIGHTCYCLE
 

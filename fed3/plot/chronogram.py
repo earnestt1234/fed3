@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from fed3.fedframe.fedfuncs import screen_mixed_alignment
+from fed3.core.fedfuncs import screen_mixed_alignment
 
 from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
@@ -292,7 +292,7 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
     if output in ['plot', 'data', 'both']:
 
         if ax is None:
-            fig, ax = plt.subplots(subplot_kw=dict(polar=True))
+            FIG, ax = plt.subplots(subplot_kw=dict(polar=True))
         ax.set_theta_zero_location("N")
         ax.set_theta_direction(-1)
 

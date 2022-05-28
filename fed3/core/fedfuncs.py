@@ -11,7 +11,7 @@ import os
 
 import pandas as pd
 
-from fed3.fedframe import FEDFrame
+from fed3.core import FEDFrame
 
 ZERO_DATE = pd.Timestamp(year=1980, month=1, day=1)
 
