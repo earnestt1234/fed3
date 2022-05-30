@@ -11,6 +11,38 @@ import pandas as pd
 
 from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
+def _bar_metric_df(feds_dict, metric, stat, agg='mean', var='std', dropna=True):
+
+    agg_key = f"total.{agg}"
+    var_key = f"total.{var}"
+
+    rows = []
+
+    for group, feds in feds_dict.items():
+
+        row = {}
+        aggregate = None
+        variation = None
+
+        tbl = _create_metric_df(feds, metric)
+
+        for col in tbl.columns:
+            vals = tbl[col]
+            if dropna:
+                vals = vals.dropna()
+
+            row[col] = vals.agg(stat)
+
+        as_series = pd.Series(row)
+        aggregate = as_series.agg(agg)
+        variation = as_series.agg(var)
+        row[agg_key] = aggregate
+        row[var_key] = variation
+
+        rows.append(row)
+
+    return pd.DataFrame(rows, index=feds_dict.keys())
+
 def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
                           reorder_index=True, relative_index=True):
 

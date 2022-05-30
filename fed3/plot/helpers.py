@@ -28,9 +28,12 @@ def _parse_feds(feds, raise_name_clash=True):
         feds = [feds]
 
     if not isinstance(feds, dict):
-
         _raise_name_clash(feds) if raise_name_clash else None
         feds = {f.name : [f] for f in feds}
+
+    for k, v in feds.items():
+        if not isinstance(v, list):
+            feds[k] = [v]
 
     if raise_name_clash:
         for l in feds.values():
