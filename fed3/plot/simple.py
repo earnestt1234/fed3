@@ -19,7 +19,7 @@ from fed3.metrics.core import (_get_metric, _get_metricname,)
 
 from fed3.plot import COLORCYCLE
 from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
-from fed3.plot.helpers import (_get_return_value, _parse_feds)
+from fed3.plot.helpers import (_get_return_value, _parse_feds, _process_plot_kwargs)
 from fed3.plot.shadedark import shade_darkness
 
 # ---- low level plotting
@@ -58,7 +58,7 @@ def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
 def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
                  var='std', omit_na=False, mixed_align='raise', output='plot',
                  xaxis='auto', shadedark=True, ax=None, legend=True,
-                 line_kwargs=None, **kwargs):
+                 plot_kwargs=None, error_kwargs=None, **kwargs):
 
     # determine general plotting function
     if kind == 'line':
@@ -103,10 +103,16 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
         rsuffix = f"_{var}" if isinstance(var, str) else "_var"
         DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
 
+    # update the kwargs to handle individual & general options
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs
+    plot_kwargs.update(kwargs) # general kwargs default to plot
+    plot_kwargs = _process_plot_kwargs(plot_kwargs, feds_dict.keys())
+
+    error_kwargs = {} if error_kwargs is None else error_kwargs
+    error_kwargs = _process_plot_kwargs(error_kwargs, feds_dict.keys())
+
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
-
-        line_kwargs = {} if line_kwargs is None else line_kwargs
 
         if ax is None:
             ax = plt.gca()
@@ -121,23 +127,24 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
-            plot_kwargs = kwargs.copy()
+            this_kwargs = {}
             color = (COLORCYCLE[i] if not plot_kwargs.get("color") else plot_kwargs.get("color"))
-            plot_kwargs['color'] = color
-            plot_kwargs['label'] = col
-
-            if line_kwargs.get(col):
-                plot_kwargs.update(line_kwargs[col])
+            this_kwargs['color'] = color
+            this_kwargs['label'] = col
+            this_kwargs.update(plot_kwargs[col])
 
             # plot
-            plotfunc(ax=ax, data=AGGDATA[col], **plot_kwargs)
+            plotfunc(ax=ax, data=AGGDATA[col], **this_kwargs)
 
             # plot error - errorbar / shade
             if not VARDATA.empty:
                 aggdata = AGGDATA[col]
                 vardata = VARDATA[col]
-                alpha = 0.3 if kind == 'line' else 1
-                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, alpha=alpha, color=color)
+                this_kwargs = {}
+                this_kwargs['color'] = color
+                this_kwargs['alpha'] = 0.3 if kind == 'line' else 1
+                this_kwargs.update(error_kwargs[col])
+                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, **this_kwargs)
 
             # plot individual lines
             if var == 'raw':
@@ -147,8 +154,14 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
                                               metric=metric,
                                               bins=bins,
                                               origin=origin)
+
+                this_kwargs = {}
+                this_kwargs['color'] = color
+                this_kwargs['alpha'] = 0.3
+                this_kwargs.update(error_kwargs[col])
+
                 for col in metric_df.columns:
-                    plotfunc(ax=ax, data=metric_df[col], alpha=.3, color=color)
+                    plotfunc(ax=ax, data=metric_df[col], **this_kwargs)
 
         # axis level formatting
         if shadedark:
@@ -169,7 +182,7 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
 def line(feds, y='pellets', bins=None, agg='mean', var='std',
             omit_na=False, mixed_align='raise', output='plot',
             xaxis='auto', shadedark=True, ax=None, legend=True,
-            line_kwargs=None, **kwargs):
+            line_kwargs=None, error_kwargs=None, **kwargs):
 
     feds_dict = _parse_feds(feds)
     is_group = any(len(v) > 1 for v in feds_dict.values())
@@ -189,13 +202,14 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
                         shadedark=shadedark,
                         ax=ax,
                         legend=legend,
-                        line_kwargs=line_kwargs,
+                        plot_kwargs=line_kwargs,
+                        error_kwargs=error_kwargs,
                         **kwargs)
 
 def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
             omit_na=False, mixed_align='raise', output='plot',
             xaxis='auto', shadedark=True, ax=None, legend=True,
-            line_kwargs=None, **kwargs):
+            point_kwargs=None, error_kwargs=None, **kwargs):
 
     feds_dict = _parse_feds(feds)
     is_group = any(len(v) > 1 for v in feds_dict.values())
@@ -215,7 +229,8 @@ def scatter(feds, y='pellets', bins=None, agg='mean', var='std',
                         shadedark=shadedark,
                         ax=ax,
                         legend=legend,
-                        line_kwargs=line_kwargs,
+                        plot_kwargs=point_kwargs,
+                        error_kwargs=error_kwargs,
                         **kwargs)
 
 

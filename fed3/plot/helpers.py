@@ -47,9 +47,13 @@ def _raise_name_clash(feds):
     if not names_okay:
         raise ValueError("Some FEDFrames passed have conflicting names; set the `name` attribute uniquely to plot.")
 
-# def _update_plot_kwargs(key, all_keys, )
+def _process_plot_kwargs(kwargs, plot_labels):
 
+    all_kwargs = {k:v for k, v in kwargs.items() if k not in plot_labels}
+    output = {}
+    for lab in plot_labels:
+        output[lab] = all_kwargs.copy()
+        if kwargs.get(lab):
+            output[lab].update(kwargs[lab])
 
-
-
-
+    return output
