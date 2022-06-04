@@ -76,6 +76,8 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
     # compute plot data
     metric = _get_metric(y)
     metricname = _get_metricname(y)
+    if normalize is not None:
+        metricname += f' ({normalize})'
     DATA = _bar_metric_df(feds_dict, metric=metric, stat=stat,
                           normalize=normalize, agg=agg, var=var)
     individual_data = DATA.iloc[:, :-2]
