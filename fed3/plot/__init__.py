@@ -9,6 +9,7 @@ COLORCYCLE = prop_cycle.by_key()['color']
 
 #imports for package namespace
 
+from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
 from .ipi import (ipi)
 from .simple import (line, scatter)

@@ -76,18 +76,19 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
         ax.set_theta_zero_location("N")
         ax.set_theta_direction(-1)
 
+        FIG = ax.get_figure()
+
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
             this_kwargs = {}
-            color = (COLORCYCLE[i] if not line_kwargs.get("color") else line_kwargs.get("color"))
-            this_kwargs['color'] = color
+            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(line_kwargs[col])
 
             this_error_kwargs = {}
-            this_error_kwargs['color'] = color
+            this_error_kwargs['color'] = COLORCYCLE[i]
             this_error_kwargs['alpha'] = 0.3
             this_error_kwargs.update(error_kwargs[col])
 
@@ -99,11 +100,6 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
 
             # plot error
             if not VARDATA.empty:
-
-                this_kwargs = {}
-                this_kwargs['color'] = color
-                this_kwargs['alpha'] = 0.3
-                this_kwargs.update(error_kwargs[col])
 
                 y = AGGDATA[col]
                 y = np.append(y, y[0])
@@ -201,18 +197,19 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
         if ax is None:
             ax = plt.gca()
 
+        FIG = ax.get_figure()
+
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
             this_kwargs = {}
-            color = (COLORCYCLE[i] if not line_kwargs.get("color") else line_kwargs.get("color"))
-            this_kwargs['color'] = color
+            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(line_kwargs[col])
 
             this_error_kwargs = {}
-            this_error_kwargs['color'] = color
+            this_error_kwargs['color'] = COLORCYCLE[i]
             this_error_kwargs['alpha'] = 0.3
             this_error_kwargs.update(error_kwargs[col])
 
@@ -324,7 +321,7 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
         ax.set_theta_zero_location("N")
         ax.set_theta_direction(-1)
 
-        # plot group level data
+        FIG = ax.get_figure()
 
         # set keyword args passed
         kwargs['color'] = 'crimson' if not kwargs.get('color') else kwargs.get('color')

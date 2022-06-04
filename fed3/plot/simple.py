@@ -123,18 +123,19 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
         if xaxis == 'elapsed':
             shadedark = False
 
+        FIG = ax.get_figure()
+
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
             this_kwargs = {}
-            color = (COLORCYCLE[i] if not plot_kwargs.get("color") else plot_kwargs.get("color"))
-            this_kwargs['color'] = color
+            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(plot_kwargs[col])
 
             this_error_kwargs = {}
-            this_error_kwargs['color'] = color
+            this_error_kwargs['color'] = COLORCYCLE[i]
             this_error_kwargs['alpha'] = 0.3 if kind == 'line' else 1
             this_error_kwargs.update(error_kwargs[col])
 

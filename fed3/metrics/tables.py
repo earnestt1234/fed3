@@ -11,10 +11,12 @@ import pandas as pd
 
 from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
-def _bar_metric_df(feds_dict, metric, stat, agg='mean', var='std', dropna=True):
+def _bar_metric_df(feds_dict, metric, stat, normalize=None, agg='mean', var='std', dropna=True):
 
     agg_key = f"total.{agg}"
     var_key = f"total.{var}"
+
+    normalize = pd.to_timedelta(normalize) if normalize is not None else None
 
     rows = []
 
@@ -31,11 +33,17 @@ def _bar_metric_df(feds_dict, metric, stat, agg='mean', var='std', dropna=True):
             if dropna:
                 vals = vals.dropna()
 
-            row[col] = vals.agg(stat)
+            v = vals.agg(stat)
+            if normalize is not None:
+                factor = (vals.index.max() - vals.index.min()) / normalize
+                v /= factor
+
+            row[col] = v
+
 
         as_series = pd.Series(row)
         aggregate = as_series.agg(agg)
-        variation = as_series.agg(var)
+        variation = as_series.agg(var) if var is not None else np.nan
         row[agg_key] = aggregate
         row[var_key] = variation
 
