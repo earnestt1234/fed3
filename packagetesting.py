@@ -12,11 +12,11 @@ import fed3.plot as fplot
 import numpy as np
 
 # load FED data
-# a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
-# b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
+a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
+b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
 
-a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
-b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
+# a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
+# b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
 
 c = fed3.split(a, dates = a.index[[1000, 2000, 3000, 4000, 5000]])
 d = fed3.split(b, dates = b.index[[1000, 2000, 3000, 4000, 5000]])
@@ -71,7 +71,10 @@ y = 'pellets'
 stat = 'max'
 mixed_align = 'raise'
 positions = [0, 1]
-position_labels = ['A', 'B']
+position_labels = ['C', 'D']
+bar_kwargs = None
+error_kwargs = None
+scatter_kwargs = None
 
 import matplotlib.pyplot as plt
 
