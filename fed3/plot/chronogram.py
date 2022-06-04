@@ -18,12 +18,15 @@ from fed3.metrics.core import (_get_metric, _get_metricname,)
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
 from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import (_get_return_value, _parse_feds, _raise_name_clash)
+from fed3.plot.helpers import (_get_return_value,
+                               _parse_feds,
+                               _raise_name_clash,
+                               _process_plot_kwargs)
 
 def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
                       mixed_align='raise', output='plot',
                       shadedark=True, ax=None, legend=True,
-                      line_kwargs=None, **kwargs):
+                      line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
     feds_dict = _parse_feds(feds)
@@ -57,10 +60,16 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
         rsuffix = f"_{var}" if isinstance(var, str) else "_var"
         DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
 
+    # update the kwargs to handle individual & general options
+    line_kwargs = {} if line_kwargs is None else line_kwargs
+    line_kwargs.update(kwargs) # general kwargs default to updatine line
+    line_kwargs = _process_plot_kwargs(line_kwargs, feds_dict.keys())
+
+    error_kwargs = {} if error_kwargs is None else error_kwargs
+    error_kwargs = _process_plot_kwargs(error_kwargs, feds_dict.keys())
+
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
-
-        line_kwargs = {} if line_kwargs is None else line_kwargs
 
         if ax is None:
             fig, ax = plt.subplots(subplot_kw=dict(polar=True))
@@ -71,28 +80,38 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
-            plot_kwargs = kwargs.copy()
-            color = (COLORCYCLE[i] if not plot_kwargs.get("color") else plot_kwargs.get("color"))
-            plot_kwargs['color'] = color
-            plot_kwargs['label'] = col
+            this_kwargs = {}
+            color = (COLORCYCLE[i] if not line_kwargs.get("color") else line_kwargs.get("color"))
+            this_kwargs['color'] = color
+            this_kwargs['label'] = col
+            this_kwargs.update(line_kwargs[col])
 
-            if line_kwargs.get(col):
-                plot_kwargs.update(line_kwargs[col])
+            this_error_kwargs = {}
+            this_error_kwargs['color'] = color
+            this_error_kwargs['alpha'] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             y = np.append(y, y[0])
-            x = np.linspace(0, 2*np.pi, 25)
-            ax.plot(x, y, **plot_kwargs)
+            x = np.linspace(0, 2*np.pi, len(y))
+            ax.plot(x, y, **this_kwargs)
 
             # plot error
             if not VARDATA.empty:
-                x = np.linspace(0, 2*np.pi, 25)
+
+                this_kwargs = {}
+                this_kwargs['color'] = color
+                this_kwargs['alpha'] = 0.3
+                this_kwargs.update(error_kwargs[col])
+
                 y = AGGDATA[col]
                 y = np.append(y, y[0])
                 v = VARDATA[col]
                 v = np.append(v, v[0])
-                ax.fill_between(x, y-v, y+v, color=color, alpha=.3)
+                x = np.linspace(0, 2*np.pi, len(y))
+
+                ax.fill_between(x, y-v, y+v, **this_error_kwargs)
 
             # plot individual lines
             if var == 'raw':
@@ -105,10 +124,10 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
                                                   reorder_index=True,
                                                   relative_index=True)
                 for col in metric_df.columns:
-                    x = np.linspace(0, 2*np.pi, 25)
                     y = metric_df[col]
                     y = np.append(y, y[0])
-                    ax.plot(x, y, alpha=.3, label='', color=color)
+                    x = np.linspace(0, 2*np.pi, len(y))
+                    ax.plot(x, y, **this_error_kwargs)
 
         # axis level formatting
         ax.set_xlabel("Hour of Light Cycle")
@@ -134,7 +153,7 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
 def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
                     mixed_align='raise', output='plot',
                     shadedark=True, ax=None, legend=True,
-                    line_kwargs=None, **kwargs):
+                    line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
     feds_dict = _parse_feds(feds)
@@ -168,10 +187,16 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
         rsuffix = f"_{var}" if isinstance(var, str) else "_var"
         DATA = AGGDATA.join(VARDATA, how='outer', lsuffix=lsuffix, rsuffix=rsuffix)
 
+    # update the kwargs to handle individual & general options
+    line_kwargs = {} if line_kwargs is None else line_kwargs
+    line_kwargs.update(kwargs) # general kwargs default to updatine line
+    line_kwargs = _process_plot_kwargs(line_kwargs, feds_dict.keys())
+
+    error_kwargs = {} if error_kwargs is None else error_kwargs
+    error_kwargs = _process_plot_kwargs(error_kwargs, feds_dict.keys())
+
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:
-
-        line_kwargs = {} if line_kwargs is None else line_kwargs
 
         if ax is None:
             ax = plt.gca()
@@ -180,25 +205,28 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
         for i, col in enumerate(AGGDATA.columns):
 
             # set keyword args passed
-            plot_kwargs = kwargs.copy()
-            color = (COLORCYCLE[i] if not plot_kwargs.get("color") else plot_kwargs.get("color"))
-            plot_kwargs['color'] = color
-            plot_kwargs['label'] = col
+            this_kwargs = {}
+            color = (COLORCYCLE[i] if not line_kwargs.get("color") else line_kwargs.get("color"))
+            this_kwargs['color'] = color
+            this_kwargs['label'] = col
+            this_kwargs.update(line_kwargs[col])
 
-            if line_kwargs.get(col):
-                plot_kwargs.update(line_kwargs[col])
+            this_error_kwargs = {}
+            this_error_kwargs['color'] = color
+            this_error_kwargs['alpha'] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             x = AGGDATA.index
-            ax.plot(x, y, **plot_kwargs)
+            ax.plot(x, y, **this_kwargs)
 
             # plot error
             if not VARDATA.empty:
                 y = AGGDATA[col]
                 x = y.index
                 v = VARDATA[col]
-                ax.fill_between(x, y-v, y+v, color=color, alpha=.3)
+                ax.fill_between(x, y-v, y+v, **this_error_kwargs)
 
             # plot individual lines
             if var == 'raw':
@@ -213,7 +241,7 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
                 for col in metric_df.columns:
                     y = metric_df[col]
                     x = y.index
-                    ax.plot(x, y, alpha=.3, label='', color=color)
+                    ax.plot(x, y, **this_error_kwargs)
 
         # axis level formatting
         ax.set_ylabel(metricname)
@@ -299,13 +327,11 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
         # plot group level data
 
         # set keyword args passed
-        plot_kwargs = kwargs.copy()
-        color = ('crimson' if not plot_kwargs.get("color") else plot_kwargs.get("color"))
-        plot_kwargs['color'] = color
+        kwargs['color'] = 'crimson' if not kwargs.get('color') else kwargs.get('color')
 
         # plot
         if plot_quick:
-            y = DATA.iloc[:, 0]
+            y = list(DATA.iloc[:, 0]) + [0]
             x = np.linspace(0, 2*np.pi, len(y))
             x, y = _spine_data_trick(x, y)
             ax.plot(x, y, **kwargs)
@@ -314,7 +340,7 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
             x = np.linspace(0, 2*np.pi, len(y)+1)
             for n, val in enumerate(y):
                 label = n * '_' + DATA.columns[0]
-                ax.plot([0, x[n]], [0, val], label=label, **plot_kwargs)
+                ax.plot([0, x[n]], [0, val], label=label, **kwargs)
 
         # axis level formatting
         ax.set_xlabel("Hour of Light Cycle")

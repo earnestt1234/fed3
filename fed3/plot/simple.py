@@ -133,6 +133,11 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
             this_kwargs['label'] = col
             this_kwargs.update(plot_kwargs[col])
 
+            this_error_kwargs = {}
+            this_error_kwargs['color'] = color
+            this_error_kwargs['alpha'] = 0.3 if kind == 'line' else 1
+            this_error_kwargs.update(error_kwargs[col])
+
             # plot
             plotfunc(ax=ax, data=AGGDATA[col], **this_kwargs)
 
@@ -140,11 +145,7 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
             if not VARDATA.empty:
                 aggdata = AGGDATA[col]
                 vardata = VARDATA[col]
-                this_kwargs = {}
-                this_kwargs['color'] = color
-                this_kwargs['alpha'] = 0.3 if kind == 'line' else 1
-                this_kwargs.update(error_kwargs[col])
-                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, **this_kwargs)
+                errorfunc(ax=ax, aggdata=aggdata, vardata=vardata, **this_error_kwargs)
 
             # plot individual lines
             if var == 'raw':
@@ -155,13 +156,8 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
                                               bins=bins,
                                               origin=origin)
 
-                this_kwargs = {}
-                this_kwargs['color'] = color
-                this_kwargs['alpha'] = 0.3
-                this_kwargs.update(error_kwargs[col])
-
                 for col in metric_df.columns:
-                    plotfunc(ax=ax, data=metric_df[col], **this_kwargs)
+                    plotfunc(ax=ax, data=metric_df[col], **this_error_kwargs)
 
         # axis level formatting
         if shadedark:

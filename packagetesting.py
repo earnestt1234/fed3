@@ -21,6 +21,8 @@ b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
 c = fed3.split(a, dates = a.index[[1000, 2000, 3000, 4000, 5000]])
 d = fed3.split(b, dates = b.index[[1000, 2000, 3000, 4000, 5000]])
 
+fplot.chronogram_spiny({'A':[a,b]}, bins='1H', color='blue', plot_quick=True)
+
 # from fed3.plot.helpers import _parse_feds
 # from fed3.core.fedfuncs import screen_mixed_alignment
 
