@@ -18,6 +18,9 @@ import numpy as np
 a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
 b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
 
+c = fed3.split(a, dates = a.index[[1000, 2000, 3000, 4000, 5000]])
+d = fed3.split(b, dates = b.index[[1000, 2000, 3000, 4000, 5000]])
+
 
 from fed3.plot.helpers import _parse_feds
 from fed3.core.fedfuncs import screen_mixed_alignment
@@ -25,6 +28,8 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 from fed3.metrics.tables import (_create_group_metric_df,  _create_metric_df, _bar_metric_df)
 
 from fed3.metrics.core import (_get_metric, _get_metricname,)
+
+from fed3.plot import COLORCYCLE
 
 def assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0.75):
 
@@ -52,12 +57,20 @@ def assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0.
 
     return centers, positions, bar_widths
 
-feds = {'a':[a, b], 'b':[a, b],
-        'c':[a, b], 'd':[a, b]}
+def jitter_ys(ys, xcenter, spread):
+
+    xs = np.random.uniform(0, spread/2, size=len(ys))
+    half = int(len(ys)/2)
+    xs[np.arange(len(xs)) < half] *= -1
+    np.random.shuffle(xs)
+    xs += xcenter
+    return xs
+
+feds = {'C':c, 'D':d}
 y = 'pellets'
 stat = 'max'
 mixed_align = 'raise'
-positions = [0, 0, 1, 1]
+positions = [0, 1]
 position_labels = ['A', 'B']
 
 import matplotlib.pyplot as plt
@@ -80,6 +93,7 @@ DATA = _bar_metric_df(feds_dict, metric, stat)
 individual_data = DATA.iloc[:, :-2]
 barvals = DATA.iloc[:, -2]
 errors = DATA.iloc[:, -1]
+show_individual = True
 
 position_width = 0.75
 centers, positions, bar_widths = assign_bar_positions_widths(feds,
@@ -93,9 +107,15 @@ for i, x in enumerate(positions):
     w = bar_widths[i]
     label = DATA.index[i]
     err = errors[i]
+    color = COLORCYCLE[i]
 
-    ax.bar(x, y, width=w, label=label)
-    ax.errorbar(x=x, y=y, yerr=err, color='grey', ls='none', capsize=5)
+    ax.bar(x, y, width=w, label=label, color=color, zorder=0)
+    ax.errorbar(x=x, y=y, yerr=err, color='grey', ls='none', capsize=5, zorder=2)
+    if show_individual:
+        spread = w * .3
+        ys = individual_data.iloc[i, :].dropna()
+        xs = jitter_ys(ys, x, spread)
+        ax.scatter(xs, ys, zorder=1, color=color, edgecolor='k')
 
 ax.set_xticks(centers)
 if position_labels is not None:

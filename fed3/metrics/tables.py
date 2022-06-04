@@ -41,7 +41,11 @@ def _bar_metric_df(feds_dict, metric, stat, agg='mean', var='std', dropna=True):
 
         rows.append(row)
 
-    return pd.DataFrame(rows, index=feds_dict.keys())
+    last2 = [agg_key, var_key]
+    out = pd.DataFrame(rows, index=feds_dict.keys())
+    out = out.loc[:, [c for c in out.columns if c not in last2] + last2]
+
+    return out
 
 def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
                           reorder_index=True, relative_index=True):
