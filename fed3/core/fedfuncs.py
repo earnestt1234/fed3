@@ -13,7 +13,7 @@ import pandas as pd
 
 from fed3.core import FEDFrame
 
-ZERO_DATE = pd.Timestamp(year=1980, month=1, day=1)
+ZERO_DATE = pd.Timestamp(year=2000, month=1, day=1)
 
 def align(fed, alignment, inplace=False):
     options = ['datetime', 'time', 'elapsed']

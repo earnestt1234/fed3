@@ -57,7 +57,7 @@ def cumulative_pellets(fed, bins=None, origin='start'):
                            binned_func=_get_cumulative_pellets,
                            bins=bins,
                            origin=origin,
-                           agg='mean')
+                           agg='max')
 
 def ipi(fed, bins=None, origin='start'):
 
