@@ -6,19 +6,34 @@ Created on Fri Apr 30 18:27:07 2021
 @author: earnestt1234
 """
 
+from collections import namedtuple
+import warnings
+
 import pandas as pd
 
-def _default_metric(fed, nonbinned_func, binned_func, bins=None, origin='start',
+# ---- Helpers
+
+def _default_metric(fed, func, bins=None, origin='start',
                     agg='sum'):
 
     if bins is None:
-        out = nonbinned_func(fed)
+        out = func(fed)
     else:
-        vals = binned_func(fed)
+        vals = func(fed)
         G = pd.Grouper(freq=bins, origin=origin)
         out = vals.groupby(G).agg(agg)
 
     return out
+
+def _get_metric(y, kind=None):
+
+    key = y.lower()
+    try:
+        return METRICS[key]
+    except KeyError:
+        metrics = str(list(METRICS.keys()))[1:-1]
+        raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
+                         f'{metrics}.')
 
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 
@@ -31,6 +46,8 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 
     return series
 
+# ---- Pellets
+
 def binary_pellets(fed, bins=None, origin='start'):
 
     def _get_binary_pellets(fed):
@@ -39,8 +56,7 @@ def binary_pellets(fed, bins=None, origin='start'):
         return y
 
     return _default_metric(fed,
-                           nonbinned_func=_get_binary_pellets,
-                           binned_func=_get_binary_pellets,
+                           func=_get_binary_pellets,
                            bins=bins,
                            origin=origin,
                            agg='sum')
@@ -49,15 +65,121 @@ def cumulative_pellets(fed, bins=None, origin='start'):
 
     def _get_cumulative_pellets(fed):
         y = fed['Pellet_Count']
-        y = _filterout(y, deduplicate=True)
+        y = _filterout(y, deduplicate=True, dropzero=True)
         return y
 
     return _default_metric(fed,
-                           nonbinned_func=_get_cumulative_pellets,
-                           binned_func=_get_cumulative_pellets,
+                           func=_get_cumulative_pellets,
                            bins=bins,
                            origin=origin,
                            agg='max')
+
+def pellets(fed, bins=None, origin='start'):
+
+    func = cumulative_pellets if bins is None else binary_pellets
+
+    return func(fed, bins=bins, origin=origin)
+
+# ---- Any sided pokes
+
+# ---- L/R pokes
+
+def binary_left_pokes(fed, bins=None, origin='start'):
+
+    def _get_binary_left(fed):
+        y = fed.binary_pokes(side='left')
+        y = _filterout(y, dropzero=True)
+        return y
+
+    return _default_metric(fed,
+                           func=_get_binary_left,
+                           bins=bins,
+                           origin=origin,
+                           agg='sum')
+
+def binary_right_pokes(fed, bins=None, origin='start'):
+
+    def _get_binary_right(fed):
+        y = fed.binary_pokes(side='right')
+        y = _filterout(y, dropzero=True)
+        return y
+
+    return _default_metric(fed,
+                           func=_get_binary_right,
+                           bins=bins,
+                           origin=origin,
+                           agg='sum')
+
+def cumulative_left_pokes(fed, bins=None, origin='start'):
+
+    def _get_cumulative_left(fed):
+        y = fed['Left_Poke_Count']
+        y = _filterout(y, deduplicate=True, dropzero=True)
+        return y
+
+    return _default_metric(fed,
+                           func=_get_cumulative_left,
+                           bins=bins,
+                           origin=origin,
+                           agg='max')
+
+def cumulative_right_pokes(fed, bins=None, origin='start'):
+
+    def _get_cumulative_right(fed):
+        y = fed['Right_Poke_Count']
+        y = _filterout(y, deduplicate=True, dropzero=True)
+        return y
+
+    return _default_metric(fed,
+                           func=_get_cumulative_right,
+                           bins=bins,
+                           origin=origin,
+                           agg='max')
+
+def cumulative_left_percentage(fed, bins=None, origin='start'):
+
+    def _get_crp(fed):
+
+        l = cumulative_left_pokes(fed)
+        r = cumulative_right_pokes(fed)
+        idx = l.index.union(r.index)
+
+        try:
+            l = l.reindex(idx)
+            r = r.reindex(idx)
+        except ValueError:
+            warnings.warn("Unable to reindex left and right pokes, likely "
+                          "due to duplicate index.  Using pandas `duplicated()` "
+                          "to remove duplicate indices.",
+                          RuntimeWarning)
+
+            l = l.loc[~ l.index.duplicated()]
+            r = r.loc[~ r.index.duplicated()]
+            l = l.reindex(idx)
+            r = r.reindex(idx)
+
+        l = l.ffill().fillna(0)
+        r = r.ffill().fillna(0)
+        total = l + r
+        p = (l / total) * 100
+
+        return p
+
+    return _get_crp(fed)
+
+
+# ---- Other
+
+def battery(fed, bins=None, origin='start'):
+
+    def _get_battery(fed):
+        return fed['Battery_Voltage']
+
+    return _default_metric(fed,
+                           func=_get_battery,
+                           bins=bins,
+                           origin=origin,
+                           agg='mean')
 
 def ipi(fed, bins=None, origin='start'):
 
@@ -67,17 +189,23 @@ def ipi(fed, bins=None, origin='start'):
         return y
 
     return _default_metric(fed,
-                           nonbinned_func=_get_ipi,
-                           binned_func=_get_ipi,
+                           func=_get_ipi,
                            bins=bins,
                            origin=origin,
                            agg='mean')
 
-def pellets(fed, bins=None, origin='start'):
+def motor_turns(fed, bins=None, origin='start'):
 
-    func = cumulative_pellets if bins is None else binary_pellets
+    def _get_mt(fed):
+        pellets = fed.binary_pellets().astype(bool)
+        y = fed.loc[pellets, 'Motor_Turns']
+        return y
 
-    return func(fed, bins=bins, origin=origin)
+    return _default_metric(fed,
+                           func=_get_mt,
+                           bins=bins,
+                           origin=origin,
+                           agg='mean')
 
 def retrival_time(fed, bins=None, origin='start'):
 
@@ -87,40 +215,20 @@ def retrival_time(fed, bins=None, origin='start'):
         return y
 
     return _default_metric(fed,
-                           nonbinned_func=_get_rt,
-                           binned_func=_get_rt,
+                           func=_get_rt,
                            bins=bins,
                            origin=origin,
                            agg='mean')
 
-# ---- module variables
+# ---- Dicts for metric access
 
 # link keywords to their default function
-METRICS = {'pellets': pellets,
-           'bpellets': binary_pellets,
-           'cpellets': cumulative_pellets,
-           'ipi': ipi,
-           'rt': retrival_time}
+Metric = namedtuple("Metric", ['func', 'nicename'])
 
-# # link keywords to names
-METRICNAMES = {'pellets': 'Pellets',
-                'bpellets': 'Pellets',
-                'cpellets': 'Pellets',
-                'ipi': 'Interpellet Intervals',
-                'rt': 'Retrieval Time (s)'}
-
-def _get_metric(y, kind=None):
-
-    key = y.lower()
-    try:
-        return METRICS[key]
-    except KeyError:
-        raise ValueError(f'y-value "{y}" is not recognized.')
-
-def _get_metricname(y):
-
-    key = y.lower()
-    try:
-        return METRICNAMES[key]
-    except KeyError:
-        raise ValueError(f'y-value "{y}" is not recognized.')
+METRICS = {'battery'           : Metric(battery, "Battery Life (V)"),
+           'binary_pellets'    : Metric(binary_pellets, "Pellets"),
+           'cumulative_pellets': Metric(cumulative_pellets, "Pellets"),
+           'ipi'               : Metric(ipi, "Interpellet Intervals"),
+           'motor'             : Metric(motor_turns, "Motor Turns"),
+           'pellets'           : Metric(pellets, "Pellets"),
+           'rt'                : Metric(retrival_time, "Retrieval Time (s)")}

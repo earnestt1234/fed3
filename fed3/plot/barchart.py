@@ -12,7 +12,7 @@ import pandas as pd
 
 from fed3.core.fedfuncs import screen_mixed_alignment
 
-from fed3.metrics.core import (_get_metric, _get_metricname,)
+from fed3.metrics.core import _get_metric
 from fed3.metrics.tables import _bar_metric_df
 
 from fed3.plot import COLORCYCLE
@@ -74,8 +74,9 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
     alignment = screen_mixed_alignment(feds_all, option=mixed_align)
 
     # compute plot data
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     if normalize is not None:
         metricname += f' ({normalize})'
     DATA = _bar_metric_df(feds_dict, metric=metric, stat=stat,

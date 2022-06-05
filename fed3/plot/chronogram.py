@@ -14,7 +14,7 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 
 from fed3.lightcycle import LIGHTCYCLE, time_to_float
 
-from fed3.metrics.core import (_get_metric, _get_metricname,)
+from fed3.metrics.core import _get_metric
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
 from fed3.plot import COLORCYCLE
@@ -46,8 +46,9 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
     alignment = screen_mixed_alignment(feds_all, option=mixed_align)
 
     # compute data
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
@@ -169,8 +170,9 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
     alignment = screen_mixed_alignment(feds_all, option=mixed_align)
 
     # compute data
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
@@ -307,8 +309,9 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
     alignment = screen_mixed_alignment(feds_all, option=mixed_align)
 
     # compute data
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     DATA, _ = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
                                           agg=agg, var=None, origin_lightcycle=True,
                                           reorder_index=True, relative_index=True)

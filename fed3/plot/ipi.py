@@ -12,7 +12,7 @@ import seaborn as sns
 
 from fed3.core.fedfuncs import screen_mixed_alignment
 
-from fed3.metrics.core import (_get_metric, _get_metricname,)
+from fed3.metrics.core import _get_metric
 from fed3.metrics.tables import (_create_metric_df,
                                  _stack_group_values)
 
@@ -49,8 +49,9 @@ def ipi(feds, logx=True, kde=True, mixed_align='raise', output='plot',
 
     # compute data for individual feds
     y = 'ipi'
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     DATA = _create_metric_df(feds=feds_all, metric=metric)
     if is_group:
         DATA = _stack_group_values(DATA, feds_dict)

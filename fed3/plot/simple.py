@@ -15,7 +15,7 @@ from fed3.lightcycle import LIGHTCYCLE
 
 from fed3.metrics.tables import (_create_group_metric_df,  _create_metric_df,)
 
-from fed3.metrics.core import (_get_metric, _get_metricname,)
+from fed3.metrics.core import _get_metric
 
 from fed3.plot import COLORCYCLE
 from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
@@ -85,8 +85,9 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
     origin = min(f.start_time.floor('1H') for f in feds_all)
 
     # compute data
-    metric = _get_metric(y)
-    metricname = _get_metricname(y)
+    metric_obj = _get_metric(y)
+    metric = metric_obj.func
+    metricname = metric_obj.nicename
     AGGDATA, VARDATA = _create_group_metric_df(feds=feds_dict,
                                                metric=metric,
                                                agg=agg,
