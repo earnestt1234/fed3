@@ -26,6 +26,19 @@ NEEDED_COLS = ['Pellet_Count',
                'Left_Poke_Count',
                'Right_Poke_Count',]
 
+def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
+
+    """Helper func for condensing series returned from FEDFrame methods."""
+
+    if dropna:
+        series = series.dropna()
+    if dropzero:
+        series = series[series != 0]
+    if deduplicate:
+        series = series[~series.duplicated()]
+
+    return series
+
 class FEDFrame(pd.DataFrame):
     _metadata = ['name', 'path', 'foreign_columns', 'missing_columns',
                  '_alignment', '_current_offset']
@@ -183,9 +196,6 @@ class FEDFrame(pd.DataFrame):
 
         return interpellet
 
-    # add alias for interpellet_intervals
-    ipi = interpellet_intervals
-
     def meals(self, pellet_minimum=1, intermeal_interval=1, only_pellet_index=False):
         ipi = self.interpellet_intervals(only_pellet_index=True)
         within_interval = ipi < intermeal_interval
@@ -197,6 +207,17 @@ class FEDFrame(pd.DataFrame):
             meals = meals.reindex(self.index)
         return meals
 
+    # def pellets(self, cumulative=True, condense=False):
+
+    #     if cumulative:
+    #         y = self['Pellet_Count']
+
+    #         if condense:
+    #             y = _filterout(y, deduplicate=True, dropzero=True)
+
+
+
+
     def reassign_events(self, include_side=True):
         if include_side:
             events = pd.Series(np.nan, index=self.index)
@@ -206,4 +227,7 @@ class FEDFrame(pd.DataFrame):
         else:
             events = np.where(self.binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
+
+    # ---- Aliases
+    ipi = interpellet_intervals
 
