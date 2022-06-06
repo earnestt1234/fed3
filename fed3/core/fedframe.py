@@ -30,29 +30,47 @@ class FEDFrame(pd.DataFrame):
     _metadata = ['name', 'path', 'foreign_columns', 'missing_columns',
                  '_alignment', '_current_offset']
 
+    # ---- Properties
+
     @property
     def _constructor(self):
         return FEDFrame
 
     @property
-    def mode(self):
-        return self.determine_mode()
-
-    @property
-    def events(self):
-        return len(self.data)
-
-    @property
-    def start_time(self):
-        return pd.Timestamp(self.index.values[0])
+    def duration(self):
+        return self.end_time-self.start_time
 
     @property
     def end_time(self):
         return pd.Timestamp(self.index.values[-1])
 
     @property
-    def duration(self):
-        return self.end_time-self.start_time
+    def events(self):
+        return len(self.data)
+
+    @property
+    def mode(self):
+        return self.determine_mode()
+
+    @property
+    def start_time(self):
+        return pd.Timestamp(self.index.values[0])
+
+    # ---- "Private"
+
+    def _binary_poke_for_side(self, side):
+        col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
+        bp = self[col].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+
+        return bp
+
+    def _handle_retrieval_time(self):
+        if 'Retrieval_Time' not in self.columns:
+            return
+        self['Retrieval_Time'] = pd.to_numeric(self['Retrieval_Time'], errors='coerce')
+
 
     def _load_init(self, name=None, path=None):
         self.name = name
@@ -62,17 +80,38 @@ class FEDFrame(pd.DataFrame):
         self._alignment = 'datetime'
         self._current_offset = pd.Timedelta(0)
 
-    def fix_column_names(self):
-        self.foreign_columns = []
-        for col in self.columns:
-            for fix in FIXED_COLS:
-                likeness = SequenceMatcher(a=col, b=fix).ratio()
-                if likeness > 0.85:
-                    self.rename(columns={col:fix}, inplace=True)
-                    break
-                self.foreign_columns.append(col)
-        self.missing_columns = [col for col in NEEDED_COLS if
-                                col not in self.columns]
+    # ---- Public
+
+    def binary_pellets(self):
+        bp = self['Pellet_Count'].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]) == 'Pellet')
+
+        return bp
+
+    def binary_pokes(self, side='both'):
+        side = side.lower()
+        if side not in ['left', 'right', 'both']:
+            raise ValueError('`side` must be "left", "right", or "both", '
+                             f'not {side}')
+        if side == 'both':
+            l = self._binary_poke_for_side('left')
+            r = self._binary_poke_for_side('right')
+            bp = ((l == 1) | (r==1)).astype(int)
+
+        else:
+            bp = self._binary_poke_for_side(side).astype(int)
+
+        return bp
+
+    def correct_pokes(self):
+        l = self.binary_pokes('left')
+        r = self.binary_pokes('right')
+        active_l = self['Active_Poke'] == 'Left'
+        active_r = self['Active_Poke'] == 'Right'
+        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
+
+        return correct
 
     def determine_mode(self):
         mode = 'Unknown'
@@ -111,35 +150,17 @@ class FEDFrame(pd.DataFrame):
                                 'no "Event" column and multiple non-zero '
                                 'entries for pellets and pokes.')
 
-    def binary_pellets(self):
-        bp = self['Pellet_Count'].diff().copy()
-        if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]) == 'Pellet')
-
-        return bp
-
-    def binary_pokes(self, side='both'):
-        side = side.lower()
-        if side not in ['left', 'right', 'both']:
-            raise ValueError('`side` must be "left", "right", or "both", '
-                             f'not {side}')
-        if side == 'both':
-            l = self._binary_poke_for_side('left')
-            r = self._binary_poke_for_side('right')
-            bp = ((l == 1) | (r==1)).astype(int)
-
-        else:
-            bp = self._binary_poke_for_side(side).astype(int)
-
-        return bp
-
-    def _binary_poke_for_side(self, side):
-        col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
-        bp = self[col].diff().copy()
-        if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
-
-        return bp
+    def fix_column_names(self):
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness > 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
 
     def interpellet_intervals(self, check_concat=True, only_pellet_index=False):
         bp = self.binary_pellets()
@@ -165,15 +186,6 @@ class FEDFrame(pd.DataFrame):
     # add alias for interpellet_intervals
     ipi = interpellet_intervals
 
-    def correct_pokes(self):
-        l = self.binary_pokes('left')
-        r = self.binary_pokes('right')
-        active_l = self['Active_Poke'] == 'Left'
-        active_r = self['Active_Poke'] == 'Right'
-        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
-
-        return correct
-
     def meals(self, pellet_minimum=1, intermeal_interval=1, only_pellet_index=False):
         ipi = self.interpellet_intervals(only_pellet_index=True)
         within_interval = ipi < intermeal_interval
@@ -195,7 +207,3 @@ class FEDFrame(pd.DataFrame):
             events = np.where(self.binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
 
-    def _handle_retrieval_time(self):
-        if 'Retrieval_Time' not in self.columns:
-            return
-        self['Retrieval_Time'] = pd.to_numeric(self['Retrieval_Time'], errors='coerce')

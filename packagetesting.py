@@ -12,13 +12,10 @@ import fed3.plot as fplot
 import numpy as np
 
 # load FED data
-# a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
-# b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
+a = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED7Cat.csv")
+b = fed3.load(r"/Users/earnestt1234/Documents/fedviz/justin_data/FED3Cat.csv")
 
-a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
-b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
-c = fed3.load(r"C:\Users\earne\Documents\fedviz\WEEK 1\WEEK 1 - Copy\4-1_FED3024_111120_01.CSV")
-d = fed3.load(r"C:\Users\earne\Documents\fedviz\poketime\FED002_110920_02.CSV")
-
-fplot.line(c, y='batterya')
-fplot.scatter(c, y='motor', color='red', shadedark=False)
+# a = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED3Cat.csv")
+# b = fed3.load(r"C:\Users\earne\Documents\fedviz\justin_data\FED7Cat.csv")
+# c = fed3.load(r"C:\Users\earne\Documents\fedviz\WEEK 1\WEEK 1 - Copy\4-1_FED3024_111120_01.CSV")
+# d = fed3.load(r"C:\Users\earne\Documents\fedviz\poketime\FED002_110920_02.CSV")
