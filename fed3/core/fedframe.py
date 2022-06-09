@@ -71,6 +71,13 @@ class FEDFrame(pd.DataFrame):
 
     # ---- "Private"
 
+    def _binary_pellets(self):
+        bp = self['Pellet_Count'].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]) == 'Pellet')
+
+        return bp
+
     def _binary_poke_for_side(self, side):
         col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
         bp = self[col].diff().copy()
@@ -94,13 +101,6 @@ class FEDFrame(pd.DataFrame):
         self._current_offset = pd.Timedelta(0)
 
     # ---- Public
-
-    def binary_pellets(self):
-        bp = self['Pellet_Count'].diff().copy()
-        if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]) == 'Pellet')
-
-        return bp
 
     def binary_pokes(self, side='both'):
         side = side.lower()
@@ -176,7 +176,7 @@ class FEDFrame(pd.DataFrame):
                                 col not in self.columns]
 
     def interpellet_intervals(self, check_concat=True, only_pellet_index=False):
-        bp = self.binary_pellets()
+        bp = self._binary_pellets()
         bp = bp[bp == 1]
         diff = bp.index.to_series().diff().dt.total_seconds() / 60
 
@@ -207,25 +207,28 @@ class FEDFrame(pd.DataFrame):
             meals = meals.reindex(self.index)
         return meals
 
-    # def pellets(self, cumulative=True, condense=False):
+    def pellets(self, cumulative=True, condense=False):
 
-    #     if cumulative:
-    #         y = self['Pellet_Count']
+        if cumulative:
+            y = self['Pellet_Count']
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
 
-    #         if condense:
-    #             y = _filterout(y, deduplicate=True, dropzero=True)
+        else:
+            y = self._binary_pellets()
+            if condense:
+                y = _filterout(y, dropzero=True)
 
-
-
+        return y
 
     def reassign_events(self, include_side=True):
         if include_side:
             events = pd.Series(np.nan, index=self.index)
-            events.loc[self.binary_pellets().astype(bool)] = 'Pellet'
+            events.loc[self._binary_pellets().astype(bool)] = 'Pellet'
             events.loc[self.binary_pokes('left').astype(bool)] = 'Left'
             events.loc[self.binary_pokes('right').astype(bool)] = 'Right'
         else:
-            events = np.where(self.binary_pellets(), 'Pellet', 'Poke')
+            events = np.where(self._binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
 
     # ---- Aliases

@@ -109,7 +109,7 @@ def _create_group_chronogram_df(feds, metric, agg='mean', var='std', bins='1H',
         group_agg.name = group
 
         if var is None or var == 'raw':
-            group_var = pd.Series()
+            group_var = pd.Series(dtype='float64')
         else:
             group_var = metric_df.agg(var, axis=1)
         group_var.name = group
@@ -133,7 +133,7 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
         group_agg.name = group
 
         if var is None or var == 'raw':
-            group_var = pd.Series()
+            group_var = pd.Series(dtype='float64')
         else:
             group_var = metric_df.agg(var, axis=1)
         group_var.name = group

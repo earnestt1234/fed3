@@ -49,35 +49,17 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 # ---- Pellets
 
 def binary_pellets(fed, bins=None, origin='start'):
-
-    def _get_binary_pellets(fed):
-        y = fed.binary_pellets()
-        y = _filterout(y, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_binary_pellets,
-                           bins=bins,
-                           origin=origin,
-                           agg='sum')
+    func = lambda f: f.pellets(cumulative=False, condense=True)
+    agg = 'sum'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_pellets(fed, bins=None, origin='start'):
-
-    def _get_cumulative_pellets(fed):
-        y = fed['Pellet_Count']
-        y = _filterout(y, deduplicate=True, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_cumulative_pellets,
-                           bins=bins,
-                           origin=origin,
-                           agg='max')
+    func = lambda f: f.pellets(cumulative=True, condense=True)
+    agg = 'max'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def pellets(fed, bins=None, origin='start'):
-
     func = cumulative_pellets if bins is None else binary_pellets
-
     return func(fed, bins=bins, origin=origin)
 
 # ---- Any sided pokes
