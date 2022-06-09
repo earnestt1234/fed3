@@ -48,32 +48,42 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 
 # ---- Helpers for computing metrics
 
-def _cumulative_poke_percentage_side(fed, side):
+def _cumulative_poke_percentage_general(fed, kind):
 
-    l = cumulative_left_pokes(fed)
-    r = cumulative_right_pokes(fed)
-    idx = l.index.union(r.index)
+    kinds = ['left', 'right', 'correct', 'error']
+    if kind not in kinds:
+        raise ValueError(f'`kind` must be one of {kinds}')
+
+    if kind == 'left':
+        a = cumulative_left_pokes(fed)
+        b = cumulative_right_pokes(fed)
+    elif kind == 'right':
+        a = cumulative_right_pokes(fed)
+        b = cumulative_left_pokes(fed)
+    else:
+        raise NotImplementedError("Yet to add correct/error cumulative percentage")
+
+    idx = a.index.union(b.index)
 
     try:
-        l = l.reindex(idx)
-        r = r.reindex(idx)
+        a = a.reindex(idx)
+        b = b.reindex(idx)
     except ValueError:
-        warnings.warn("Unable to reindex left and right pokes, likely "
+        warnings.warn("Unable to reindex two poke arrays, likely "
                       "due to duplicate index.  Using pandas `duplicated()` "
                       "to remove duplicate indices.",
                       RuntimeWarning)
 
-        l = l.loc[~ l.index.duplicated()]
-        r = r.loc[~ r.index.duplicated()]
-        l = l.reindex(idx)
-        r = r.reindex(idx)
+        a = a.loc[~ a.index.duplicated()]
+        b = b.loc[~ b.index.duplicated()]
+        a = a.reindex(idx)
+        b = b.reindex(idx)
 
-    l = l.ffill().fillna(0)
-    r = r.ffill().fillna(0)
-    total = l + r
-    opts = {'left': (l / total) * 100, 'right': (r / total) * 100}
+    a = a.ffill().fillna(0)
+    b = b.ffill().fillna(0)
+    total = a + b
 
-    return opts[side]
+    return (a / total) * 100
 
 # ---- Pellets
 
