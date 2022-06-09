@@ -11,7 +11,7 @@ import warnings
 
 import pandas as pd
 
-# ---- Helpers
+# ---- General helpers
 
 def _default_metric(fed, func, bins=None, origin='start',
                     agg='sum'):
@@ -46,6 +46,35 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 
     return series
 
+# ---- Helpers for computing metrics
+
+def _cumulative_poke_percentage_side(fed, side):
+
+    l = cumulative_left_pokes(fed)
+    r = cumulative_right_pokes(fed)
+    idx = l.index.union(r.index)
+
+    try:
+        l = l.reindex(idx)
+        r = r.reindex(idx)
+    except ValueError:
+        warnings.warn("Unable to reindex left and right pokes, likely "
+                      "due to duplicate index.  Using pandas `duplicated()` "
+                      "to remove duplicate indices.",
+                      RuntimeWarning)
+
+        l = l.loc[~ l.index.duplicated()]
+        r = r.loc[~ r.index.duplicated()]
+        l = l.reindex(idx)
+        r = r.reindex(idx)
+
+    l = l.ffill().fillna(0)
+    r = r.ffill().fillna(0)
+    total = l + r
+    opts = {'left': (l / total) * 100, 'right': (r / total) * 100}
+
+    return opts[side]
+
 # ---- Pellets
 
 def binary_pellets(fed, bins=None, origin='start'):
@@ -67,140 +96,70 @@ def pellets(fed, bins=None, origin='start'):
 # ---- L/R pokes
 
 def binary_left_pokes(fed, bins=None, origin='start'):
-
-    def _get_binary_left(fed):
-        y = fed.binary_pokes(side='left')
-        y = _filterout(y, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_binary_left,
-                           bins=bins,
-                           origin=origin,
-                           agg='sum')
+    func = lambda f: f.pokes(side='left', cumulative=False, condense=True)
+    agg = 'sum'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_right_pokes(fed, bins=None, origin='start'):
-
-    def _get_binary_right(fed):
-        y = fed.binary_pokes(side='right')
-        y = _filterout(y, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_binary_right,
-                           bins=bins,
-                           origin=origin,
-                           agg='sum')
+    func = lambda f: f.pokes(side='right', cumulative=False, condense=True)
+    agg = 'sum'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_pokes(fed, bins=None, origin='start'):
-
-    def _get_cumulative_left(fed):
-        y = fed['Left_Poke_Count']
-        y = _filterout(y, deduplicate=True, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_cumulative_left,
-                           bins=bins,
-                           origin=origin,
-                           agg='max')
+    func = lambda f: f.pokes(side='left', cumulative=True, condense=True)
+    agg = 'max'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_pokes(fed, bins=None, origin='start'):
-
-    def _get_cumulative_right(fed):
-        y = fed['Right_Poke_Count']
-        y = _filterout(y, deduplicate=True, dropzero=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_cumulative_right,
-                           bins=bins,
-                           origin=origin,
-                           agg='max')
+    func = lambda f: f.pokes(side='right', cumulative=True, condense=True)
+    agg = 'max'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_percentage(fed, bins=None, origin='start'):
+    func = lambda f: _cumulative_poke_percentage_side(f, 'left')
+    agg = 'last'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
-    def _get_crp(fed):
+def cumulative_right_percentage(fed, bins=None, origin='start'):
+    func = lambda f: _cumulative_poke_percentage_side(f, 'right')
+    agg = 'last'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
-        l = cumulative_left_pokes(fed)
-        r = cumulative_right_pokes(fed)
-        idx = l.index.union(r.index)
+def left_pokes(fed, bins=None, origin='start'):
+    func = cumulative_left_pokes if bins is None else binary_left_pokes
+    return func(fed, bins=bins, origin=origin)
 
-        try:
-            l = l.reindex(idx)
-            r = r.reindex(idx)
-        except ValueError:
-            warnings.warn("Unable to reindex left and right pokes, likely "
-                          "due to duplicate index.  Using pandas `duplicated()` "
-                          "to remove duplicate indices.",
-                          RuntimeWarning)
-
-            l = l.loc[~ l.index.duplicated()]
-            r = r.loc[~ r.index.duplicated()]
-            l = l.reindex(idx)
-            r = r.reindex(idx)
-
-        l = l.ffill().fillna(0)
-        r = r.ffill().fillna(0)
-        total = l + r
-        p = (l / total) * 100
-
-        return p
-
-    return _get_crp(fed)
-
+def right_pokes(fed, bins=None, origin='start'):
+    func = cumulative_right_pokes if bins is None else binary_right_pokes
+    return func(fed, bins=bins, origin=origin)
 
 # ---- Other
 
 def battery(fed, bins=None, origin='start'):
-
-    def _get_battery(fed):
-        return fed['Battery_Voltage']
-
-    return _default_metric(fed,
-                           func=_get_battery,
-                           bins=bins,
-                           origin=origin,
-                           agg='mean')
+    func = lambda f: f['Battery_Voltage']
+    agg = 'mean'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def ipi(fed, bins=None, origin='start'):
-
-    def _get_ipi(fed):
-        y = fed.ipi()
-        y = _filterout(y, dropna=True)
-        return y
-
-    return _default_metric(fed,
-                           func=_get_ipi,
-                           bins=bins,
-                           origin=origin,
-                           agg='mean')
+    func = lambda f: f.ipi(condense=True)
+    agg = 'mean'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def motor_turns(fed, bins=None, origin='start'):
-
-    def _get_mt(fed):
+    def func(fed):
         pellets = fed.binary_pellets().astype(bool)
         y = fed.loc[pellets, 'Motor_Turns']
         return y
-
-    return _default_metric(fed,
-                           func=_get_mt,
-                           bins=bins,
-                           origin=origin,
-                           agg='mean')
+    agg = 'mean'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def retrival_time(fed, bins=None, origin='start'):
-
-    def _get_rt(fed):
+    def func(fed):
         y = fed['Retrieval_Time']
         y = _filterout(y, dropna=True)
         return y
-
-    return _default_metric(fed,
-                           func=_get_rt,
-                           bins=bins,
-                           origin=origin,
-                           agg='mean')
+    agg = 'mean'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 # ---- Dicts for metric access
 

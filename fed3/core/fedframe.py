@@ -86,6 +86,43 @@ class FEDFrame(pd.DataFrame):
 
         return bp
 
+    def _binary_pokes(self, side='both'):
+        side = side.lower()
+        if side not in ['left', 'right', 'both']:
+            raise ValueError('`side` must be "left", "right", or "both", '
+                             f'not {side}')
+        if side == 'both':
+            l = self._binary_poke_for_side('left')
+            r = self._binary_poke_for_side('right')
+            bp = ((l == 1) | (r==1)).astype(int)
+
+        else:
+            bp = self._binary_poke_for_side(side).astype(int)
+
+        return bp
+
+    def _cumulative_poke_for_side(self, side):
+        col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
+        cp = self[col]
+
+        return cp
+
+    def _cumulative_pokes(self, side='both'):
+        side = side.lower()
+        if side not in ['left', 'right', 'both']:
+            raise ValueError('`side` must be "left", "right", or "both", '
+                             f'not {side}')
+
+        if side == 'both':
+            l = self._cumulative_poke_for_side('left')
+            r = self._cumulative_poke_for_side('right')
+            cp = (l + r).astype(int)
+
+        else:
+            cp = self._cumulative_poke_for_side(side).astype(int)
+
+        return cp
+
     def _handle_retrieval_time(self):
         if 'Retrieval_Time' not in self.columns:
             return
@@ -102,24 +139,9 @@ class FEDFrame(pd.DataFrame):
 
     # ---- Public
 
-    def binary_pokes(self, side='both'):
-        side = side.lower()
-        if side not in ['left', 'right', 'both']:
-            raise ValueError('`side` must be "left", "right", or "both", '
-                             f'not {side}')
-        if side == 'both':
-            l = self._binary_poke_for_side('left')
-            r = self._binary_poke_for_side('right')
-            bp = ((l == 1) | (r==1)).astype(int)
-
-        else:
-            bp = self._binary_poke_for_side(side).astype(int)
-
-        return bp
-
     def correct_pokes(self):
-        l = self.binary_pokes('left')
-        r = self.binary_pokes('right')
+        l = self._binary_pokes('left')
+        r = self._binary_pokes('right')
         active_l = self['Active_Poke'] == 'Left'
         active_r = self['Active_Poke'] == 'Right'
         correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
@@ -175,7 +197,7 @@ class FEDFrame(pd.DataFrame):
         self.missing_columns = [col for col in NEEDED_COLS if
                                 col not in self.columns]
 
-    def interpellet_intervals(self, check_concat=True, only_pellet_index=False):
+    def interpellet_intervals(self, check_concat=True, condense=False):
         bp = self._binary_pellets()
         bp = bp[bp == 1]
         diff = bp.index.to_series().diff().dt.total_seconds() / 60
@@ -191,19 +213,20 @@ class FEDFrame(pd.DataFrame):
                 pos = dropped.index.to_series().groupby(self['Concat_#']).first()
                 interpellet.loc[pos[1:]] = np.nan
 
-        if only_pellet_index:
+        if condense:
             interpellet = interpellet.loc[bp.index]
+            interpellet = _filterout(interpellet, dropna=True)
 
         return interpellet
 
-    def meals(self, pellet_minimum=1, intermeal_interval=1, only_pellet_index=False):
-        ipi = self.interpellet_intervals(only_pellet_index=True)
+    def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+        ipi = self.interpellet_intervals(condense=True)
         within_interval = ipi < intermeal_interval
         meals = ((~within_interval).cumsum() + 1)
         above_min = meals.value_counts().sort_index() >= pellet_minimum
         replacements = above_min[above_min].cumsum().reindex(above_min.index)
         meals = meals.map(replacements)
-        if not only_pellet_index:
+        if not condense:
             meals = meals.reindex(self.index)
         return meals
 
@@ -221,12 +244,30 @@ class FEDFrame(pd.DataFrame):
 
         return y
 
+    def pokes(self, side='both', cumulative=True, condense=False):
+
+        if side not in ['left', 'right', 'both']:
+            raise ValueError('`side` must be "left", "right", or "both", '
+                             f'not {side}')
+
+        if cumulative:
+            y = self._cumulative_pokes(side)
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
+
+        else:
+            y = self._binary_pokes(side)
+            if condense:
+                y = _filterout(y, dropzero=True)
+
+        return y
+
     def reassign_events(self, include_side=True):
         if include_side:
             events = pd.Series(np.nan, index=self.index)
             events.loc[self._binary_pellets().astype(bool)] = 'Pellet'
-            events.loc[self.binary_pokes('left').astype(bool)] = 'Left'
-            events.loc[self.binary_pokes('right').astype(bool)] = 'Right'
+            events.loc[self._binary_pokes('left').astype(bool)] = 'Left'
+            events.loc[self._binary_pokes('right').astype(bool)] = 'Right'
         else:
             events = np.where(self._binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
