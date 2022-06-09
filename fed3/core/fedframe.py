@@ -71,6 +71,24 @@ class FEDFrame(pd.DataFrame):
 
     # ---- "Private"
 
+    def _binary_correct_pokes(self):
+        l = self._binary_pokes('left')
+        r = self._binary_pokes('right')
+        active_l = self['Active_Poke'] == 'Left'
+        active_r = self['Active_Poke'] == 'Right'
+        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
+
+        return correct
+
+    def _binary_error_pokes(self):
+        l = self._binary_pokes('left')
+        r = self._binary_pokes('right')
+        active_l = self['Active_Poke'] == 'Left'
+        active_r = self['Active_Poke'] == 'Right'
+        error = ((l * active_r).astype(int) | (r * active_l).astype(int))
+
+        return error
+
     def _binary_pellets(self):
         bp = self['Pellet_Count'].diff().copy()
         if not bp.empty:
@@ -86,18 +104,22 @@ class FEDFrame(pd.DataFrame):
 
         return bp
 
-    def _binary_pokes(self, side='both'):
-        side = side.lower()
-        if side not in ['left', 'right', 'both']:
-            raise ValueError('`side` must be "left", "right", or "both", '
-                             f'not {side}')
-        if side == 'both':
+    def _binary_pokes(self, kind='any'):
+        kind = kind.lower()
+        kinds = ['left', 'right', 'any', 'correct', 'error']
+        if kind not in kinds:
+            raise ValueError(f'`kind` must be one of  {kinds}, not {kind}')
+
+        if kind == 'any':
             l = self._binary_poke_for_side('left')
             r = self._binary_poke_for_side('right')
             bp = ((l == 1) | (r==1)).astype(int)
 
-        else:
-            bp = self._binary_poke_for_side(side).astype(int)
+        elif kind in ['left', 'right']:
+            bp = self._binary_poke_for_side(kind).astype(int)
+
+        elif kind in ['correct', 'error']:
+            bp = self._binary_correct_pokes() if kind == 'correct' else self._binary_error_pokes()
 
         return bp
 
@@ -107,19 +129,23 @@ class FEDFrame(pd.DataFrame):
 
         return cp
 
-    def _cumulative_pokes(self, side='both'):
-        side = side.lower()
-        if side not in ['left', 'right', 'both']:
-            raise ValueError('`side` must be "left", "right", or "both", '
-                             f'not {side}')
+    def _cumulative_pokes(self, kind='any'):
+        kind = kind.lower()
+        kinds = ['left', 'right', 'any', 'correct', 'error']
+        if kind not in kinds:
+            raise ValueError(f'`kind` must be one of  {kinds}, not {kind}')
 
-        if side == 'both':
+        if kind == 'any':
             l = self._cumulative_poke_for_side('left')
             r = self._cumulative_poke_for_side('right')
             cp = (l + r).astype(int)
 
-        else:
-            cp = self._cumulative_poke_for_side(side).astype(int)
+        elif kind in ['left', 'right']:
+            cp = self._cumulative_poke_for_side(kind).astype(int)
+
+        elif kind in ['correct', 'error']:
+            bp = self._binary_correct_pokes() if kind == 'correct' else self._binary_error_pokes()
+            cp = bp.cumsum()
 
         return cp
 
@@ -138,15 +164,6 @@ class FEDFrame(pd.DataFrame):
         self._current_offset = pd.Timedelta(0)
 
     # ---- Public
-
-    def correct_pokes(self):
-        l = self._binary_pokes('left')
-        r = self._binary_pokes('right')
-        active_l = self['Active_Poke'] == 'Left'
-        active_r = self['Active_Poke'] == 'Right'
-        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
-
-        return correct
 
     def determine_mode(self):
         mode = 'Unknown'
@@ -244,19 +261,20 @@ class FEDFrame(pd.DataFrame):
 
         return y
 
-    def pokes(self, side='both', cumulative=True, condense=False):
+    def pokes(self, kind='any', cumulative=True, condense=False):
 
-        if side not in ['left', 'right', 'both']:
-            raise ValueError('`side` must be "left", "right", or "both", '
-                             f'not {side}')
+        kind = kind.lower()
+        kinds = ['left', 'right', 'any', 'correct', 'error']
+        if kind not in kinds:
+            raise ValueError(f'`kind` must be one of  {kinds}, not {kind}')
 
         if cumulative:
-            y = self._cumulative_pokes(side)
+            y = self._cumulative_pokes(kind)
             if condense:
                 y = _filterout(y, deduplicate=True, dropzero=True)
 
         else:
-            y = self._binary_pokes(side)
+            y = self._binary_pokes(kind)
             if condense:
                 y = _filterout(y, dropzero=True)
 

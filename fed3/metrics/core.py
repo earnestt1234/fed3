@@ -96,22 +96,22 @@ def pellets(fed, bins=None, origin='start'):
 # ---- L/R pokes
 
 def binary_left_pokes(fed, bins=None, origin='start'):
-    func = lambda f: f.pokes(side='left', cumulative=False, condense=True)
+    func = lambda f: f.pokes(kind='left', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_right_pokes(fed, bins=None, origin='start'):
-    func = lambda f: f.pokes(side='right', cumulative=False, condense=True)
+    func = lambda f: f.pokes(kind='right', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_pokes(fed, bins=None, origin='start'):
-    func = lambda f: f.pokes(side='left', cumulative=True, condense=True)
+    func = lambda f: f.pokes(kind='left', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_pokes(fed, bins=None, origin='start'):
-    func = lambda f: f.pokes(side='right', cumulative=True, condense=True)
+    func = lambda f: f.pokes(kind='right', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
