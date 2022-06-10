@@ -8,7 +8,12 @@ Setup for `fed3`.
 
 from setuptools import find_packages, setup
 
-requirements = []
+requirements = [
+    'numpy>=1.2'
+    'matplotlib>=3.4',
+    'pandas>=1.3',
+    'seaborn>=0.11'
+    ]
 
 setup(name='fed3',
       version='0.0.1',
