@@ -103,6 +103,20 @@ def pellets(fed, bins=None, origin='start'):
 
 # ---- Any sided pokes
 
+def binary_pokes(fed, bins=None, origin='start'):
+    func = lambda f: f.pokes(kind='any', cumulative=False, condense=True)
+    agg = 'sum'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
+
+def cumulative_pokes(fed, bins=None, origin='start'):
+    func = lambda f: f.pokes(kind='any', cumulative=True, condense=True)
+    agg = 'max'
+    return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
+
+def pokes(fed, bins=None, origin='start'):
+    func = cumulative_pokes if bins is None else binary_pokes
+    return func(fed, bins=bins, origin=origin)
+
 # ---- L/R pokes
 
 def binary_left_pokes(fed, bins=None, origin='start'):
@@ -126,12 +140,12 @@ def cumulative_right_pokes(fed, bins=None, origin='start'):
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_percentage(fed, bins=None, origin='start'):
-    func = lambda f: _cumulative_poke_percentage_side(f, 'left')
+    func = lambda f: _cumulative_poke_percentage_general(f, 'left')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_percentage(fed, bins=None, origin='start'):
-    func = lambda f: _cumulative_poke_percentage_side(f, 'right')
+    func = lambda f: _cumulative_poke_percentage_general(f, 'right')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
@@ -176,10 +190,21 @@ def retrival_time(fed, bins=None, origin='start'):
 # link keywords to their default function
 Metric = namedtuple("Metric", ['func', 'nicename'])
 
-METRICS = {'battery'           : Metric(battery, "Battery Life (V)"),
-           'binary_pellets'    : Metric(binary_pellets, "Pellets"),
-           'cumulative_pellets': Metric(cumulative_pellets, "Pellets"),
-           'ipi'               : Metric(ipi, "Interpellet Intervals"),
-           'motor'             : Metric(motor_turns, "Motor Turns"),
-           'pellets'           : Metric(pellets, "Pellets"),
-           'rt'                : Metric(retrival_time, "Retrieval Time (s)")}
+METRICS = {'binary_pellets'           : Metric(binary_pellets, "Pellets"),
+           'cumulative_pellets'       : Metric(cumulative_pellets, "Pellets"),
+           'pellets'                  : Metric(pellets, "Pellets"),
+           'binary_pokes'             : Metric(binary_pokes, "Pokes"),
+           'cumulative_pokes'         : Metric(cumulative_pokes, "Pokes"),
+           'pokes'                    : Metric(pokes, "Pokes"),
+           'binary_left_pokes'        : Metric(binary_left_pokes, "Left Pokes"),
+           'binary_right_pokes'       : Metric(binary_left_pokes, "Right Pokes"),
+           'cumulative_left_pokes'    : Metric(binary_left_pokes, "Left Pokes"),
+           'cumulative_right_pokes'   : Metric(binary_left_pokes, "Right Pokes"),
+           'cumulative_left_percent'  : Metric(cumulative_left_percentage, "Left Pokes (%)"),
+           'cumulative_right_percent' : Metric(cumulative_right_percentage, "Right Pokes (%)"),
+           'left_pokes'               : Metric(left_pokes, "Left Pokes"),
+           'right_pokes'              : Metric(right_pokes, "Right Pokes"),
+           'battery'                  : Metric(battery, "Battery Life (V)"),
+           'ipi'                      : Metric(ipi, "Interpellet Intervals"),
+           'motor'                    : Metric(motor_turns, "Motor Turns"),
+           'rt'                       : Metric(retrival_time, "Retrieval Time (s)")}
