@@ -25,16 +25,6 @@ def _default_metric(fed, func, bins=None, origin='start',
 
     return out
 
-def _get_metric(y, kind=None):
-
-    key = y.lower()
-    try:
-        return METRICS[key]
-    except KeyError:
-        metrics = str(list(METRICS.keys()))[1:-1]
-        raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
-                         f'{metrics}.')
-
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 
     if dropna:
@@ -185,7 +175,17 @@ def retrival_time(fed, bins=None, origin='start'):
     agg = 'mean'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
-# ---- Dicts for metric access
+# ---- Metric access
+
+def get_metric(y, kind=None):
+
+    key = y.lower()
+    try:
+        return METRICS[key]
+    except KeyError:
+        metrics = str(list(METRICS.keys()))[1:-1]
+        raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
+                         f'{metrics}.')
 
 # link keywords to their default function
 Metric = namedtuple("Metric", ['func', 'nicename'])
