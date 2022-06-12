@@ -7,6 +7,7 @@ Created on Sun Apr 25 21:16:23 2021
 """
 
 from difflib import SequenceMatcher
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -155,15 +156,55 @@ class FEDFrame(pd.DataFrame):
         self['Retrieval_Time'] = pd.to_numeric(self['Retrieval_Time'], errors='coerce')
 
 
-    def _load_init(self, name=None, path=None):
+    def _load_init(self, name=None, path=None, deduplicate_index=None):
         self.name = name
         self.path = path
         self.fix_column_names()
         self._handle_retrieval_time()
         self._alignment = 'datetime'
         self._current_offset = pd.Timedelta(0)
+        if deduplicate_index is not None:
+            self.deduplicate_index(method=deduplicate_index)
+        if self.check_duplicated_index():
+            warnings.warn("Index has duplicate values, which may prevent some "
+                          "fed3 operations.  Use the deuplicate_index() method "
+                          "to remove duplicate timestamps.", RuntimeWarning)
 
     # ---- Public
+
+    def check_duplicated_index(self):
+        return self.index.duplicated().any()
+
+    def deduplicate_index(self, method='keep_first', offset='1S'):
+
+        if method not in ['keep_first', 'keep_last', 'remove',
+                             'offset', 'interpolate']:
+            raise ValueError(f'`method` must be one of {method}, not "{method}"')
+
+        if method == 'keep_first':
+            mask = ~ self.index.duplicated(keep='first')
+            self.query('@mask', inplace=True)
+        elif method == 'keep_last':
+            mask = ~ self.index.duplicated(keep='last')
+            self.query('@mask', inplace=True)
+        elif method == 'remove':
+            mask = ~ self.index.duplicated(keep=False)
+            self.query('@mask', inplace=True)
+        elif method == 'offset':
+            dt = pd.to_timedelta(offset)
+            while self.check_duplicated_index():
+                self.index = np.where(self.index.duplicated(),
+                                      self.index + dt,
+                                      self.index)
+        elif method == 'interpolate':
+            if self.index.duplicated()[-1]:
+                raise ValueError("Cannot interpolate when the last "
+                                 "timestamp is duplicated; try a different "
+                                 "deduplication method.")
+            t0 = self.index[0]
+            s = pd.Series(self.index)
+            s[s.duplicated()] = None
+            self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit='seconds')
 
     def determine_mode(self):
         mode = 'Unknown'
