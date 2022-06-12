@@ -24,4 +24,5 @@ setup(name='fed3',
       license='CC',
       packages=find_packages(),
       install_requires=requirements,
+      include_package_data=True
 	 )

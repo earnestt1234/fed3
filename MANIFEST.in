@@ -1,0 +1,2 @@
+include fed3/examples/data/*/*.csv
+include fed3/examples/data/*/*.xlsx
