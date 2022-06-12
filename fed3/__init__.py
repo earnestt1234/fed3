@@ -4,6 +4,7 @@
 import warnings
 
 from fed3.core import *
+from fed3.examples import load_examples
 from fed3.lightcycle import set_lightcycle
 
 # set warnings style to remove reprinting of warning

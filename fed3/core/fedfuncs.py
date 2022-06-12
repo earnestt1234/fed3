@@ -96,7 +96,8 @@ def determine_alignment(feds):
     alignments = set(f._alignment for f in feds)
     return 'mixed' if len(alignments) > 1 else list(alignments)[0]
 
-def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True):
+def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True,
+         deduplicate_index=None):
     # read the path
     name, ext = os.path.splitext(path)
     ext = ext.lower()
@@ -111,7 +112,7 @@ def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True):
 
     name = os.path.basename(name)
     f = FEDFrame(feddata)
-    f._load_init(name=name, path=path)
+    f._load_init(name=name, path=path, deduplicate_index=deduplicate_index)
 
     return f
 
