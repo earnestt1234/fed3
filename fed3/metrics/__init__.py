@@ -2,4 +2,4 @@
 
 #imports for package namespace
 
-from .core import get_metric
+from .core import get_metric, list_metrics

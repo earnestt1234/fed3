@@ -229,6 +229,9 @@ def get_metric(y, kind=None):
         raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
                          f'{metrics}.')
 
+def list_metrics():
+    return list(METRICS.keys())
+
 # link keywords to their default function
 Metric = namedtuple("Metric", ['func', 'nicename'])
 
