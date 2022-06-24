@@ -16,7 +16,7 @@ requirements = [
     ]
 
 setup(name='fed3',
-      version='0.0.1',
+      version='0.0.0',
       description='A Python package for analyzing FED3 data.',
       url='https://github.com/earnestt1234/fed3',
       author='Tom Earnest',
