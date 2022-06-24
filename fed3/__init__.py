@@ -16,8 +16,11 @@ from fed3.core import (FEDFrame,
                        load,
                        split,
                        timecrop)
+
 from fed3.examples import load_examples
+
 from fed3.lightcycle import set_lightcycle
+
 from fed3.metrics import get_metric, list_metrics
 
 __all__ = [

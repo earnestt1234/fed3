@@ -6,6 +6,8 @@ Created on Sun May 29 20:31:41 2022
 @author: earnestt1234
 """
 
+__all__ = ['bar']
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

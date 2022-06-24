@@ -6,6 +6,8 @@ Created on Wed Feb  2 12:38:40 2022
 @author: earnestt1234
 """
 
+__all__ = ['ipi']
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns

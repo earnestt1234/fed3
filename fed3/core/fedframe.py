@@ -6,11 +6,14 @@ Created on Sun Apr 25 21:16:23 2021
 @author: earnestt1234
 """
 
+__all__ = ['FEDFrame']
+
 from difflib import SequenceMatcher
 import warnings
 
 import numpy as np
 import pandas as pd
+
 
 FIXED_COLS = ['Device_Number',
               'Battery_Voltage',

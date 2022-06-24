@@ -6,6 +6,8 @@ Created on Fri Apr 30 18:06:53 2021
 @author: earnestt1234
 """
 
+__all__ = ['line', 'scatter']
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
