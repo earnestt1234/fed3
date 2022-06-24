@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>fed3.core.fedfuncs API documentation</title>
+<meta name="description" content="Created on Tue Feb
+1 22:40:51 2022 …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fed3.core.fedfuncs</code></h1>
+</header>
+<section id="section-intro">
+<p>Created on Tue Feb
+1 22:40:51 2022</p>
+<p>@author: earnestt1234</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+Created on Tue Feb  1 22:40:51 2022
+
+@author: earnestt1234
+&#34;&#34;&#34;
+
+__all__ = [&#39;align&#39;,
+           &#39;can_concat&#39;,
+           &#39;concat&#39;,
+           &#39;load&#39;,
+           &#39;split&#39;,
+           &#39;timecrop&#39;]
+
+from collections.abc import Iterable
+import os
+
+import pandas as pd
+
+from fed3.core import FEDFrame
+
+ZERO_DATE = pd.Timestamp(year=2000, month=1, day=1)
+
+def align(fed, alignment, inplace=False):
+    options = [&#39;datetime&#39;, &#39;time&#39;, &#39;elapsed&#39;]
+
+    if alignment not in options:
+        raise ValueError(f&#39;`alignment` must be one of {options}, &#39;
+                         f&#39;not &#34;{alignment}&#34;&#39;)
+    if alignment in [&#39;none&#39;, &#39;datetime&#39;]:
+        new_diff = fed._current_offset
+    elif alignment == &#39;time&#39;:
+        new_diff = fed.index[0].date() - ZERO_DATE.date()
+    elif alignment == &#39;elapsed&#39;:
+        new_diff = fed.index[0] - ZERO_DATE
+
+    newfed = fed if inplace else fed.copy()
+    newfed.index -= new_diff
+    newfed._current_offset -= new_diff
+    newfed._alignment = alignment
+
+    return newfed
+
+def can_concat(feds):
+    &#34;&#34;&#34;
+    Determines whether or not FED3_Files can be concatenated, (based on whether
+    their start and end times overlap).
+
+    Parameters
+    ----------
+    feds : array
+        an array of FED3_Files
+
+    Returns
+    -------
+    bool
+
+    &#34;&#34;&#34;
+    sorted_feds = sorted(feds, key=lambda x: x.start_time)
+    for i, file in enumerate(sorted_feds[1:], start=1):
+        if file.start_time &lt;= sorted_feds[i-1].end_time:
+            return False
+    return True
+
+def concat(feds, name=None, add_concat_number=True,
+           reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;,&#39;Right_Poke_Count&#39;)):
+
+    if name is None:
+        name = feds[0].name
+
+    if not can_concat(feds):
+        raise ValueError(&#39;FED file dates overlap, cannot concat.&#39;)
+
+    output=[]
+    offsets = {}
+
+    sorted_feds = sorted(feds, key=lambda x: x.start_time)
+
+    for i, fed in enumerate(sorted_feds):
+        df = fed.copy()
+        if add_concat_number:
+            df[&#39;Concat_#&#39;] = i
+
+        if i==0:
+            for col in reset_columns:
+                if col in df.columns:
+                    offsets[col] = df[col].max()
+
+        else:
+            for col, offset in offsets.items():
+                df[col] += offset
+                offsets[col] = df[col].max()
+
+        output.append(df)
+
+    newfed = pd.concat(output)
+    newfed._load_init(name=name)
+
+    return newfed
+
+def determine_alignment(feds):
+    alignments = set(f._alignment for f in feds)
+    return &#39;mixed&#39; if len(alignments) &gt; 1 else list(alignments)[0]
+
+def load(path, index_col=&#39;MM:DD:YYYY hh:mm:ss&#39;, dropna=True,
+         deduplicate_index=None):
+    # read the path
+    name, ext = os.path.splitext(path)
+    ext = ext.lower()
+
+    read_opts = {&#39;.csv&#39;:pd.read_csv, &#39;.xlsx&#39;:pd.read_excel}
+    func = read_opts[ext]
+    feddata = func(path,
+                   parse_dates=True,
+                   index_col=index_col)
+    if dropna:
+        feddata = feddata.dropna(how=&#39;all&#39;)
+
+    name = os.path.basename(name)
+    f = FEDFrame(feddata)
+    f._load_init(name=name, path=path, deduplicate_index=deduplicate_index)
+
+    return f
+
+def screen_mixed_alignment(feds, option=&#39;raise&#39;):
+
+    alignment = determine_alignment(feds)
+
+    if alignment != &#39;mixed&#39;:
+        return alignment
+
+    if option == &#39;raise&#39;:
+        raise ValueError(&#39;The passed FEDS have mixed alignment.&#39;)
+
+    elif option == &#39;warn&#39;:
+        print(&#34;PLACE A REAL WARNING HERE&#34;)
+
+    elif option != &#39;ignore&#39;:
+        raise ValueError(&#39;Mixed alignment option must be &#34;ignore&#34;, &#34;warn&#34;, or &#34;raise&#34;&#39;)
+
+    return alignment
+
+def _split_handle_dates(dates):
+    old = pd.Timestamp(&#39;01-01-1970&#39;)
+    future = pd.Timestamp(&#39;12-31-2200&#39;)
+    if not isinstance(dates, Iterable) or isinstance(dates, str):
+        dates = [old, pd.to_datetime(dates), future]
+    else:
+        dates = [pd.to_datetime(date) for date in dates]
+        dates = [old] + dates + [future]
+
+    return dates
+
+def split(fed, dates, reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
+          return_empty=False, tag_name=True):
+    dates = _split_handle_dates(dates)
+    output = []
+    offsets = {col: 0 for col in reset_columns}
+    og_name = fed.name
+    for i in range(len(dates[:-1])):
+        start = dates[i]
+        end = dates[i+1]
+        subset = fed[(fed.index &gt;= start) &amp;
+                     (fed.index &lt; end)].copy()
+        if tag_name:
+            subset.name = f&#34;{og_name}_{i}&#34;
+        if not return_empty and subset.empty:
+            continue
+        if offsets:
+            for col in reset_columns:
+                subset[col] -= offsets[col]
+                offsets[col] = subset[col].max()
+        output.append(subset)
+    return output
+
+def timecrop(fed, start, end,
+             reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
+             name=None):
+
+    prior = fed[(fed.index &lt; start)]
+    newfed = fed[(fed.index &gt;= start) &amp;
+                 (fed.index &lt; end)].copy()
+    for col in reset_columns:
+        if not prior.empty:
+            newfed[col] -= prior[col].max()
+
+    if name is not None:
+        newfed.name = name
+
+    return newfed</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="fed3.core.fedfuncs.align"><code class="name flex">
+<span>def <span class="ident">align</span></span>(<span>fed, alignment, inplace=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def align(fed, alignment, inplace=False):
+    options = [&#39;datetime&#39;, &#39;time&#39;, &#39;elapsed&#39;]
+
+    if alignment not in options:
+        raise ValueError(f&#39;`alignment` must be one of {options}, &#39;
+                         f&#39;not &#34;{alignment}&#34;&#39;)
+    if alignment in [&#39;none&#39;, &#39;datetime&#39;]:
+        new_diff = fed._current_offset
+    elif alignment == &#39;time&#39;:
+        new_diff = fed.index[0].date() - ZERO_DATE.date()
+    elif alignment == &#39;elapsed&#39;:
+        new_diff = fed.index[0] - ZERO_DATE
+
+    newfed = fed if inplace else fed.copy()
+    newfed.index -= new_diff
+    newfed._current_offset -= new_diff
+    newfed._alignment = alignment
+
+    return newfed</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedfuncs.can_concat"><code class="name flex">
+<span>def <span class="ident">can_concat</span></span>(<span>feds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines whether or not FED3_Files can be concatenated, (based on whether
+their start and end times overlap).</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>feds</code></strong> :&ensp;<code>array</code></dt>
+<dd>an array of FED3_Files</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def can_concat(feds):
+    &#34;&#34;&#34;
+    Determines whether or not FED3_Files can be concatenated, (based on whether
+    their start and end times overlap).
+
+    Parameters
+    ----------
+    feds : array
+        an array of FED3_Files
+
+    Returns
+    -------
+    bool
+
+    &#34;&#34;&#34;
+    sorted_feds = sorted(feds, key=lambda x: x.start_time)
+    for i, file in enumerate(sorted_feds[1:], start=1):
+        if file.start_time &lt;= sorted_feds[i-1].end_time:
+            return False
+    return True</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedfuncs.concat"><code class="name flex">
+<span>def <span class="ident">concat</span></span>(<span>feds, name=None, add_concat_number=True, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'))</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def concat(feds, name=None, add_concat_number=True,
+           reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;,&#39;Right_Poke_Count&#39;)):
+
+    if name is None:
+        name = feds[0].name
+
+    if not can_concat(feds):
+        raise ValueError(&#39;FED file dates overlap, cannot concat.&#39;)
+
+    output=[]
+    offsets = {}
+
+    sorted_feds = sorted(feds, key=lambda x: x.start_time)
+
+    for i, fed in enumerate(sorted_feds):
+        df = fed.copy()
+        if add_concat_number:
+            df[&#39;Concat_#&#39;] = i
+
+        if i==0:
+            for col in reset_columns:
+                if col in df.columns:
+                    offsets[col] = df[col].max()
+
+        else:
+            for col, offset in offsets.items():
+                df[col] += offset
+                offsets[col] = df[col].max()
+
+        output.append(df)
+
+    newfed = pd.concat(output)
+    newfed._load_init(name=name)
+
+    return newfed</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedfuncs.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True, deduplicate_index=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load(path, index_col=&#39;MM:DD:YYYY hh:mm:ss&#39;, dropna=True,
+         deduplicate_index=None):
+    # read the path
+    name, ext = os.path.splitext(path)
+    ext = ext.lower()
+
+    read_opts = {&#39;.csv&#39;:pd.read_csv, &#39;.xlsx&#39;:pd.read_excel}
+    func = read_opts[ext]
+    feddata = func(path,
+                   parse_dates=True,
+                   index_col=index_col)
+    if dropna:
+        feddata = feddata.dropna(how=&#39;all&#39;)
+
+    name = os.path.basename(name)
+    f = FEDFrame(feddata)
+    f._load_init(name=name, path=path, deduplicate_index=deduplicate_index)
+
+    return f</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedfuncs.split"><code class="name flex">
+<span>def <span class="ident">split</span></span>(<span>fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'), return_empty=False, tag_name=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split(fed, dates, reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
+          return_empty=False, tag_name=True):
+    dates = _split_handle_dates(dates)
+    output = []
+    offsets = {col: 0 for col in reset_columns}
+    og_name = fed.name
+    for i in range(len(dates[:-1])):
+        start = dates[i]
+        end = dates[i+1]
+        subset = fed[(fed.index &gt;= start) &amp;
+                     (fed.index &lt; end)].copy()
+        if tag_name:
+            subset.name = f&#34;{og_name}_{i}&#34;
+        if not return_empty and subset.empty:
+            continue
+        if offsets:
+            for col in reset_columns:
+                subset[col] -= offsets[col]
+                offsets[col] = subset[col].max()
+        output.append(subset)
+    return output</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedfuncs.timecrop"><code class="name flex">
+<span>def <span class="ident">timecrop</span></span>(<span>fed, start, end, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'), name=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def timecrop(fed, start, end,
+             reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
+             name=None):
+
+    prior = fed[(fed.index &lt; start)]
+    newfed = fed[(fed.index &gt;= start) &amp;
+                 (fed.index &lt; end)].copy()
+    for col in reset_columns:
+        if not prior.empty:
+            newfed[col] -= prior[col].max()
+
+    if name is not None:
+        newfed.name = name
+
+    return newfed</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="fed3.core" href="index.html">fed3.core</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="fed3.core.fedfuncs.align" href="#fed3.core.fedfuncs.align">align</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.can_concat" href="#fed3.core.fedfuncs.can_concat">can_concat</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.concat" href="#fed3.core.fedfuncs.concat">concat</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.load" href="#fed3.core.fedfuncs.load">load</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.split" href="#fed3.core.fedfuncs.split">split</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.timecrop" href="#fed3.core.fedfuncs.timecrop">timecrop</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

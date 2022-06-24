@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>fed3.core.fedframe API documentation</title>
+<meta name="description" content="The FEDFrame is a subclass of the pandas DataFrame.
+It is tailored
+to FED3 data, defining additional attributes and methods for FED3-specific
+…" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fed3.core.fedframe</code></h1>
+</header>
+<section id="section-intro">
+<p>The FEDFrame is a subclass of the pandas DataFrame.
+It is tailored
+to FED3 data, defining additional attributes and methods for FED3-specific
+operations.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+The FEDFrame is a subclass of the pandas DataFrame.  It is tailored
+to FED3 data, defining additional attributes and methods for FED3-specific
+operations.
+&#34;&#34;&#34;
+
+__all__ = [&#39;FEDFrame&#39;]
+
+from difflib import SequenceMatcher
+import warnings
+
+import numpy as np
+import pandas as pd
+
+
+FIXED_COLS = [&#39;Device_Number&#39;,
+              &#39;Battery_Voltage&#39;,
+              &#39;Motor_Turns&#39;,
+              &#39;Session_Type&#39;,
+              &#39;Event&#39;,
+              &#39;Active_Poke&#39;,
+              &#39;Left_Poke_Count&#39;,
+              &#39;Right_Poke_Count&#39;,
+              &#39;Pellet_Count&#39;,
+              &#39;Retrieval_Time&#39;,]
+
+NEEDED_COLS = [&#39;Pellet_Count&#39;,
+               &#39;Left_Poke_Count&#39;,
+               &#39;Right_Poke_Count&#39;,]
+
+def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
+    &#34;&#34;&#34;Helper func for condensing series returned from FEDFrame methods.&#34;&#34;&#34;
+
+    if dropna:
+        series = series.dropna()
+    if dropzero:
+        series = series[series != 0]
+    if deduplicate:
+        series = series[~series.duplicated()]
+
+    return series
+
+class FEDFrame(pd.DataFrame):
+    &#39;&#39;&#39;Test&#39;&#39;&#39;
+    _metadata = [&#39;name&#39;, &#39;path&#39;, &#39;foreign_columns&#39;, &#39;missing_columns&#39;,
+                 &#39;_alignment&#39;, &#39;_current_offset&#39;]
+
+    # ---- Properties
+
+    @property
+    def _constructor(self):
+        return FEDFrame
+
+    @property
+    def duration(self):
+        &#34;&#34;&#34;Time delta of last timestamp and first timestamp.&#34;&#34;&#34;
+        return self.end_time-self.start_time
+
+    @property
+    def end_time(self):
+        &#34;&#34;&#34;Last timestamp in file.&#34;&#34;&#34;
+        return pd.Timestamp(self.index.values[-1])
+
+    @property
+    def events(self):
+        &#39;&#39;&#39;Number of logged events (i.e. rows).&#39;&#39;&#39;
+        return len(self.data)
+
+    @property
+    def fedmode(self):
+        &#39;&#39;&#39;FED3 operating mode for this data.&#39;&#39;&#39;
+        return self.determine_mode()
+
+    @property
+    def start_time(self):
+        &#39;&#39;&#39;First timestamp in file.&#39;&#39;&#39;
+        return pd.Timestamp(self.index.values[0])
+
+    # ---- &#34;Private&#34;
+
+    def _binary_correct_pokes(self):
+        l = self._binary_pokes(&#39;left&#39;)
+        r = self._binary_pokes(&#39;right&#39;)
+        active_l = self[&#39;Active_Poke&#39;] == &#39;Left&#39;
+        active_r = self[&#39;Active_Poke&#39;] == &#39;Right&#39;
+        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
+
+        return correct
+
+    def _binary_error_pokes(self):
+        l = self._binary_pokes(&#39;left&#39;)
+        r = self._binary_pokes(&#39;right&#39;)
+        active_l = self[&#39;Active_Poke&#39;] == &#39;Left&#39;
+        active_r = self[&#39;Active_Poke&#39;] == &#39;Right&#39;
+        error = ((l * active_r).astype(int) | (r * active_l).astype(int))
+
+        return error
+
+    def _binary_pellets(self):
+        bp = self[&#39;Pellet_Count&#39;].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]) == &#39;Pellet&#39;)
+
+        return bp
+
+    def _binary_poke_for_side(self, side):
+        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+        bp = self[col].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+
+        return bp
+
+    def _binary_pokes(self, kind=&#39;any&#39;):
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if kind == &#39;any&#39;:
+            l = self._binary_poke_for_side(&#39;left&#39;)
+            r = self._binary_poke_for_side(&#39;right&#39;)
+            bp = ((l == 1) | (r==1)).astype(int)
+
+        elif kind in [&#39;left&#39;, &#39;right&#39;]:
+            bp = self._binary_poke_for_side(kind).astype(int)
+
+        elif kind in [&#39;correct&#39;, &#39;error&#39;]:
+            bp = self._binary_correct_pokes() if kind == &#39;correct&#39; else self._binary_error_pokes()
+
+        return bp
+
+    def _cumulative_poke_for_side(self, side):
+        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+        cp = self[col]
+
+        return cp
+
+    def _cumulative_pokes(self, kind=&#39;any&#39;):
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if kind == &#39;any&#39;:
+            l = self._cumulative_poke_for_side(&#39;left&#39;)
+            r = self._cumulative_poke_for_side(&#39;right&#39;)
+            cp = (l + r).astype(int)
+
+        elif kind in [&#39;left&#39;, &#39;right&#39;]:
+            cp = self._cumulative_poke_for_side(kind).astype(int)
+
+        elif kind in [&#39;correct&#39;, &#39;error&#39;]:
+            bp = self._binary_correct_pokes() if kind == &#39;correct&#39; else self._binary_error_pokes()
+            cp = bp.cumsum()
+
+        return cp
+
+    def _handle_retrieval_time(self):
+        if &#39;Retrieval_Time&#39; not in self.columns:
+            return
+        self[&#39;Retrieval_Time&#39;] = pd.to_numeric(self[&#39;Retrieval_Time&#39;], errors=&#39;coerce&#39;)
+
+
+    def _load_init(self, name=None, path=None, deduplicate_index=None):
+        self.name = name
+        self.path = path
+        self.fix_column_names()
+        self._handle_retrieval_time()
+        self._alignment = &#39;datetime&#39;
+        self._current_offset = pd.Timedelta(0)
+        if deduplicate_index is not None:
+            self.deduplicate_index(method=deduplicate_index)
+        if self.check_duplicated_index():
+            warnings.warn(&#34;Index has duplicate values, which may prevent some &#34;
+                          &#34;fed3 operations.  Use the deuplicate_index() method &#34;
+                          &#34;to remove duplicate timestamps.&#34;, RuntimeWarning)
+
+    # ---- Public
+
+    def check_duplicated_index(self):
+        return self.index.duplicated().any()
+
+    def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+
+        if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
+                             &#39;offset&#39;, &#39;interpolate&#39;]:
+            raise ValueError(f&#39;`method` must be one of {method}, not &#34;{method}&#34;&#39;)
+
+        if method == &#39;keep_first&#39;:
+            mask = ~ self.index.duplicated(keep=&#39;first&#39;)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;keep_last&#39;:
+            mask = ~ self.index.duplicated(keep=&#39;last&#39;)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;remove&#39;:
+            mask = ~ self.index.duplicated(keep=False)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;offset&#39;:
+            dt = pd.to_timedelta(offset)
+            while self.check_duplicated_index():
+                self.index = np.where(self.index.duplicated(),
+                                      self.index + dt,
+                                      self.index)
+        elif method == &#39;interpolate&#39;:
+            if self.index.duplicated()[-1]:
+                raise ValueError(&#34;Cannot interpolate when the last &#34;
+                                 &#34;timestamp is duplicated; try a different &#34;
+                                 &#34;deduplication method.&#34;)
+            t0 = self.index[0]
+            s = pd.Series(self.index)
+            s[s.duplicated()] = None
+            self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)
+
+    def determine_mode(self):
+        mode = &#39;Unknown&#39;
+        column = pd.Series(dtype=object)
+        for col in [&#39;FR&#39;,&#39;FR_Ratio&#39;,&#39; FR_Ratio&#39;,&#39;Mode&#39;,&#39;Session_Type&#39;]:
+            if col in self.columns:
+                column = self[col]
+        if not column.empty:
+            if all(isinstance(i,int) for i in column):
+                if len(set(column)) == 1:
+                    mode = &#39;FR&#39; + str(column[0])
+                else:
+                    mode = &#39;PR&#39;
+            elif &#39;PR&#39; in column[0]:
+                mode = &#39;PR&#39;
+            else:
+                mode = str(column[0])
+        return mode
+
+    def event_type(self, timestamp, poke_side=True):
+        if &#39;Event&#39; in self.columns:
+            return self.loc[timestamp, &#39;Event&#39;]
+        else:
+            pellet = self.loc[timestamp, &#39;Pellet_Count&#39;] == 0
+            left = self.loc[timestamp, &#39;Left_Poke_Count&#39;] == 0
+            right = self.loc[timestamp, &#39;Right_Poke_Count&#39;] == 0
+            if sum((pellet, left, right)) == 2:
+                if pellet:
+                    return &#39;Pellet&#39;
+                if left:
+                    return &#39;Left&#39; if poke_side else &#39;Poke&#39;
+                if right:
+                    return &#39;Right&#39; if poke_side else &#39;Poke&#39;
+            else:
+                raise Exception(&#39;Cannot determine event for timestamp with &#39;
+                                &#39;no &#34;Event&#34; column and multiple non-zero &#39;
+                                &#39;entries for pellets and pokes.&#39;)
+
+    def fix_column_names(self):
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness &gt; 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
+
+    def interpellet_intervals(self, check_concat=True, condense=False):
+        bp = self._binary_pellets()
+        bp = bp[bp == 1]
+        diff = bp.index.to_series().diff().dt.total_seconds() / 60
+
+        interpellet = pd.Series(np.nan, index = self.index)
+        interpellet.loc[diff.index] = diff
+
+        if check_concat and &#39;Concat_#&#39; in self.columns:
+            #this can&#39;t do duplicate indexes
+            if not any(self.index.duplicated()):
+                #thanks to this answer https://stackoverflow.com/a/47115490/13386979
+                dropped = interpellet.dropna()
+                pos = dropped.index.to_series().groupby(self[&#39;Concat_#&#39;]).first()
+                interpellet.loc[pos[1:]] = np.nan
+
+        if condense:
+            interpellet = interpellet.loc[bp.index]
+            interpellet = _filterout(interpellet, dropna=True)
+
+        return interpellet
+
+    def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+        ipi = self.interpellet_intervals(condense=True)
+        within_interval = ipi &lt; intermeal_interval
+        meals = ((~within_interval).cumsum() + 1)
+        above_min = meals.value_counts().sort_index() &gt;= pellet_minimum
+        replacements = above_min[above_min].cumsum().reindex(above_min.index)
+        meals = meals.map(replacements)
+        if not condense:
+            meals = meals.reindex(self.index)
+        return meals
+
+    def pellets(self, cumulative=True, condense=False):
+
+        if cumulative:
+            y = self[&#39;Pellet_Count&#39;]
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
+
+        else:
+            y = self._binary_pellets()
+            if condense:
+                y = _filterout(y, dropzero=True)
+
+        return y
+
+    def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if cumulative:
+            y = self._cumulative_pokes(kind)
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
+
+        else:
+            y = self._binary_pokes(kind)
+            if condense:
+                y = _filterout(y, dropzero=True)
+
+        return y
+
+    def reassign_events(self, include_side=True):
+        if include_side:
+            events = pd.Series(np.nan, index=self.index)
+            events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
+            events.loc[self._binary_pokes(&#39;left&#39;).astype(bool)] = &#39;Left&#39;
+            events.loc[self._binary_pokes(&#39;right&#39;).astype(bool)] = &#39;Right&#39;
+        else:
+            events = np.where(self._binary_pellets(), &#39;Pellet&#39;, &#39;Poke&#39;)
+        self[&#39;Event&#39;] = events
+
+    # ---- Aliases
+    ipi = interpellet_intervals</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="fed3.core.fedframe.FEDFrame"><code class="flex name class">
+<span>class <span class="ident">FEDFrame</span></span>
+<span>(</span><span>data=None, index: Axes | None = None, columns: Axes | None = None, dtype: Dtype | None = None, copy: bool | None = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FEDFrame(pd.DataFrame):
+    &#39;&#39;&#39;Test&#39;&#39;&#39;
+    _metadata = [&#39;name&#39;, &#39;path&#39;, &#39;foreign_columns&#39;, &#39;missing_columns&#39;,
+                 &#39;_alignment&#39;, &#39;_current_offset&#39;]
+
+    # ---- Properties
+
+    @property
+    def _constructor(self):
+        return FEDFrame
+
+    @property
+    def duration(self):
+        &#34;&#34;&#34;Time delta of last timestamp and first timestamp.&#34;&#34;&#34;
+        return self.end_time-self.start_time
+
+    @property
+    def end_time(self):
+        &#34;&#34;&#34;Last timestamp in file.&#34;&#34;&#34;
+        return pd.Timestamp(self.index.values[-1])
+
+    @property
+    def events(self):
+        &#39;&#39;&#39;Number of logged events (i.e. rows).&#39;&#39;&#39;
+        return len(self.data)
+
+    @property
+    def fedmode(self):
+        &#39;&#39;&#39;FED3 operating mode for this data.&#39;&#39;&#39;
+        return self.determine_mode()
+
+    @property
+    def start_time(self):
+        &#39;&#39;&#39;First timestamp in file.&#39;&#39;&#39;
+        return pd.Timestamp(self.index.values[0])
+
+    # ---- &#34;Private&#34;
+
+    def _binary_correct_pokes(self):
+        l = self._binary_pokes(&#39;left&#39;)
+        r = self._binary_pokes(&#39;right&#39;)
+        active_l = self[&#39;Active_Poke&#39;] == &#39;Left&#39;
+        active_r = self[&#39;Active_Poke&#39;] == &#39;Right&#39;
+        correct = ((l * active_l).astype(int) | (r * active_r).astype(int))
+
+        return correct
+
+    def _binary_error_pokes(self):
+        l = self._binary_pokes(&#39;left&#39;)
+        r = self._binary_pokes(&#39;right&#39;)
+        active_l = self[&#39;Active_Poke&#39;] == &#39;Left&#39;
+        active_r = self[&#39;Active_Poke&#39;] == &#39;Right&#39;
+        error = ((l * active_r).astype(int) | (r * active_l).astype(int))
+
+        return error
+
+    def _binary_pellets(self):
+        bp = self[&#39;Pellet_Count&#39;].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]) == &#39;Pellet&#39;)
+
+        return bp
+
+    def _binary_poke_for_side(self, side):
+        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+        bp = self[col].diff().copy()
+        if not bp.empty:
+            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+
+        return bp
+
+    def _binary_pokes(self, kind=&#39;any&#39;):
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if kind == &#39;any&#39;:
+            l = self._binary_poke_for_side(&#39;left&#39;)
+            r = self._binary_poke_for_side(&#39;right&#39;)
+            bp = ((l == 1) | (r==1)).astype(int)
+
+        elif kind in [&#39;left&#39;, &#39;right&#39;]:
+            bp = self._binary_poke_for_side(kind).astype(int)
+
+        elif kind in [&#39;correct&#39;, &#39;error&#39;]:
+            bp = self._binary_correct_pokes() if kind == &#39;correct&#39; else self._binary_error_pokes()
+
+        return bp
+
+    def _cumulative_poke_for_side(self, side):
+        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+        cp = self[col]
+
+        return cp
+
+    def _cumulative_pokes(self, kind=&#39;any&#39;):
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if kind == &#39;any&#39;:
+            l = self._cumulative_poke_for_side(&#39;left&#39;)
+            r = self._cumulative_poke_for_side(&#39;right&#39;)
+            cp = (l + r).astype(int)
+
+        elif kind in [&#39;left&#39;, &#39;right&#39;]:
+            cp = self._cumulative_poke_for_side(kind).astype(int)
+
+        elif kind in [&#39;correct&#39;, &#39;error&#39;]:
+            bp = self._binary_correct_pokes() if kind == &#39;correct&#39; else self._binary_error_pokes()
+            cp = bp.cumsum()
+
+        return cp
+
+    def _handle_retrieval_time(self):
+        if &#39;Retrieval_Time&#39; not in self.columns:
+            return
+        self[&#39;Retrieval_Time&#39;] = pd.to_numeric(self[&#39;Retrieval_Time&#39;], errors=&#39;coerce&#39;)
+
+
+    def _load_init(self, name=None, path=None, deduplicate_index=None):
+        self.name = name
+        self.path = path
+        self.fix_column_names()
+        self._handle_retrieval_time()
+        self._alignment = &#39;datetime&#39;
+        self._current_offset = pd.Timedelta(0)
+        if deduplicate_index is not None:
+            self.deduplicate_index(method=deduplicate_index)
+        if self.check_duplicated_index():
+            warnings.warn(&#34;Index has duplicate values, which may prevent some &#34;
+                          &#34;fed3 operations.  Use the deuplicate_index() method &#34;
+                          &#34;to remove duplicate timestamps.&#34;, RuntimeWarning)
+
+    # ---- Public
+
+    def check_duplicated_index(self):
+        return self.index.duplicated().any()
+
+    def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+
+        if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
+                             &#39;offset&#39;, &#39;interpolate&#39;]:
+            raise ValueError(f&#39;`method` must be one of {method}, not &#34;{method}&#34;&#39;)
+
+        if method == &#39;keep_first&#39;:
+            mask = ~ self.index.duplicated(keep=&#39;first&#39;)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;keep_last&#39;:
+            mask = ~ self.index.duplicated(keep=&#39;last&#39;)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;remove&#39;:
+            mask = ~ self.index.duplicated(keep=False)
+            self.query(&#39;@mask&#39;, inplace=True)
+        elif method == &#39;offset&#39;:
+            dt = pd.to_timedelta(offset)
+            while self.check_duplicated_index():
+                self.index = np.where(self.index.duplicated(),
+                                      self.index + dt,
+                                      self.index)
+        elif method == &#39;interpolate&#39;:
+            if self.index.duplicated()[-1]:
+                raise ValueError(&#34;Cannot interpolate when the last &#34;
+                                 &#34;timestamp is duplicated; try a different &#34;
+                                 &#34;deduplication method.&#34;)
+            t0 = self.index[0]
+            s = pd.Series(self.index)
+            s[s.duplicated()] = None
+            self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)
+
+    def determine_mode(self):
+        mode = &#39;Unknown&#39;
+        column = pd.Series(dtype=object)
+        for col in [&#39;FR&#39;,&#39;FR_Ratio&#39;,&#39; FR_Ratio&#39;,&#39;Mode&#39;,&#39;Session_Type&#39;]:
+            if col in self.columns:
+                column = self[col]
+        if not column.empty:
+            if all(isinstance(i,int) for i in column):
+                if len(set(column)) == 1:
+                    mode = &#39;FR&#39; + str(column[0])
+                else:
+                    mode = &#39;PR&#39;
+            elif &#39;PR&#39; in column[0]:
+                mode = &#39;PR&#39;
+            else:
+                mode = str(column[0])
+        return mode
+
+    def event_type(self, timestamp, poke_side=True):
+        if &#39;Event&#39; in self.columns:
+            return self.loc[timestamp, &#39;Event&#39;]
+        else:
+            pellet = self.loc[timestamp, &#39;Pellet_Count&#39;] == 0
+            left = self.loc[timestamp, &#39;Left_Poke_Count&#39;] == 0
+            right = self.loc[timestamp, &#39;Right_Poke_Count&#39;] == 0
+            if sum((pellet, left, right)) == 2:
+                if pellet:
+                    return &#39;Pellet&#39;
+                if left:
+                    return &#39;Left&#39; if poke_side else &#39;Poke&#39;
+                if right:
+                    return &#39;Right&#39; if poke_side else &#39;Poke&#39;
+            else:
+                raise Exception(&#39;Cannot determine event for timestamp with &#39;
+                                &#39;no &#34;Event&#34; column and multiple non-zero &#39;
+                                &#39;entries for pellets and pokes.&#39;)
+
+    def fix_column_names(self):
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness &gt; 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
+
+    def interpellet_intervals(self, check_concat=True, condense=False):
+        bp = self._binary_pellets()
+        bp = bp[bp == 1]
+        diff = bp.index.to_series().diff().dt.total_seconds() / 60
+
+        interpellet = pd.Series(np.nan, index = self.index)
+        interpellet.loc[diff.index] = diff
+
+        if check_concat and &#39;Concat_#&#39; in self.columns:
+            #this can&#39;t do duplicate indexes
+            if not any(self.index.duplicated()):
+                #thanks to this answer https://stackoverflow.com/a/47115490/13386979
+                dropped = interpellet.dropna()
+                pos = dropped.index.to_series().groupby(self[&#39;Concat_#&#39;]).first()
+                interpellet.loc[pos[1:]] = np.nan
+
+        if condense:
+            interpellet = interpellet.loc[bp.index]
+            interpellet = _filterout(interpellet, dropna=True)
+
+        return interpellet
+
+    def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+        ipi = self.interpellet_intervals(condense=True)
+        within_interval = ipi &lt; intermeal_interval
+        meals = ((~within_interval).cumsum() + 1)
+        above_min = meals.value_counts().sort_index() &gt;= pellet_minimum
+        replacements = above_min[above_min].cumsum().reindex(above_min.index)
+        meals = meals.map(replacements)
+        if not condense:
+            meals = meals.reindex(self.index)
+        return meals
+
+    def pellets(self, cumulative=True, condense=False):
+
+        if cumulative:
+            y = self[&#39;Pellet_Count&#39;]
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
+
+        else:
+            y = self._binary_pellets()
+            if condense:
+                y = _filterout(y, dropzero=True)
+
+        return y
+
+    def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+
+        kind = kind.lower()
+        kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+        if kind not in kinds:
+            raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+        if cumulative:
+            y = self._cumulative_pokes(kind)
+            if condense:
+                y = _filterout(y, deduplicate=True, dropzero=True)
+
+        else:
+            y = self._binary_pokes(kind)
+            if condense:
+                y = _filterout(y, dropzero=True)
+
+        return y
+
+    def reassign_events(self, include_side=True):
+        if include_side:
+            events = pd.Series(np.nan, index=self.index)
+            events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
+            events.loc[self._binary_pokes(&#39;left&#39;).astype(bool)] = &#39;Left&#39;
+            events.loc[self._binary_pokes(&#39;right&#39;).astype(bool)] = &#39;Right&#39;
+        else:
+            events = np.where(self._binary_pellets(), &#39;Pellet&#39;, &#39;Poke&#39;)
+        self[&#39;Event&#39;] = events
+
+    # ---- Aliases
+    ipi = interpellet_intervals</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pandas.core.frame.DataFrame</li>
+<li>pandas.core.generic.NDFrame</li>
+<li>pandas.core.base.PandasObject</li>
+<li>pandas.core.accessor.DirNamesMixin</li>
+<li>pandas.core.indexing.IndexingMixin</li>
+<li>pandas.core.arraylike.OpsMixin</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="fed3.core.fedframe.FEDFrame.columns"><code class="name">var <span class="ident">columns</span></code></dt>
+<dd>
+<div class="desc"><p>The column labels of the DataFrame.</p></div>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.duration"><code class="name">var <span class="ident">duration</span></code></dt>
+<dd>
+<div class="desc"><p>Time delta of last timestamp and first timestamp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def duration(self):
+    &#34;&#34;&#34;Time delta of last timestamp and first timestamp.&#34;&#34;&#34;
+    return self.end_time-self.start_time</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.end_time"><code class="name">var <span class="ident">end_time</span></code></dt>
+<dd>
+<div class="desc"><p>Last timestamp in file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def end_time(self):
+    &#34;&#34;&#34;Last timestamp in file.&#34;&#34;&#34;
+    return pd.Timestamp(self.index.values[-1])</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.events"><code class="name">var <span class="ident">events</span></code></dt>
+<dd>
+<div class="desc"><p>Number of logged events (i.e. rows).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def events(self):
+    &#39;&#39;&#39;Number of logged events (i.e. rows).&#39;&#39;&#39;
+    return len(self.data)</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.fedmode"><code class="name">var <span class="ident">fedmode</span></code></dt>
+<dd>
+<div class="desc"><p>FED3 operating mode for this data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def fedmode(self):
+    &#39;&#39;&#39;FED3 operating mode for this data.&#39;&#39;&#39;
+    return self.determine_mode()</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.index"><code class="name">var <span class="ident">index</span></code></dt>
+<dd>
+<div class="desc"><p>The index (row labels) of the DataFrame.</p></div>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
+<dd>
+<div class="desc"><p>First timestamp in file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def start_time(self):
+    &#39;&#39;&#39;First timestamp in file.&#39;&#39;&#39;
+    return pd.Timestamp(self.index.values[0])</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="fed3.core.fedframe.FEDFrame.check_duplicated_index"><code class="name flex">
+<span>def <span class="ident">check_duplicated_index</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_duplicated_index(self):
+    return self.index.duplicated().any()</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.deduplicate_index"><code class="name flex">
+<span>def <span class="ident">deduplicate_index</span></span>(<span>self, method='keep_first', offset='1S')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+
+    if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
+                         &#39;offset&#39;, &#39;interpolate&#39;]:
+        raise ValueError(f&#39;`method` must be one of {method}, not &#34;{method}&#34;&#39;)
+
+    if method == &#39;keep_first&#39;:
+        mask = ~ self.index.duplicated(keep=&#39;first&#39;)
+        self.query(&#39;@mask&#39;, inplace=True)
+    elif method == &#39;keep_last&#39;:
+        mask = ~ self.index.duplicated(keep=&#39;last&#39;)
+        self.query(&#39;@mask&#39;, inplace=True)
+    elif method == &#39;remove&#39;:
+        mask = ~ self.index.duplicated(keep=False)
+        self.query(&#39;@mask&#39;, inplace=True)
+    elif method == &#39;offset&#39;:
+        dt = pd.to_timedelta(offset)
+        while self.check_duplicated_index():
+            self.index = np.where(self.index.duplicated(),
+                                  self.index + dt,
+                                  self.index)
+    elif method == &#39;interpolate&#39;:
+        if self.index.duplicated()[-1]:
+            raise ValueError(&#34;Cannot interpolate when the last &#34;
+                             &#34;timestamp is duplicated; try a different &#34;
+                             &#34;deduplication method.&#34;)
+        t0 = self.index[0]
+        s = pd.Series(self.index)
+        s[s.duplicated()] = None
+        self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.determine_mode"><code class="name flex">
+<span>def <span class="ident">determine_mode</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def determine_mode(self):
+    mode = &#39;Unknown&#39;
+    column = pd.Series(dtype=object)
+    for col in [&#39;FR&#39;,&#39;FR_Ratio&#39;,&#39; FR_Ratio&#39;,&#39;Mode&#39;,&#39;Session_Type&#39;]:
+        if col in self.columns:
+            column = self[col]
+    if not column.empty:
+        if all(isinstance(i,int) for i in column):
+            if len(set(column)) == 1:
+                mode = &#39;FR&#39; + str(column[0])
+            else:
+                mode = &#39;PR&#39;
+        elif &#39;PR&#39; in column[0]:
+            mode = &#39;PR&#39;
+        else:
+            mode = str(column[0])
+    return mode</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.event_type"><code class="name flex">
+<span>def <span class="ident">event_type</span></span>(<span>self, timestamp, poke_side=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def event_type(self, timestamp, poke_side=True):
+    if &#39;Event&#39; in self.columns:
+        return self.loc[timestamp, &#39;Event&#39;]
+    else:
+        pellet = self.loc[timestamp, &#39;Pellet_Count&#39;] == 0
+        left = self.loc[timestamp, &#39;Left_Poke_Count&#39;] == 0
+        right = self.loc[timestamp, &#39;Right_Poke_Count&#39;] == 0
+        if sum((pellet, left, right)) == 2:
+            if pellet:
+                return &#39;Pellet&#39;
+            if left:
+                return &#39;Left&#39; if poke_side else &#39;Poke&#39;
+            if right:
+                return &#39;Right&#39; if poke_side else &#39;Poke&#39;
+        else:
+            raise Exception(&#39;Cannot determine event for timestamp with &#39;
+                            &#39;no &#34;Event&#34; column and multiple non-zero &#39;
+                            &#39;entries for pellets and pokes.&#39;)</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.fix_column_names"><code class="name flex">
+<span>def <span class="ident">fix_column_names</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fix_column_names(self):
+    self.foreign_columns = []
+    for col in self.columns:
+        for fix in FIXED_COLS:
+            likeness = SequenceMatcher(a=col, b=fix).ratio()
+            if likeness &gt; 0.85:
+                self.rename(columns={col:fix}, inplace=True)
+                break
+            self.foreign_columns.append(col)
+    self.missing_columns = [col for col in NEEDED_COLS if
+                            col not in self.columns]</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.interpellet_intervals"><code class="name flex">
+<span>def <span class="ident">interpellet_intervals</span></span>(<span>self, check_concat=True, condense=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interpellet_intervals(self, check_concat=True, condense=False):
+    bp = self._binary_pellets()
+    bp = bp[bp == 1]
+    diff = bp.index.to_series().diff().dt.total_seconds() / 60
+
+    interpellet = pd.Series(np.nan, index = self.index)
+    interpellet.loc[diff.index] = diff
+
+    if check_concat and &#39;Concat_#&#39; in self.columns:
+        #this can&#39;t do duplicate indexes
+        if not any(self.index.duplicated()):
+            #thanks to this answer https://stackoverflow.com/a/47115490/13386979
+            dropped = interpellet.dropna()
+            pos = dropped.index.to_series().groupby(self[&#39;Concat_#&#39;]).first()
+            interpellet.loc[pos[1:]] = np.nan
+
+    if condense:
+        interpellet = interpellet.loc[bp.index]
+        interpellet = _filterout(interpellet, dropna=True)
+
+    return interpellet</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.ipi"><code class="name flex">
+<span>def <span class="ident">ipi</span></span>(<span>self, check_concat=True, condense=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interpellet_intervals(self, check_concat=True, condense=False):
+    bp = self._binary_pellets()
+    bp = bp[bp == 1]
+    diff = bp.index.to_series().diff().dt.total_seconds() / 60
+
+    interpellet = pd.Series(np.nan, index = self.index)
+    interpellet.loc[diff.index] = diff
+
+    if check_concat and &#39;Concat_#&#39; in self.columns:
+        #this can&#39;t do duplicate indexes
+        if not any(self.index.duplicated()):
+            #thanks to this answer https://stackoverflow.com/a/47115490/13386979
+            dropped = interpellet.dropna()
+            pos = dropped.index.to_series().groupby(self[&#39;Concat_#&#39;]).first()
+            interpellet.loc[pos[1:]] = np.nan
+
+    if condense:
+        interpellet = interpellet.loc[bp.index]
+        interpellet = _filterout(interpellet, dropna=True)
+
+    return interpellet</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.meals"><code class="name flex">
+<span>def <span class="ident">meals</span></span>(<span>self, pellet_minimum=1, intermeal_interval=1, condense=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+    ipi = self.interpellet_intervals(condense=True)
+    within_interval = ipi &lt; intermeal_interval
+    meals = ((~within_interval).cumsum() + 1)
+    above_min = meals.value_counts().sort_index() &gt;= pellet_minimum
+    replacements = above_min[above_min].cumsum().reindex(above_min.index)
+    meals = meals.map(replacements)
+    if not condense:
+        meals = meals.reindex(self.index)
+    return meals</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.pellets"><code class="name flex">
+<span>def <span class="ident">pellets</span></span>(<span>self, cumulative=True, condense=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pellets(self, cumulative=True, condense=False):
+
+    if cumulative:
+        y = self[&#39;Pellet_Count&#39;]
+        if condense:
+            y = _filterout(y, deduplicate=True, dropzero=True)
+
+    else:
+        y = self._binary_pellets()
+        if condense:
+            y = _filterout(y, dropzero=True)
+
+    return y</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.pokes"><code class="name flex">
+<span>def <span class="ident">pokes</span></span>(<span>self, kind='any', cumulative=True, condense=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+
+    kind = kind.lower()
+    kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
+    if kind not in kinds:
+        raise ValueError(f&#39;`kind` must be one of  {kinds}, not {kind}&#39;)
+
+    if cumulative:
+        y = self._cumulative_pokes(kind)
+        if condense:
+            y = _filterout(y, deduplicate=True, dropzero=True)
+
+    else:
+        y = self._binary_pokes(kind)
+        if condense:
+            y = _filterout(y, dropzero=True)
+
+    return y</code></pre>
+</details>
+</dd>
+<dt id="fed3.core.fedframe.FEDFrame.reassign_events"><code class="name flex">
+<span>def <span class="ident">reassign_events</span></span>(<span>self, include_side=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reassign_events(self, include_side=True):
+    if include_side:
+        events = pd.Series(np.nan, index=self.index)
+        events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
+        events.loc[self._binary_pokes(&#39;left&#39;).astype(bool)] = &#39;Left&#39;
+        events.loc[self._binary_pokes(&#39;right&#39;).astype(bool)] = &#39;Right&#39;
+    else:
+        events = np.where(self._binary_pellets(), &#39;Pellet&#39;, &#39;Poke&#39;)
+    self[&#39;Event&#39;] = events</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="fed3.core" href="index.html">fed3.core</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fed3.core.fedframe.FEDFrame" href="#fed3.core.fedframe.FEDFrame">FEDFrame</a></code></h4>
+<ul class="">
+<li><code><a title="fed3.core.fedframe.FEDFrame.check_duplicated_index" href="#fed3.core.fedframe.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.columns" href="#fed3.core.fedframe.FEDFrame.columns">columns</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.deduplicate_index" href="#fed3.core.fedframe.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.determine_mode" href="#fed3.core.fedframe.FEDFrame.determine_mode">determine_mode</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.duration" href="#fed3.core.fedframe.FEDFrame.duration">duration</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.end_time" href="#fed3.core.fedframe.FEDFrame.end_time">end_time</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.event_type" href="#fed3.core.fedframe.FEDFrame.event_type">event_type</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.events" href="#fed3.core.fedframe.FEDFrame.events">events</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.fedmode" href="#fed3.core.fedframe.FEDFrame.fedmode">fedmode</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.fix_column_names" href="#fed3.core.fedframe.FEDFrame.fix_column_names">fix_column_names</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.index" href="#fed3.core.fedframe.FEDFrame.index">index</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.interpellet_intervals" href="#fed3.core.fedframe.FEDFrame.interpellet_intervals">interpellet_intervals</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.ipi" href="#fed3.core.fedframe.FEDFrame.ipi">ipi</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.meals" href="#fed3.core.fedframe.FEDFrame.meals">meals</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.pellets" href="#fed3.core.fedframe.FEDFrame.pellets">pellets</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.pokes" href="#fed3.core.fedframe.FEDFrame.pokes">pokes</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.reassign_events" href="#fed3.core.fedframe.FEDFrame.reassign_events">reassign_events</a></code></li>
+<li><code><a title="fed3.core.fedframe.FEDFrame.start_time" href="#fed3.core.fedframe.FEDFrame.start_time">start_time</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

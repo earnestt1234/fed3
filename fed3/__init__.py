@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+'''fed3 is a Python package for working with FED3 data.'''
+
 # set warnings style to remove reprinting of warning
 import warnings as __warnings
 

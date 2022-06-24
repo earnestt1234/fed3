@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr 25 21:16:23 2021
-
-@author: earnestt1234
+The FEDFrame is a subclass of the pandas DataFrame.  It is tailored
+to FED3 data, defining additional attributes and methods for FED3-specific
+operations.
 """
 
 __all__ = ['FEDFrame']
@@ -31,7 +31,6 @@ NEEDED_COLS = ['Pellet_Count',
                'Right_Poke_Count',]
 
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
-
     """Helper func for condensing series returned from FEDFrame methods."""
 
     if dropna:
@@ -44,6 +43,7 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
     return series
 
 class FEDFrame(pd.DataFrame):
+    '''Test'''
     _metadata = ['name', 'path', 'foreign_columns', 'missing_columns',
                  '_alignment', '_current_offset']
 
@@ -55,22 +55,27 @@ class FEDFrame(pd.DataFrame):
 
     @property
     def duration(self):
+        """Time delta of last timestamp and first timestamp."""
         return self.end_time-self.start_time
 
     @property
     def end_time(self):
+        """Last timestamp in file."""
         return pd.Timestamp(self.index.values[-1])
 
     @property
     def events(self):
+        '''Number of logged events (i.e. rows).'''
         return len(self.data)
 
     @property
-    def mode(self):
+    def fedmode(self):
+        '''FED3 operating mode for this data.'''
         return self.determine_mode()
 
     @property
     def start_time(self):
+        '''First timestamp in file.'''
         return pd.Timestamp(self.index.values[0])
 
     # ---- "Private"
