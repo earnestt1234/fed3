@@ -43,7 +43,8 @@ operations.
 
 __all__ = [&#39;FEDFrame&#39;]
 
-__pdoc__ = {&#39;FEDFrame._load_init&#39;:True}
+__pdoc__ = {&#39;FEDFrame._load_init&#39;:True,
+            &#39;FEDFrame.ipi&#39;:False}
 
 from difflib import SequenceMatcher
 import warnings
@@ -94,10 +95,10 @@ class FEDFrame(pd.DataFrame):
 
     Most of the time, FED3 data will be accessed directly from the logged CSV
     files.  In this case, using the FEDFrame constructor is not recommended;
-    you should instead use `fed3.core.load()`  But if for some reason you already
+    you should instead use `fed3.core.load()`.  But if for some reason you already
     have FED3 data loaded into a pandas DataFrame, you can make use of the
-    constructor and the `fed3.core.fedframe.FEDFrame._load_init()` function to get full
-    FEDFrame functionality.
+    constructor and the `fed3.core.fedframe.FEDFrame._load_init()` function to
+    get full FEDFrame functionality.
 
     Other links:
 
@@ -221,6 +222,27 @@ class FEDFrame(pd.DataFrame):
 
         return cp
 
+    def _fix_column_names(self):
+        &#39;&#39;&#39;
+        Checks for and fixes old FED3 issue where column names included a
+        trailing/starting space.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness &gt; 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
+
     def _handle_retrieval_time(self):
         if &#39;Retrieval_Time&#39; not in self.columns:
             return
@@ -267,7 +289,7 @@ class FEDFrame(pd.DataFrame):
         &#39;&#39;&#39;
         self.name = name
         self.path = path
-        self.fix_column_names()
+        self._fix_column_names()
         self._handle_retrieval_time()
         self._alignment = &#39;datetime&#39;
         self._current_offset = pd.Timedelta(0)
@@ -449,19 +471,30 @@ class FEDFrame(pd.DataFrame):
                                 &#39;no &#34;Event&#34; column and multiple non-zero &#39;
                                 &#39;entries for pellets and pokes.&#39;)
 
-    def fix_column_names(self):
-        self.foreign_columns = []
-        for col in self.columns:
-            for fix in FIXED_COLS:
-                likeness = SequenceMatcher(a=col, b=fix).ratio()
-                if likeness &gt; 0.85:
-                    self.rename(columns={col:fix}, inplace=True)
-                    break
-                self.foreign_columns.append(col)
-        self.missing_columns = [col for col in NEEDED_COLS if
-                                col not in self.columns]
-
     def interpellet_intervals(self, check_concat=True, condense=False):
+        &#39;&#39;&#39;
+        Calculate the interpellet intervals for each pellet event.
+        This is the time (in minutes) since the last pellet was retrieved.
+
+        Note that there is a shortcut for this method: `ipi`.
+
+        Parameters
+        ----------
+        check_concat : bool, optional
+            Removes IPIs when they are identified as coming directly after
+            data concatenation. The default is True.  This will only work
+            when data were concatenated with fed3.
+        condense : bool, optional
+            Return only rows where there are interpellet intervals.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        interpellet : pandas.Series
+            Pandas Series containing the interpellet intervals.
+
+        &#39;&#39;&#39;
         bp = self._binary_pellets()
         bp = bp[bp == 1]
         diff = bp.index.to_series().diff().dt.total_seconds() / 60
@@ -484,6 +517,33 @@ class FEDFrame(pd.DataFrame):
         return interpellet
 
     def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+        &#39;&#39;&#39;
+        Assign a meal number to each pellet retrieval.  Returns a series
+        with those assignments.
+
+        Parameters to this function determine what constitutes a meal.
+        Assignments are based on interpellet intervals
+        (see `FEDFrame.interpellet_intervals()`).
+
+        Parameters
+        ----------
+        pellet_minimum : int, optional
+            Number of pellets required in one meal. The default is 1.  For
+            high numbers, some pellets can be unassigned to any meal.
+        intermeal_interval : int, optional
+            Maximum length of time (in minutes) that can pass between any
+            two consecutive pellets assigned to the same meal. The default is 1.
+        condense : False, optional
+            Return only rows where there are meals (i.e. only pellet index).
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        meals : pandas.Series
+            pandas Series with labeled meals
+
+        &#39;&#39;&#39;
         ipi = self.interpellet_intervals(condense=True)
         within_interval = ipi &lt; intermeal_interval
         meals = ((~within_interval).cumsum() + 1)
@@ -495,7 +555,24 @@ class FEDFrame(pd.DataFrame):
         return meals
 
     def pellets(self, cumulative=True, condense=False):
+        &#39;&#39;&#39;
+        Provide a series containing pellet retrieval information.
 
+        Parameters
+        ----------
+        cumulative : bool, optional
+            When True (default), the values returned are a cumulative pellet count.
+            When False, the values are binary.
+        condense : bool, optional
+            Return only rows corresponding to pellets.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        y : pandas Series
+            pandas Series containing pellet retrieval counts/indicators.
+        &#39;&#39;&#39;
         if cumulative:
             y = self[&#39;Pellet_Count&#39;]
             if condense:
@@ -509,6 +586,34 @@ class FEDFrame(pd.DataFrame):
         return y
 
     def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+        &#39;&#39;&#39;
+        Get an array of poke events.
+
+        Parameters
+        ----------
+        kind : str, optional
+            Key for determining the poke type returned. The default is &#39;any&#39;
+            (any poke event).  Other options are &#39;left&#39;, &#39;right&#39;, &#39;correct&#39;,
+            and &#39;error&#39;.
+        cumulative : bool, optional
+            When True (default), the values returned are a cumulative poke count.
+            When False, the values are binary.
+        condense : bool, optional
+            Return only rows corresponding to poke events.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Raises
+        ------
+        ValueError
+            Unaccetped key passed to `kind`.
+
+        Returns
+        -------
+        y : pandas Series
+            Pandas Series containing poke counts/indicators.
+
+        &#39;&#39;&#39;
 
         kind = kind.lower()
         kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
@@ -528,6 +633,20 @@ class FEDFrame(pd.DataFrame):
         return y
 
     def reassign_events(self, include_side=True):
+        &#39;&#39;&#39;
+        Run an intitial assignment or reassignment of the &#34;Event&#34; column.
+
+        Parameters
+        ----------
+        include_side : bool, optional
+            Label poke events with &#34;Left&#34; and &#34;Right&#34; instead of &#34;Poke&#34;.
+            The default is True.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
         if include_side:
             events = pd.Series(np.nan, index=self.index)
             events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
@@ -569,11 +688,11 @@ See additional documentation for these below.</p>
 <p>Most of the time, FED3 data will be accessed directly from the logged CSV
 files.
 In this case, using the FEDFrame constructor is not recommended;
-you should instead use <code><a title="fed3.core.load" href="index.html#fed3.core.load">load()</a></code>
+you should instead use <code><a title="fed3.core.load" href="index.html#fed3.core.load">load()</a></code>.
 But if for some reason you already
 have FED3 data loaded into a pandas DataFrame, you can make use of the
-constructor and the <code><a title="fed3.core.fedframe.FEDFrame._load_init" href="#fed3.core.fedframe.FEDFrame._load_init">FEDFrame._load_init()</a></code> function to get full
-FEDFrame functionality.</p>
+constructor and the <code><a title="fed3.core.fedframe.FEDFrame._load_init" href="#fed3.core.fedframe.FEDFrame._load_init">FEDFrame._load_init()</a></code> function to
+get full FEDFrame functionality.</p>
 <p>Other links:</p>
 <ul>
 <li>pandas: <a href="https://pandas.pydata.org/docs/index.html">https://pandas.pydata.org/docs/index.html</a></li>
@@ -599,10 +718,10 @@ FEDFrame functionality.</p>
 
     Most of the time, FED3 data will be accessed directly from the logged CSV
     files.  In this case, using the FEDFrame constructor is not recommended;
-    you should instead use `fed3.core.load()`  But if for some reason you already
+    you should instead use `fed3.core.load()`.  But if for some reason you already
     have FED3 data loaded into a pandas DataFrame, you can make use of the
-    constructor and the `fed3.core.fedframe.FEDFrame._load_init()` function to get full
-    FEDFrame functionality.
+    constructor and the `fed3.core.fedframe.FEDFrame._load_init()` function to
+    get full FEDFrame functionality.
 
     Other links:
 
@@ -726,6 +845,27 @@ FEDFrame functionality.</p>
 
         return cp
 
+    def _fix_column_names(self):
+        &#39;&#39;&#39;
+        Checks for and fixes old FED3 issue where column names included a
+        trailing/starting space.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness &gt; 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
+
     def _handle_retrieval_time(self):
         if &#39;Retrieval_Time&#39; not in self.columns:
             return
@@ -772,7 +912,7 @@ FEDFrame functionality.</p>
         &#39;&#39;&#39;
         self.name = name
         self.path = path
-        self.fix_column_names()
+        self._fix_column_names()
         self._handle_retrieval_time()
         self._alignment = &#39;datetime&#39;
         self._current_offset = pd.Timedelta(0)
@@ -954,19 +1094,30 @@ FEDFrame functionality.</p>
                                 &#39;no &#34;Event&#34; column and multiple non-zero &#39;
                                 &#39;entries for pellets and pokes.&#39;)
 
-    def fix_column_names(self):
-        self.foreign_columns = []
-        for col in self.columns:
-            for fix in FIXED_COLS:
-                likeness = SequenceMatcher(a=col, b=fix).ratio()
-                if likeness &gt; 0.85:
-                    self.rename(columns={col:fix}, inplace=True)
-                    break
-                self.foreign_columns.append(col)
-        self.missing_columns = [col for col in NEEDED_COLS if
-                                col not in self.columns]
-
     def interpellet_intervals(self, check_concat=True, condense=False):
+        &#39;&#39;&#39;
+        Calculate the interpellet intervals for each pellet event.
+        This is the time (in minutes) since the last pellet was retrieved.
+
+        Note that there is a shortcut for this method: `ipi`.
+
+        Parameters
+        ----------
+        check_concat : bool, optional
+            Removes IPIs when they are identified as coming directly after
+            data concatenation. The default is True.  This will only work
+            when data were concatenated with fed3.
+        condense : bool, optional
+            Return only rows where there are interpellet intervals.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        interpellet : pandas.Series
+            Pandas Series containing the interpellet intervals.
+
+        &#39;&#39;&#39;
         bp = self._binary_pellets()
         bp = bp[bp == 1]
         diff = bp.index.to_series().diff().dt.total_seconds() / 60
@@ -989,6 +1140,33 @@ FEDFrame functionality.</p>
         return interpellet
 
     def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+        &#39;&#39;&#39;
+        Assign a meal number to each pellet retrieval.  Returns a series
+        with those assignments.
+
+        Parameters to this function determine what constitutes a meal.
+        Assignments are based on interpellet intervals
+        (see `FEDFrame.interpellet_intervals()`).
+
+        Parameters
+        ----------
+        pellet_minimum : int, optional
+            Number of pellets required in one meal. The default is 1.  For
+            high numbers, some pellets can be unassigned to any meal.
+        intermeal_interval : int, optional
+            Maximum length of time (in minutes) that can pass between any
+            two consecutive pellets assigned to the same meal. The default is 1.
+        condense : False, optional
+            Return only rows where there are meals (i.e. only pellet index).
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        meals : pandas.Series
+            pandas Series with labeled meals
+
+        &#39;&#39;&#39;
         ipi = self.interpellet_intervals(condense=True)
         within_interval = ipi &lt; intermeal_interval
         meals = ((~within_interval).cumsum() + 1)
@@ -1000,7 +1178,24 @@ FEDFrame functionality.</p>
         return meals
 
     def pellets(self, cumulative=True, condense=False):
+        &#39;&#39;&#39;
+        Provide a series containing pellet retrieval information.
 
+        Parameters
+        ----------
+        cumulative : bool, optional
+            When True (default), the values returned are a cumulative pellet count.
+            When False, the values are binary.
+        condense : bool, optional
+            Return only rows corresponding to pellets.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Returns
+        -------
+        y : pandas Series
+            pandas Series containing pellet retrieval counts/indicators.
+        &#39;&#39;&#39;
         if cumulative:
             y = self[&#39;Pellet_Count&#39;]
             if condense:
@@ -1014,6 +1209,34 @@ FEDFrame functionality.</p>
         return y
 
     def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+        &#39;&#39;&#39;
+        Get an array of poke events.
+
+        Parameters
+        ----------
+        kind : str, optional
+            Key for determining the poke type returned. The default is &#39;any&#39;
+            (any poke event).  Other options are &#39;left&#39;, &#39;right&#39;, &#39;correct&#39;,
+            and &#39;error&#39;.
+        cumulative : bool, optional
+            When True (default), the values returned are a cumulative poke count.
+            When False, the values are binary.
+        condense : bool, optional
+            Return only rows corresponding to poke events.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.
+
+        Raises
+        ------
+        ValueError
+            Unaccetped key passed to `kind`.
+
+        Returns
+        -------
+        y : pandas Series
+            Pandas Series containing poke counts/indicators.
+
+        &#39;&#39;&#39;
 
         kind = kind.lower()
         kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
@@ -1033,6 +1256,20 @@ FEDFrame functionality.</p>
         return y
 
     def reassign_events(self, include_side=True):
+        &#39;&#39;&#39;
+        Run an intitial assignment or reassignment of the &#34;Event&#34; column.
+
+        Parameters
+        ----------
+        include_side : bool, optional
+            Label poke events with &#34;Left&#34; and &#34;Right&#34; instead of &#34;Poke&#34;.
+            The default is True.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
         if include_side:
             events = pd.Series(np.nan, index=self.index)
             events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
@@ -1212,7 +1449,7 @@ allowable methods.</dd>
     &#39;&#39;&#39;
     self.name = name
     self.path = path
-    self.fix_column_names()
+    self._fix_column_names()
     self._handle_retrieval_time()
     self._alignment = &#39;datetime&#39;
     self._current_offset = pd.Timedelta(0)
@@ -1517,70 +1754,59 @@ when the event is a poke.</dd>
                             &#39;entries for pellets and pokes.&#39;)</code></pre>
 </details>
 </dd>
-<dt id="fed3.core.fedframe.FEDFrame.fix_column_names"><code class="name flex">
-<span>def <span class="ident">fix_column_names</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def fix_column_names(self):
-    self.foreign_columns = []
-    for col in self.columns:
-        for fix in FIXED_COLS:
-            likeness = SequenceMatcher(a=col, b=fix).ratio()
-            if likeness &gt; 0.85:
-                self.rename(columns={col:fix}, inplace=True)
-                break
-            self.foreign_columns.append(col)
-    self.missing_columns = [col for col in NEEDED_COLS if
-                            col not in self.columns]</code></pre>
-</details>
-</dd>
 <dt id="fed3.core.fedframe.FEDFrame.interpellet_intervals"><code class="name flex">
 <span>def <span class="ident">interpellet_intervals</span></span>(<span>self, check_concat=True, condense=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Calculate the interpellet intervals for each pellet event.
+This is the time (in minutes) since the last pellet was retrieved.</p>
+<p>Note that there is a shortcut for this method: <code>ipi</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>check_concat</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Removes IPIs when they are identified as coming directly after
+data concatenation. The default is True.
+This will only work
+when data were concatenated with fed3.</dd>
+<dt><strong><code>condense</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Return only rows where there are interpellet intervals.
+The default is False.
+When False, the returned Series will
+have same length as full FEDFrame.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>interpellet</code></strong> :&ensp;<code>pandas.Series</code></dt>
+<dd>Pandas Series containing the interpellet intervals.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def interpellet_intervals(self, check_concat=True, condense=False):
-    bp = self._binary_pellets()
-    bp = bp[bp == 1]
-    diff = bp.index.to_series().diff().dt.total_seconds() / 60
+    &#39;&#39;&#39;
+    Calculate the interpellet intervals for each pellet event.
+    This is the time (in minutes) since the last pellet was retrieved.
 
-    interpellet = pd.Series(np.nan, index = self.index)
-    interpellet.loc[diff.index] = diff
+    Note that there is a shortcut for this method: `ipi`.
 
-    if check_concat and &#39;Concat_#&#39; in self.columns:
-        #this can&#39;t do duplicate indexes
-        if not any(self.index.duplicated()):
-            #thanks to this answer https://stackoverflow.com/a/47115490/13386979
-            dropped = interpellet.dropna()
-            pos = dropped.index.to_series().groupby(self[&#39;Concat_#&#39;]).first()
-            interpellet.loc[pos[1:]] = np.nan
+    Parameters
+    ----------
+    check_concat : bool, optional
+        Removes IPIs when they are identified as coming directly after
+        data concatenation. The default is True.  This will only work
+        when data were concatenated with fed3.
+    condense : bool, optional
+        Return only rows where there are interpellet intervals.
+        The default is False.  When False, the returned Series will
+        have same length as full FEDFrame.
 
-    if condense:
-        interpellet = interpellet.loc[bp.index]
-        interpellet = _filterout(interpellet, dropna=True)
+    Returns
+    -------
+    interpellet : pandas.Series
+        Pandas Series containing the interpellet intervals.
 
-    return interpellet</code></pre>
-</details>
-</dd>
-<dt id="fed3.core.fedframe.FEDFrame.ipi"><code class="name flex">
-<span>def <span class="ident">ipi</span></span>(<span>self, check_concat=True, condense=False)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def interpellet_intervals(self, check_concat=True, condense=False):
+    &#39;&#39;&#39;
     bp = self._binary_pellets()
     bp = bp[bp == 1]
     diff = bp.index.to_series().diff().dt.total_seconds() / 60
@@ -1607,12 +1833,64 @@ when the event is a poke.</dd>
 <span>def <span class="ident">meals</span></span>(<span>self, pellet_minimum=1, intermeal_interval=1, condense=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Assign a meal number to each pellet retrieval.
+Returns a series
+with those assignments.</p>
+<p>Parameters to this function determine what constitutes a meal.
+Assignments are based on interpellet intervals
+(see <code><a title="fed3.core.fedframe.FEDFrame.interpellet_intervals" href="#fed3.core.fedframe.FEDFrame.interpellet_intervals">FEDFrame.interpellet_intervals()</a></code>).</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>pellet_minimum</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of pellets required in one meal. The default is 1.
+For
+high numbers, some pellets can be unassigned to any meal.</dd>
+<dt><strong><code>intermeal_interval</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Maximum length of time (in minutes) that can pass between any
+two consecutive pellets assigned to the same meal. The default is 1.</dd>
+<dt><strong><code>condense</code></strong> :&ensp;<code>False</code>, optional</dt>
+<dd>Return only rows where there are meals (i.e. only pellet index).
+The default is False.
+When False, the returned Series will
+have same length as full FEDFrame.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>meals</code></strong> :&ensp;<code>pandas.Series</code></dt>
+<dd>pandas Series with labeled meals</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def meals(self, pellet_minimum=1, intermeal_interval=1, condense=False):
+    &#39;&#39;&#39;
+    Assign a meal number to each pellet retrieval.  Returns a series
+    with those assignments.
+
+    Parameters to this function determine what constitutes a meal.
+    Assignments are based on interpellet intervals
+    (see `FEDFrame.interpellet_intervals()`).
+
+    Parameters
+    ----------
+    pellet_minimum : int, optional
+        Number of pellets required in one meal. The default is 1.  For
+        high numbers, some pellets can be unassigned to any meal.
+    intermeal_interval : int, optional
+        Maximum length of time (in minutes) that can pass between any
+        two consecutive pellets assigned to the same meal. The default is 1.
+    condense : False, optional
+        Return only rows where there are meals (i.e. only pellet index).
+        The default is False.  When False, the returned Series will
+        have same length as full FEDFrame.
+
+    Returns
+    -------
+    meals : pandas.Series
+        pandas Series with labeled meals
+
+    &#39;&#39;&#39;
     ipi = self.interpellet_intervals(condense=True)
     within_interval = ipi &lt; intermeal_interval
     meals = ((~within_interval).cumsum() + 1)
@@ -1628,13 +1906,46 @@ when the event is a poke.</dd>
 <span>def <span class="ident">pellets</span></span>(<span>self, cumulative=True, condense=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Provide a series containing pellet retrieval information.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>cumulative</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When True (default), the values returned are a cumulative pellet count.
+When False, the values are binary.</dd>
+<dt><strong><code>condense</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Return only rows corresponding to pellets.
+The default is False.
+When False, the returned Series will
+have same length as full FEDFrame.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>pandas Series</code></dt>
+<dd>pandas Series containing pellet retrieval counts/indicators.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def pellets(self, cumulative=True, condense=False):
+    &#39;&#39;&#39;
+    Provide a series containing pellet retrieval information.
 
+    Parameters
+    ----------
+    cumulative : bool, optional
+        When True (default), the values returned are a cumulative pellet count.
+        When False, the values are binary.
+    condense : bool, optional
+        Return only rows corresponding to pellets.
+        The default is False.  When False, the returned Series will
+        have same length as full FEDFrame.
+
+    Returns
+    -------
+    y : pandas Series
+        pandas Series containing pellet retrieval counts/indicators.
+    &#39;&#39;&#39;
     if cumulative:
         y = self[&#39;Pellet_Count&#39;]
         if condense:
@@ -1652,12 +1963,66 @@ when the event is a poke.</dd>
 <span>def <span class="ident">pokes</span></span>(<span>self, kind='any', cumulative=True, condense=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Get an array of poke events.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>kind</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Key for determining the poke type returned. The default is 'any'
+(any poke event).
+Other options are 'left', 'right', 'correct',
+and 'error'.</dd>
+<dt><strong><code>cumulative</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When True (default), the values returned are a cumulative poke count.
+When False, the values are binary.</dd>
+<dt><strong><code>condense</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Return only rows corresponding to poke events.
+The default is False.
+When False, the returned Series will
+have same length as full FEDFrame.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Unaccetped key passed to <code>kind</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>pandas Series</code></dt>
+<dd>Pandas Series containing poke counts/indicators.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def pokes(self, kind=&#39;any&#39;, cumulative=True, condense=False):
+    &#39;&#39;&#39;
+    Get an array of poke events.
+
+    Parameters
+    ----------
+    kind : str, optional
+        Key for determining the poke type returned. The default is &#39;any&#39;
+        (any poke event).  Other options are &#39;left&#39;, &#39;right&#39;, &#39;correct&#39;,
+        and &#39;error&#39;.
+    cumulative : bool, optional
+        When True (default), the values returned are a cumulative poke count.
+        When False, the values are binary.
+    condense : bool, optional
+        Return only rows corresponding to poke events.
+        The default is False.  When False, the returned Series will
+        have same length as full FEDFrame.
+
+    Raises
+    ------
+    ValueError
+        Unaccetped key passed to `kind`.
+
+    Returns
+    -------
+    y : pandas Series
+        Pandas Series containing poke counts/indicators.
+
+    &#39;&#39;&#39;
 
     kind = kind.lower()
     kinds = [&#39;left&#39;, &#39;right&#39;, &#39;any&#39;, &#39;correct&#39;, &#39;error&#39;]
@@ -1681,12 +2046,34 @@ when the event is a poke.</dd>
 <span>def <span class="ident">reassign_events</span></span>(<span>self, include_side=True)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Run an intitial assignment or reassignment of the "Event" column.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>include_side</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Label poke events with "Left" and "Right" instead of "Poke".
+The default is True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reassign_events(self, include_side=True):
+    &#39;&#39;&#39;
+    Run an intitial assignment or reassignment of the &#34;Event&#34; column.
+
+    Parameters
+    ----------
+    include_side : bool, optional
+        Label poke events with &#34;Left&#34; and &#34;Right&#34; instead of &#34;Poke&#34;.
+        The default is True.
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
     if include_side:
         events = pd.Series(np.nan, index=self.index)
         events.loc[self._binary_pellets().astype(bool)] = &#39;Pellet&#39;
@@ -1728,10 +2115,8 @@ when the event is a poke.</dd>
 <li><code><a title="fed3.core.fedframe.FEDFrame.event_type" href="#fed3.core.fedframe.FEDFrame.event_type">event_type</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.events" href="#fed3.core.fedframe.FEDFrame.events">events</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.fedmode" href="#fed3.core.fedframe.FEDFrame.fedmode">fedmode</a></code></li>
-<li><code><a title="fed3.core.fedframe.FEDFrame.fix_column_names" href="#fed3.core.fedframe.FEDFrame.fix_column_names">fix_column_names</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.index" href="#fed3.core.fedframe.FEDFrame.index">index</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.interpellet_intervals" href="#fed3.core.fedframe.FEDFrame.interpellet_intervals">interpellet_intervals</a></code></li>
-<li><code><a title="fed3.core.fedframe.FEDFrame.ipi" href="#fed3.core.fedframe.FEDFrame.ipi">ipi</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.meals" href="#fed3.core.fedframe.FEDFrame.meals">meals</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.pellets" href="#fed3.core.fedframe.FEDFrame.pellets">pellets</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.pokes" href="#fed3.core.fedframe.FEDFrame.pokes">pokes</a></code></li>
