@@ -59,10 +59,10 @@ class FEDFrame(pd.DataFrame):
 
     Most of the time, FED3 data will be accessed directly from the logged CSV
     files.  In this case, using the FEDFrame constructor is not recommended;
-    you should instead use `fed3.core.load()`  But if for some reason you already
+    you should instead use `fed3.core.load()`.  But if for some reason you already
     have FED3 data loaded into a pandas DataFrame, you can make use of the
-    constructor and the `FEDFrame._load_init()` function to get full FEDFrame
-    functionality.
+    constructor and the `fed3.core.fedframe.FEDFrame._load_init()` function to
+    get full FEDFrame functionality.
 
     Other links:
 
@@ -415,6 +415,14 @@ class FEDFrame(pd.DataFrame):
                                 'entries for pellets and pokes.')
 
     def fix_column_names(self):
+        '''
+        This
+
+        Returns
+        -------
+        None.
+
+        '''
         self.foreign_columns = []
         for col in self.columns:
             for fix in FIXED_COLS:
