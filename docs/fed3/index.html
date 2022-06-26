@@ -107,18 +107,128 @@ Other …</p></div>
 <span>def <span class="ident">align</span></span>(<span>fed, alignment, inplace=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Shift the timestamps of a FEDFrame to allow for comparisons with other data
+recorded at different times.</p>
+<p>This is particularly intended for plotting with <code><a title="fed3.plot" href="plot/index.html">fed3.plot</a></code>.
+By default,
+fed3 will plot fed3 data over the timestamps they were recorded.
+For
+temporal plots (with time on the x-axis), this disallows combination
+(e.g. averaging) of data recorded on different dates.
+To combine
+these sorts of data, this function will shift the timestamps FEDFrames
+to a common time.</p>
+<p>There are three options for temporal alignment, 'datetime', 'time',
+and 'elapsed'.
+Note that these are the equivalents of 'shared date &amp; time',
+'shared time', and 'elapsed time' from FED3_Viz.</p>
+<ul>
+<li>'datetime': Use the original recorded timestamps for plotting.
+This is
+the default behavior for plotting.
+This is generally useful when
+all your data were collected at the same time, when you want to show
+exactly when data were recorded, or when working with plots where
+the time of recording does not matter.</li>
+<li>'time': Shift the timestamps so that they have the same start date,
+but preserved time of day information.
+This is useful for when you
+want to compare or average data recorded on different dates, but want
+to preserve circadian patterns.</li>
+<li>'elapsed': Shift the timestamps such that the first recorded timestamp
+is equal to a single, shared date.
+This is useful for comparing data
+relative to the initiation of the recording, and you do not need
+to preserve circadian information.</li>
+</ul>
+<p>Note that for 'elapsed' and 'time' alignment, the common date is set
+by the <code>ZERO_DATE</code> variable in this module.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>FED3 data.</dd>
+<dt><strong><code>alignment</code></strong> :&ensp;<code>str, 'datetime', 'time',</code> or <code>'elapsed'</code></dt>
+<dd>Option for temporal alignment.
+See above for more information.</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When True, the object passed to <code>fed</code> is modified.
+When False (default),
+a new FEDFrame is created.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Option for alignment not recognized.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>newfed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>FED3 data with new alignment.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def align(fed, alignment, inplace=False):
+    &#39;&#39;&#39;
+    Shift the timestamps of a FEDFrame to allow for comparisons with other data
+    recorded at different times.
+
+    This is particularly intended for plotting with `fed3.plot`.  By default,
+    fed3 will plot fed3 data over the timestamps they were recorded.  For
+    temporal plots (with time on the x-axis), this disallows combination
+    (e.g. averaging) of data recorded on different dates.  To combine
+    these sorts of data, this function will shift the timestamps FEDFrames
+    to a common time.
+
+    There are three options for temporal alignment, &#39;datetime&#39;, &#39;time&#39;,
+    and &#39;elapsed&#39;.  Note that these are the equivalents of &#39;shared date &amp; time&#39;,
+    &#39;shared time&#39;, and &#39;elapsed time&#39; from FED3_Viz.
+
+    - &#39;datetime&#39;: Use the original recorded timestamps for plotting.  This is
+    the default behavior for plotting.  This is generally useful when
+    all your data were collected at the same time, when you want to show
+    exactly when data were recorded, or when working with plots where
+    the time of recording does not matter.
+    - &#39;time&#39;: Shift the timestamps so that they have the same start date,
+    but preserved time of day information.  This is useful for when you
+    want to compare or average data recorded on different dates, but want
+    to preserve circadian patterns.
+    - &#39;elapsed&#39;: Shift the timestamps such that the first recorded timestamp
+    is equal to a single, shared date.  This is useful for comparing data
+    relative to the initiation of the recording, and you do not need
+    to preserve circadian information.
+
+    Note that for &#39;elapsed&#39; and &#39;time&#39; alignment, the common date is set
+    by the `ZERO_DATE` variable in this module.
+
+    Parameters
+    ----------
+    fed : fed3.FEDFrame
+        FED3 data.
+    alignment : str, &#39;datetime&#39;, &#39;time&#39;, or &#39;elapsed&#39;
+        Option for temporal alignment.  See above for more information.
+    inplace : bool, optional
+        When True, the object passed to `fed` is modified.  When False (default),
+        a new FEDFrame is created.
+
+    Raises
+    ------
+    ValueError
+        Option for alignment not recognized.
+
+    Returns
+    -------
+    newfed : fed3.FEDFrame
+        FED3 data with new alignment.
+
+    &#39;&#39;&#39;
     options = [&#39;datetime&#39;, &#39;time&#39;, &#39;elapsed&#39;]
 
     if alignment not in options:
         raise ValueError(f&#39;`alignment` must be one of {options}, &#39;
                          f&#39;not &#34;{alignment}&#34;&#39;)
-    if alignment in [&#39;none&#39;, &#39;datetime&#39;]:
+    if alignment == &#39;datetime&#39;:
         new_diff = fed._current_offset
     elif alignment == &#39;time&#39;:
         new_diff = fed.index[0].date() - ZERO_DATE.date()
@@ -137,12 +247,12 @@ Other …</p></div>
 <span>def <span class="ident">can_concat</span></span>(<span>feds)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Determines whether or not FED3_Files can be concatenated, (based on whether
+<div class="desc"><p>Determines whether or not FEDFrames can be concatenated, (based on whether
 their start and end times overlap).</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>feds</code></strong> :&ensp;<code>array</code></dt>
-<dd>an array of FED3_Files</dd>
+<dd>an array of FEDFrames</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -155,13 +265,13 @@ their start and end times overlap).</p>
 </summary>
 <pre><code class="python">def can_concat(feds):
     &#34;&#34;&#34;
-    Determines whether or not FED3_Files can be concatenated, (based on whether
+    Determines whether or not FEDFrames can be concatenated, (based on whether
     their start and end times overlap).
 
     Parameters
     ----------
     feds : array
-        an array of FED3_Files
+        an array of FEDFrames
 
     Returns
     -------
@@ -179,19 +289,74 @@ their start and end times overlap).</p>
 <span>def <span class="ident">concat</span></span>(<span>feds, name=None, add_concat_number=True, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'))</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Concatenated FED3 data in time.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>feds</code></strong> :&ensp;<code>collection</code> of <code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a> objects</code></dt>
+<dd>List or other collection of FEDFrame</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name to give the new FEDFrame with concatenated data.
+The default is None, in which case the name of the first FEDFrame
+is used.</dd>
+<dt><strong><code>add_concat_number</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Adds a column keeping record of the concatenation. The default is True.</dd>
+<dt><strong><code>reset_columns</code></strong> :&ensp;<code>list-like</code>, optional</dt>
+<dd>Columns whose counts should be modified in order to preserve counts
+across the concatenated data.
+The default is
+<code>('Pellet_Count', 'Left_Poke_Count','Right_Poke_Count')</code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Cannot concatenated FED data when the timestamps are overlapping.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>newfed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>New FEDFrame object with concatenated data.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def concat(feds, name=None, add_concat_number=True,
            reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;,&#39;Right_Poke_Count&#39;)):
+    &#39;&#39;&#39;
+    Concatenated FED3 data in time.
+
+    Parameters
+    ----------
+    feds : collection of FEDFrame objects
+        List or other collection of FEDFrame
+    name : str, optional
+        Name to give the new FEDFrame with concatenated data.
+        The default is None, in which case the name of the first FEDFrame
+        is used.
+    add_concat_number : bool, optional
+        Adds a column keeping record of the concatenation. The default is True.
+    reset_columns : list-like, optional
+        Columns whose counts should be modified in order to preserve counts
+        across the concatenated data.  The default is
+        `(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;,&#39;Right_Poke_Count&#39;)`.
+
+    Raises
+    ------
+    ValueError
+        Cannot concatenated FED data when the timestamps are overlapping.
+
+    Returns
+    -------
+    newfed : fed3.FEDFrame
+        New FEDFrame object with concatenated data.
+
+    &#39;&#39;&#39;
 
     if name is None:
         name = feds[0].name
 
     if not can_concat(feds):
-        raise ValueError(&#39;FED file dates overlap, cannot concat.&#39;)
+        raise ValueError(&#39;FEDFrame dates overlap, cannot concat.&#39;)
 
     output=[]
     offsets = {}
@@ -258,13 +423,60 @@ their start and end times overlap).</p>
 <span>def <span class="ident">load</span></span>(<span>path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True, deduplicate_index=None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Load FED3 data from a CSV/Excel file.
+This is the typical
+recommended way for importing FED3 data.
+Relies mostly
+on <code>pandas.read_csv()</code> and <code>pandas.read_excel()</code> for the parsing.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>System path to FED3 data file.</dd>
+<dt><strong><code>index_col</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Timestamp column to use as index. The default is 'MM:DD:YYYY hh:mm:ss'.</dd>
+<dt><strong><code>dropna</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Remove all empty rows. The default is True.</dd>
+<dt><strong><code>deduplicate_index</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Method for removing duplicate timestamps in the index.
+The default is None (no index altering).
+See
+<code><a title="fed3.core.FEDFrame.deduplicate_index" href="core/index.html#fed3.core.FEDFrame.deduplicate_index">FEDFrame.deduplicate_index()</a></code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>f</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>New FEDFrame object.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load(path, index_col=&#39;MM:DD:YYYY hh:mm:ss&#39;, dropna=True,
          deduplicate_index=None):
+    &#39;&#39;&#39;
+    Load FED3 data from a CSV/Excel file.  This is the typical
+    recommended way for importing FED3 data.  Relies mostly
+    on `pandas.read_csv()` and `pandas.read_excel()` for the parsing.
+
+    Parameters
+    ----------
+    path : str
+        System path to FED3 data file.
+    index_col : str, optional
+        Timestamp column to use as index. The default is &#39;MM:DD:YYYY hh:mm:ss&#39;.
+    dropna : bool, optional
+        Remove all empty rows. The default is True.
+    deduplicate_index : str, optional
+        Method for removing duplicate timestamps in the index.
+        The default is None (no index altering).  See
+        `fed3.core.FEDFrame.deduplicate_index()`.
+
+    Returns
+    -------
+    f : fed3.FEDFrame
+        New FEDFrame object.
+
+    &#39;&#39;&#39;
     # read the path
     name, ext = os.path.splitext(path)
     ext = ext.lower()
@@ -320,13 +532,55 @@ their start and end times overlap).</p>
 <span>def <span class="ident">split</span></span>(<span>fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'), return_empty=False, tag_name=True)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Split one FEDFrame into a multiple based on one or more dates.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>FED3 data.</dd>
+<dt><strong><code>dates</code></strong> :&ensp;<code>datetime string</code> or <code>datetime object,</code> or <code>list-like</code> of <code>such</code></dt>
+<dd>Timestamp(s) to split the data on.</dd>
+<dt><strong><code>reset_columns</code></strong> :&ensp;<code>list-like</code>, optional</dt>
+<dd>Columns whose cumulative totals should be reset when splitting the data.
+The default is ('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count').</dd>
+<dt><strong><code>return_empty</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Return empty FEDFrames created from splitting. The default is False.</dd>
+<dt><strong><code>tag_name</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Add a <code>'_#'</code> tag to the name of each new FEDFrame. The default is True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>output</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of FED3 objects created by split.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def split(fed, dates, reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
           return_empty=False, tag_name=True):
+    &#39;&#39;&#39;
+    Split one FEDFrame into a multiple based on one or more dates.
+
+    Parameters
+    ----------
+    fed : fed3.FEDFrame
+        FED3 data.
+    dates : datetime string or datetime object, or list-like of such
+        Timestamp(s) to split the data on.
+    reset_columns : list-like, optional
+        Columns whose cumulative totals should be reset when splitting the data.
+        The default is (&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;).
+    return_empty : bool, optional
+        Return empty FEDFrames created from splitting. The default is False.
+    tag_name : bool, optional
+        Add a `&#39;_#&#39;` tag to the name of each new FEDFrame. The default is True.
+
+    Returns
+    -------
+    output : list
+        List of FED3 objects created by split.
+
+    &#39;&#39;&#39;
     dates = _split_handle_dates(dates)
     output = []
     offsets = {col: 0 for col in reset_columns}
@@ -352,7 +606,27 @@ their start and end times overlap).</p>
 <span>def <span class="ident">timecrop</span></span>(<span>fed, start, end, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'), name=None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Return a new FEDFrame cropped in time to only include data between two
+dates.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>FED3 data.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>datetime str</code> or <code>object</code></dt>
+<dd>Time to start including data (inclusive).</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>datetime str</code> or <code>object</code></dt>
+<dd>Time to stop including data (exclusive).</dd>
+<dt><strong><code>reset_columns</code></strong> :&ensp;<code>list-like</code>, optional</dt>
+<dd>Columns whose cumulative totals should be reset when cropping the data.
+The default is ('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count').</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name for the new FEDFrame produced. The default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>newfed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></dt>
+<dd>New FEDFrame object after filtering.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -360,6 +634,30 @@ their start and end times overlap).</p>
 <pre><code class="python">def timecrop(fed, start, end,
              reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;),
              name=None):
+    &#39;&#39;&#39;
+    Return a new FEDFrame cropped in time to only include data between two
+    dates.
+
+    Parameters
+    ----------
+    fed : fed3.FEDFrame
+        FED3 data.
+    start : datetime str or object
+        Time to start including data (inclusive).
+    end : datetime str or object
+        Time to stop including data (exclusive).
+    reset_columns : list-like, optional
+        Columns whose cumulative totals should be reset when cropping the data.
+        The default is (&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;).
+    name : str, optional
+        Name for the new FEDFrame produced. The default is None.
+
+    Returns
+    -------
+    newfed : fed3.FEDFrame
+        New FEDFrame object after filtering.
+
+    &#39;&#39;&#39;
 
     prior = fed[(fed.index &lt; start)]
     newfed = fed[(fed.index &gt;= start) &amp;
