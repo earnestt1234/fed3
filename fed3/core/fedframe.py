@@ -59,7 +59,7 @@ class FEDFrame(pd.DataFrame):
 
     Most of the time, FED3 data will be accessed directly from the logged CSV
     files.  In this case, using the FEDFrame constructor is not recommended;
-    you should instead use `fed3.core.load().`  But if for some reason you already
+    you should instead use `fed3.core.load()`  But if for some reason you already
     have FED3 data loaded into a pandas DataFrame, you can make use of the
     constructor and the `FEDFrame._load_init()` function to get full FEDFrame
     functionality.
@@ -279,21 +279,39 @@ class FEDFrame(pd.DataFrame):
         them.  When available, non-duplicated data should be loaded into
         the program.
 
+        fed3 should raise a warning when files with duplicated timestamps
+        are loaded. The status of the index can also be checked with
+        `check_duplicated_index()`.
+
         Parameters
         ----------
         method : str, optional
-            DESCRIPTION. The default is 'keep_first'.
-        offset : TYPE, optional
-            DESCRIPTION. The default is '1S'.
+            Method for removing duplicates.  Options are:
+
+            - `'keep_first'`: keep only the first instance of each duplicate
+            set (default)
+            - `'keep_last'`: keep only the last instance of each duplicate set
+            - `'remove'`: delete any rows with duplicate timestamps
+            - `'offset'`: add a small time offset to each date - does so
+            iteratively until the index is not duplicated.
+            - `'interpolate'`: offset duplicates such that they are spaced
+            evenly between their value and the next timestamp in the series
+
+            Note that `'interpolate'` and `'offset'` should preserve the
+            length of the FEDFrame, while other options can reduce it.
+
+        offset : str, optional
+            Pandas time offset string, only used when `method='offset'`.
+            The default is `'1S'`.
 
         Raises
         ------
         ValueError
-            DESCRIPTION.
+            Trying to use `'interpolate'` when the last timestamp is duplicated.
 
         Returns
         -------
-        None.
+        None.  Data is modified in place.
 
         '''
 
@@ -327,6 +345,17 @@ class FEDFrame(pd.DataFrame):
             self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit='seconds')
 
     def determine_mode(self):
+        '''
+        Return the recording mode of the current FED data.  This function tries
+        to take this literally from the data headers.  There are likely
+        to be problems for custom programs or particular FED software versions.
+
+        Returns
+        -------
+        mode : str
+            String indicating the mode.
+
+        '''
         mode = 'Unknown'
         column = pd.Series(dtype=object)
         for col in ['FR','FR_Ratio',' FR_Ratio','Mode','Session_Type']:
@@ -345,6 +374,28 @@ class FEDFrame(pd.DataFrame):
         return mode
 
     def event_type(self, timestamp, poke_side=True):
+        '''
+        Return the type of a given timestamp within the data (pellet or poke).
+
+        Parameters
+        ----------
+        timestamp : str, `pandas.Timestamp`
+            timestamp to query.
+        poke_side : bool, optional
+            When True (default), will try to return `'Left'` or `'Right'`
+            when the event is a poke.
+
+        Raises
+        ------
+        Exception
+            Fails when the type can't automatically be determined.
+
+        Returns
+        -------
+        str
+            Event type for queried timestamp.
+
+        '''
         if 'Event' in self.columns:
             return self.loc[timestamp, 'Event']
         else:

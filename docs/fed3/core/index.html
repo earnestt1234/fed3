@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="generator" content="pdoc 0.9.1" />
 <title>fed3.core API documentation</title>
 <meta name="description" content="This packge defines the major FEDFrame class (`fed3.core.fedframe.FEDFrame`)
 for representing fed3 data.
@@ -310,7 +310,7 @@ See additional documentation for these below.</p>
 <p>Most of the time, FED3 data will be accessed directly from the logged CSV
 files.
 In this case, using the FEDFrame constructor is not recommended;
-you should instead use <code><a title="fed3.core.load" href="#fed3.core.load">load()</a>.</code>
+you should instead use <code><a title="fed3.core.load" href="#fed3.core.load">load()</a></code>
 But if for some reason you already
 have FED3 data loaded into a pandas DataFrame, you can make use of the
 constructor and the <code>FEDFrame._load_init()</code> function to get full FEDFrame
@@ -340,7 +340,7 @@ functionality.</p>
 
     Most of the time, FED3 data will be accessed directly from the logged CSV
     files.  In this case, using the FEDFrame constructor is not recommended;
-    you should instead use `fed3.core.load().`  But if for some reason you already
+    you should instead use `fed3.core.load()`  But if for some reason you already
     have FED3 data loaded into a pandas DataFrame, you can make use of the
     constructor and the `FEDFrame._load_init()` function to get full FEDFrame
     functionality.
@@ -560,21 +560,39 @@ functionality.</p>
         them.  When available, non-duplicated data should be loaded into
         the program.
 
+        fed3 should raise a warning when files with duplicated timestamps
+        are loaded. The status of the index can also be checked with
+        `check_duplicated_index()`.
+
         Parameters
         ----------
         method : str, optional
-            DESCRIPTION. The default is &#39;keep_first&#39;.
-        offset : TYPE, optional
-            DESCRIPTION. The default is &#39;1S&#39;.
+            Method for removing duplicates.  Options are:
+
+            - `&#39;keep_first&#39;`: keep only the first instance of each duplicate
+            set (default)
+            - `&#39;keep_last&#39;`: keep only the last instance of each duplicate set
+            - `&#39;remove&#39;`: delete any rows with duplicate timestamps
+            - `&#39;offset&#39;`: add a small time offset to each date - does so
+            iteratively until the index is not duplicated.
+            - `&#39;interpolate&#39;`: offset duplicates such that they are spaced
+            evenly between their value and the next timestamp in the series
+
+            Note that `&#39;interpolate&#39;` and `&#39;offset&#39;` should preserve the
+            length of the FEDFrame, while other options can reduce it.
+
+        offset : str, optional
+            Pandas time offset string, only used when `method=&#39;offset&#39;`.
+            The default is `&#39;1S&#39;`.
 
         Raises
         ------
         ValueError
-            DESCRIPTION.
+            Trying to use `&#39;interpolate&#39;` when the last timestamp is duplicated.
 
         Returns
         -------
-        None.
+        None.  Data is modified in place.
 
         &#39;&#39;&#39;
 
@@ -608,6 +626,17 @@ functionality.</p>
             self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)
 
     def determine_mode(self):
+        &#39;&#39;&#39;
+        Return the recording mode of the current FED data.  This function tries
+        to take this literally from the data headers.  There are likely
+        to be problems for custom programs or particular FED software versions.
+
+        Returns
+        -------
+        mode : str
+            String indicating the mode.
+
+        &#39;&#39;&#39;
         mode = &#39;Unknown&#39;
         column = pd.Series(dtype=object)
         for col in [&#39;FR&#39;,&#39;FR_Ratio&#39;,&#39; FR_Ratio&#39;,&#39;Mode&#39;,&#39;Session_Type&#39;]:
@@ -626,6 +655,28 @@ functionality.</p>
         return mode
 
     def event_type(self, timestamp, poke_side=True):
+        &#39;&#39;&#39;
+        Return the type of a given timestamp within the data (pellet or poke).
+
+        Parameters
+        ----------
+        timestamp : str, `pandas.Timestamp`
+            timestamp to query.
+        poke_side : bool, optional
+            When True (default), will try to return `&#39;Left&#39;` or `&#39;Right&#39;`
+            when the event is a poke.
+
+        Raises
+        ------
+        Exception
+            Fails when the type can&#39;t automatically be determined.
+
+        Returns
+        -------
+        str
+            Event type for queried timestamp.
+
+        &#39;&#39;&#39;
         if &#39;Event&#39; in self.columns:
             return self.loc[timestamp, &#39;Event&#39;]
         else:
@@ -872,20 +923,40 @@ it either removes duplicated indices or applies simple rules to alter
 them.
 When available, non-duplicated data should be loaded into
 the program.</p>
+<p>fed3 should raise a warning when files with duplicated timestamps
+are loaded. The status of the index can also be checked with
+<code>check_duplicated_index()</code>.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>method</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>DESCRIPTION. The default is 'keep_first'.</dd>
-<dt><strong><code>offset</code></strong> :&ensp;<code>TYPE</code>, optional</dt>
-<dd>DESCRIPTION. The default is '1S'.</dd>
+<dd>
+<p>Method for removing duplicates.
+Options are:</p>
+<ul>
+<li><code>'keep_first'</code>: keep only the first instance of each duplicate
+set (default)</li>
+<li><code>'keep_last'</code>: keep only the last instance of each duplicate set</li>
+<li><code>'remove'</code>: delete any rows with duplicate timestamps</li>
+<li><code>'offset'</code>: add a small time offset to each date - does so
+iteratively until the index is not duplicated.</li>
+<li><code>'interpolate'</code>: offset duplicates such that they are spaced
+evenly between their value and the next timestamp in the series</li>
+</ul>
+<p>Note that <code>'interpolate'</code> and <code>'offset'</code> should preserve the
+length of the FEDFrame, while other options can reduce it.</p>
+</dd>
+<dt><strong><code>offset</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Pandas time offset string, only used when <code>method='offset'</code>.
+The default is <code>'1S'</code>.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>ValueError</code></dt>
-<dd>DESCRIPTION.</dd>
+<dd>Trying to use <code>'interpolate'</code> when the last timestamp is duplicated.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>None.</p></div>
+<p>None.
+Data is modified in place.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -912,21 +983,39 @@ the program.</p>
     them.  When available, non-duplicated data should be loaded into
     the program.
 
+    fed3 should raise a warning when files with duplicated timestamps
+    are loaded. The status of the index can also be checked with
+    `check_duplicated_index()`.
+
     Parameters
     ----------
     method : str, optional
-        DESCRIPTION. The default is &#39;keep_first&#39;.
-    offset : TYPE, optional
-        DESCRIPTION. The default is &#39;1S&#39;.
+        Method for removing duplicates.  Options are:
+
+        - `&#39;keep_first&#39;`: keep only the first instance of each duplicate
+        set (default)
+        - `&#39;keep_last&#39;`: keep only the last instance of each duplicate set
+        - `&#39;remove&#39;`: delete any rows with duplicate timestamps
+        - `&#39;offset&#39;`: add a small time offset to each date - does so
+        iteratively until the index is not duplicated.
+        - `&#39;interpolate&#39;`: offset duplicates such that they are spaced
+        evenly between their value and the next timestamp in the series
+
+        Note that `&#39;interpolate&#39;` and `&#39;offset&#39;` should preserve the
+        length of the FEDFrame, while other options can reduce it.
+
+    offset : str, optional
+        Pandas time offset string, only used when `method=&#39;offset&#39;`.
+        The default is `&#39;1S&#39;`.
 
     Raises
     ------
     ValueError
-        DESCRIPTION.
+        Trying to use `&#39;interpolate&#39;` when the last timestamp is duplicated.
 
     Returns
     -------
-    None.
+    None.  Data is modified in place.
 
     &#39;&#39;&#39;
 
@@ -964,12 +1053,32 @@ the program.</p>
 <span>def <span class="ident">determine_mode</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Return the recording mode of the current FED data.
+This function tries
+to take this literally from the data headers.
+There are likely
+to be problems for custom programs or particular FED software versions.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>mode</code></strong> :&ensp;<code>str</code></dt>
+<dd>String indicating the mode.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def determine_mode(self):
+    &#39;&#39;&#39;
+    Return the recording mode of the current FED data.  This function tries
+    to take this literally from the data headers.  There are likely
+    to be problems for custom programs or particular FED software versions.
+
+    Returns
+    -------
+    mode : str
+        String indicating the mode.
+
+    &#39;&#39;&#39;
     mode = &#39;Unknown&#39;
     column = pd.Series(dtype=object)
     for col in [&#39;FR&#39;,&#39;FR_Ratio&#39;,&#39; FR_Ratio&#39;,&#39;Mode&#39;,&#39;Session_Type&#39;]:
@@ -992,12 +1101,52 @@ the program.</p>
 <span>def <span class="ident">event_type</span></span>(<span>self, timestamp, poke_side=True)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Return the type of a given timestamp within the data (pellet or poke).</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>timestamp</code></strong> :&ensp;<code>str, </code>pandas.Timestamp``</dt>
+<dd>timestamp to query.</dd>
+<dt><strong><code>poke_side</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When True (default), will try to return <code>'Left'</code> or <code>'Right'</code>
+when the event is a poke.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>Fails when the type can't automatically be determined.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Event type for queried timestamp.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def event_type(self, timestamp, poke_side=True):
+    &#39;&#39;&#39;
+    Return the type of a given timestamp within the data (pellet or poke).
+
+    Parameters
+    ----------
+    timestamp : str, `pandas.Timestamp`
+        timestamp to query.
+    poke_side : bool, optional
+        When True (default), will try to return `&#39;Left&#39;` or `&#39;Right&#39;`
+        when the event is a poke.
+
+    Raises
+    ------
+    Exception
+        Fails when the type can&#39;t automatically be determined.
+
+    Returns
+    -------
+    str
+        Event type for queried timestamp.
+
+    &#39;&#39;&#39;
     if &#39;Event&#39; in self.columns:
         return self.loc[timestamp, &#39;Event&#39;]
     else:
@@ -1260,7 +1409,7 @@ the program.</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
 </footer>
 </body>
 </html>
