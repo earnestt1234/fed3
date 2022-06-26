@@ -186,6 +186,27 @@ class FEDFrame(pd.DataFrame):
 
         return cp
 
+    def _fix_column_names(self):
+        '''
+        Checks for and fixes old FED3 issue where column names included a
+        trailing/starting space.
+
+        Returns
+        -------
+        None.
+
+        '''
+        self.foreign_columns = []
+        for col in self.columns:
+            for fix in FIXED_COLS:
+                likeness = SequenceMatcher(a=col, b=fix).ratio()
+                if likeness > 0.85:
+                    self.rename(columns={col:fix}, inplace=True)
+                    break
+                self.foreign_columns.append(col)
+        self.missing_columns = [col for col in NEEDED_COLS if
+                                col not in self.columns]
+
     def _handle_retrieval_time(self):
         if 'Retrieval_Time' not in self.columns:
             return
@@ -232,7 +253,7 @@ class FEDFrame(pd.DataFrame):
         '''
         self.name = name
         self.path = path
-        self.fix_column_names()
+        self._fix_column_names()
         self._handle_retrieval_time()
         self._alignment = 'datetime'
         self._current_offset = pd.Timedelta(0)
@@ -414,27 +435,29 @@ class FEDFrame(pd.DataFrame):
                                 'no "Event" column and multiple non-zero '
                                 'entries for pellets and pokes.')
 
-    def fix_column_names(self):
+    def interpellet_intervals(self, check_concat=True, condense=False):
         '''
-        This
+        Calculate the interpellet intervals for each pellet event.
+        This is the time (in minutes) since the last pellet was retrieved.
+
+        Parameters
+        ----------
+        check_concat : bool, optional
+            Removes IPIs when they are identified as coming directly after
+            data concatenation. The default is True.  This will only work
+            when data were concatenated with fed3.
+        condense : bool, optional
+            Return only records where interpellet intervals are observed.
+            The default is False.  When False, the returned Series will
+            have same length as full FEDFrame.  When True, the Series
+            will usually be shorter
 
         Returns
         -------
-        None.
+        interpellet : pandas.Series
+            Pandas Series containing the interpellet intervals.
 
         '''
-        self.foreign_columns = []
-        for col in self.columns:
-            for fix in FIXED_COLS:
-                likeness = SequenceMatcher(a=col, b=fix).ratio()
-                if likeness > 0.85:
-                    self.rename(columns={col:fix}, inplace=True)
-                    break
-                self.foreign_columns.append(col)
-        self.missing_columns = [col for col in NEEDED_COLS if
-                                col not in self.columns]
-
-    def interpellet_intervals(self, check_concat=True, condense=False):
         bp = self._binary_pellets()
         bp = bp[bp == 1]
         diff = bp.index.to_series().diff().dt.total_seconds() / 60
