@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.lightcycle API documentation</title>
-<meta name="description" content="Created on Sun May
-9 15:26:30 2021 …" />
+<meta name="description" content="General code for helping with the light cycle for FED3 data." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,9 +22,7 @@
 <h1 class="title">Module <code>fed3.lightcycle</code></h1>
 </header>
 <section id="section-intro">
-<p>Created on Sun May
-9 15:26:30 2021</p>
-<p>@author: earnestt1234</p>
+<p>General code for helping with the light cycle for FED3 data.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -33,9 +30,7 @@
 <pre><code class="python">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 &#34;&#34;&#34;
-Created on Sun May  9 15:26:30 2021
-
-@author: earnestt1234
+General code for helping with the light cycle for FED3 data.
 &#34;&#34;&#34;
 
 __all__ = [&#39;set_lightcycle&#39;]
@@ -45,15 +40,41 @@ import datetime as dt
 import pandas as pd
 
 LIGHTCYCLE = {&#39;on&#39;: dt.time(hour=7, minute=0), &#39;off&#39;: dt.time(hour=19, minute=0)}
+&#39;&#39;&#39;Dictionary determining the light cycle.  Should be a dictionary with an
+`&#39;on&#39;` key and an `&#39;off&#39;`, each pointint to  `datetime.time` object with the
+hour and minute specified (note that further precision is not used).&#39;&#39;&#39;
 
 def time_to_float(x):
+    &#39;&#39;&#39;Convert a datetime/time object to an float in [0-24).&#39;&#39;&#39;
     return x.hour + (1/60) * x.minute
 
 def set_lightcycle(on_hour, off_hour, on_minute=0, off_minute=0):
+    &#39;&#39;&#39;
+    Set the light cycle.  This affects shading on plots and operations
+    which group data based on the light cycle.
+
+    Parameters
+    ----------
+    on_hour : int
+        Integer indicating the hour of day when lights turn on, in [0-24).
+    off_hour : int
+        Integer indicating the hour of day when lights turn off, in [0-24).
+    on_minute : int, optional
+        Minute of the `on_hour` where lights turn on, in [0-60).
+    off_minute : int, optional
+        Minute of the `off_hour` where lights turn off, in [0-60).
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
     LIGHTCYCLE[&#39;on&#39;] = dt.time(hour=on_hour, minute=on_minute)
     LIGHTCYCLE[&#39;off&#39;] = dt.time(hour=off_hour, minute=off_minute)
 
 def is_at_night(datetime, lights_on, lights_off):
+    &#39;&#39;&#39;Returns `True` if an input timestamp is at night.  Note that `lights_on`
+    and `lights_off` should be `datetime.time` objects.&#39;&#39;&#39;
     ashour = time_to_float(datetime)
     lights_on = time_to_float(lights_on)
     lights_off = time_to_float(lights_off)
@@ -64,6 +85,39 @@ def is_at_night(datetime, lights_on, lights_off):
 
 def lightcycle_tuples(start_date, end_date, lights_on, lights_off, kind=&#39;nights&#39;,
                       pdconvert=True):
+    &#39;&#39;&#39;
+    Given two input timestamps, return a list of tuples indicating the
+    start and end of each day/night period occuring between them.  Used
+    for determining when to shade dark periods within `fed3.plot`.
+
+    Parameters
+    ----------
+    start_date : str or datetime object
+        Start time.
+    end_date : str or datetime object
+        End time.
+    lights_on : datetime.time
+        Time of day lights turn on.
+    lights_off : datetime.time
+        Time of day lights turn off.
+    kind : str, &#39;days&#39; or &#39;nights&#39;, optional
+        Return tuples corresponding to the daytime or nighttime.
+        The default is &#39;nights&#39;.
+    pdconvert : bool, optional
+        Use `pandas.to_datetime` to convert `start_date` and `end_date`.
+        The default is True.
+
+    Raises
+    ------
+    ValueError
+        Unrecognized value passed to `kind`.
+
+    Returns
+    -------
+    result : list
+        List of two-tuples of datetime objects.
+
+    &#39;&#39;&#39;
 
     if kind not in [&#39;days&#39;, &#39;nights&#39;]:
         raise ValueError(f&#34;`kind` must be &#39;nights&#39; or &#39;days&#39;, not {kind}&#34;)
@@ -125,12 +179,47 @@ def lightcycle_tuples(start_date, end_date, lights_on, lights_off, kind=&#39;nig
 <span>def <span class="ident">set_lightcycle</span></span>(<span>on_hour, off_hour, on_minute=0, off_minute=0)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Set the light cycle.
+This affects shading on plots and operations
+which group data based on the light cycle.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>on_hour</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integer indicating the hour of day when lights turn on, in [0-24).</dd>
+<dt><strong><code>off_hour</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integer indicating the hour of day when lights turn off, in [0-24).</dd>
+<dt><strong><code>on_minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Minute of the <code>on_hour</code> where lights turn on, in [0-60).</dd>
+<dt><strong><code>off_minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Minute of the <code>off_hour</code> where lights turn off, in [0-60).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def set_lightcycle(on_hour, off_hour, on_minute=0, off_minute=0):
+    &#39;&#39;&#39;
+    Set the light cycle.  This affects shading on plots and operations
+    which group data based on the light cycle.
+
+    Parameters
+    ----------
+    on_hour : int
+        Integer indicating the hour of day when lights turn on, in [0-24).
+    off_hour : int
+        Integer indicating the hour of day when lights turn off, in [0-24).
+    on_minute : int, optional
+        Minute of the `on_hour` where lights turn on, in [0-60).
+    off_minute : int, optional
+        Minute of the `off_hour` where lights turn off, in [0-60).
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
     LIGHTCYCLE[&#39;on&#39;] = dt.time(hour=on_hour, minute=on_minute)
     LIGHTCYCLE[&#39;off&#39;] = dt.time(hour=off_hour, minute=off_minute)</code></pre>
 </details>

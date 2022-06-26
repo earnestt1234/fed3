@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.examples API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Example FED3 data for practice &amp; demonstration of fed3." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,13 @@
 <h1 class="title">Module <code>fed3.examples</code></h1>
 </header>
 <section id="section-intro">
+<p>Example FED3 data for practice &amp; demonstration of fed3.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+&#39;&#39;&#39;Example FED3 data for practice &amp; demonstration of fed3.&#39;&#39;&#39;
 
 __all__ = [&#39;load_examples&#39;]
 
@@ -41,6 +43,25 @@ DATADIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), &#39;data&#39
 DATA = {}
 
 def load_examples(key):
+    &#39;&#39;&#39;
+    Load the example data linked to a given key.
+
+    Parameters
+    ----------
+    key : str
+        Example to load.
+
+    Raises
+    ------
+    KeyError
+        Unrecognized key.
+
+    Returns
+    -------
+    list
+        FED3 example data, as a list of FEDFrame objects.
+
+    &#39;&#39;&#39;
 
     try:
         return DATA[key]
@@ -49,6 +70,7 @@ def load_examples(key):
                        f&#34;{list(DATA.keys())}&#34;)
 
 def _build_examples():
+    &#39;&#39;&#39;Load all the FED3 example data.  To be called on start up.&#39;&#39;&#39;
     if not os.path.isdir(DATADIR):
         warnings.warn(&#34;Unable to find fed3 example data directory; unable &#34;
                       &#34;to load example data.&#34;, RuntimeWarning)
@@ -84,12 +106,46 @@ _build_examples()</code></pre>
 <span>def <span class="ident">load_examples</span></span>(<span>key)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Load the example data linked to a given key.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>key</code></strong> :&ensp;<code>str</code></dt>
+<dd>Example to load.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>Unrecognized key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>FED3 example data, as a list of FEDFrame objects.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_examples(key):
+    &#39;&#39;&#39;
+    Load the example data linked to a given key.
+
+    Parameters
+    ----------
+    key : str
+        Example to load.
+
+    Raises
+    ------
+    KeyError
+        Unrecognized key.
+
+    Returns
+    -------
+    list
+        FED3 example data, as a list of FEDFrame objects.
+
+    &#39;&#39;&#39;
 
     try:
         return DATA[key]

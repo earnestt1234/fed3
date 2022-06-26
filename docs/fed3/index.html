@@ -81,12 +81,11 @@ Other …</p></div>
 </dd>
 <dt><code class="name"><a title="fed3.examples" href="examples/index.html">fed3.examples</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Example FED3 data for practice &amp; demonstration of fed3.</p></div>
 </dd>
 <dt><code class="name"><a title="fed3.lightcycle" href="lightcycle.html">fed3.lightcycle</a></code></dt>
 <dd>
-<div class="desc"><p>Created on Sun May
-9 15:26:30 2021 …</p></div>
+<div class="desc"><p>General code for helping with the light cycle for FED3 data.</p></div>
 </dd>
 <dt><code class="name"><a title="fed3.metrics" href="metrics/index.html">fed3.metrics</a></code></dt>
 <dd>
@@ -500,12 +499,46 @@ See
 <span>def <span class="ident">load_examples</span></span>(<span>key)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Load the example data linked to a given key.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>key</code></strong> :&ensp;<code>str</code></dt>
+<dd>Example to load.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>Unrecognized key.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>FED3 example data, as a list of FEDFrame objects.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_examples(key):
+    &#39;&#39;&#39;
+    Load the example data linked to a given key.
+
+    Parameters
+    ----------
+    key : str
+        Example to load.
+
+    Raises
+    ------
+    KeyError
+        Unrecognized key.
+
+    Returns
+    -------
+    list
+        FED3 example data, as a list of FEDFrame objects.
+
+    &#39;&#39;&#39;
 
     try:
         return DATA[key]
@@ -518,12 +551,47 @@ See
 <span>def <span class="ident">set_lightcycle</span></span>(<span>on_hour, off_hour, on_minute=0, off_minute=0)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Set the light cycle.
+This affects shading on plots and operations
+which group data based on the light cycle.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>on_hour</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integer indicating the hour of day when lights turn on, in [0-24).</dd>
+<dt><strong><code>off_hour</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integer indicating the hour of day when lights turn off, in [0-24).</dd>
+<dt><strong><code>on_minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Minute of the <code>on_hour</code> where lights turn on, in [0-60).</dd>
+<dt><strong><code>off_minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Minute of the <code>off_hour</code> where lights turn off, in [0-60).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def set_lightcycle(on_hour, off_hour, on_minute=0, off_minute=0):
+    &#39;&#39;&#39;
+    Set the light cycle.  This affects shading on plots and operations
+    which group data based on the light cycle.
+
+    Parameters
+    ----------
+    on_hour : int
+        Integer indicating the hour of day when lights turn on, in [0-24).
+    off_hour : int
+        Integer indicating the hour of day when lights turn off, in [0-24).
+    on_minute : int, optional
+        Minute of the `on_hour` where lights turn on, in [0-60).
+    off_minute : int, optional
+        Minute of the `off_hour` where lights turn off, in [0-60).
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
     LIGHTCYCLE[&#39;on&#39;] = dt.time(hour=on_hour, minute=on_minute)
     LIGHTCYCLE[&#39;off&#39;] = dt.time(hour=off_hour, minute=off_minute)</code></pre>
 </details>

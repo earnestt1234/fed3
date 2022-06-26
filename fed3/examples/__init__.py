@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+'''Example FED3 data for practice & demonstration of fed3.'''
 
 __all__ = ['load_examples']
 
@@ -13,6 +14,25 @@ DATADIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 DATA = {}
 
 def load_examples(key):
+    '''
+    Load the example data linked to a given key.
+
+    Parameters
+    ----------
+    key : str
+        Example to load.
+
+    Raises
+    ------
+    KeyError
+        Unrecognized key.
+
+    Returns
+    -------
+    list
+        FED3 example data, as a list of FEDFrame objects.
+
+    '''
 
     try:
         return DATA[key]
@@ -21,6 +41,7 @@ def load_examples(key):
                        f"{list(DATA.keys())}")
 
 def _build_examples():
+    '''Load all the FED3 example data.  To be called on start up.'''
     if not os.path.isdir(DATADIR):
         warnings.warn("Unable to find fed3 example data directory; unable "
                       "to load example data.", RuntimeWarning)
