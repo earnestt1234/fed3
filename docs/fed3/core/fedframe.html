@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.core.fedframe API documentation</title>
 <meta name="description" content="The FEDFrame is a subclass of the pandas DataFrame.
 It is tailored
@@ -43,6 +43,8 @@ operations.
 
 __all__ = [&#39;FEDFrame&#39;]
 
+__pdoc__ = {&#39;FEDFrame._load_init&#39;:True}
+
 from difflib import SequenceMatcher
 import warnings
 
@@ -78,7 +80,31 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
     return series
 
 class FEDFrame(pd.DataFrame):
-    &#39;&#39;&#39;Test&#39;&#39;&#39;
+    &#39;&#39;&#39;The main object interface for FED3 data in the fed3 library.  Provides
+    a 2D table for storing FED3 data.
+
+    FEDFrame is a subclass of the DataFrame, which allows for the highly-developed
+    data manipulation operations provided by pandas.  Most things you can do
+    with a pandas DataFrame can also be done with a FEDFrame.
+
+    Note there is no equivalent of the pandas Series which is specific to FEDs.
+
+    FEDFrame provides additional attributes and methods which are specific
+    to FED3 data.  See additional documentation for these below.
+
+    Most of the time, FED3 data will be accessed directly from the logged CSV
+    files.  In this case, using the FEDFrame constructor is not recommended;
+    you should instead use `fed3.core.load().`  But if for some reason you already
+    have FED3 data loaded into a pandas DataFrame, you can make use of the
+    constructor and the `FEDFrame._load_init()` function to get full FEDFrame
+    functionality.
+
+    Other links:
+
+    - pandas: https://pandas.pydata.org/docs/index.html
+    - pandas DataFrame: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
+    - Subclassing pandas: https://pandas.pydata.org/docs/development/extending.html&#39;&#39;&#39;
+
     _metadata = [&#39;name&#39;, &#39;path&#39;, &#39;foreign_columns&#39;, &#39;missing_columns&#39;,
                  &#39;_alignment&#39;, &#39;_current_offset&#39;]
 
@@ -86,6 +112,8 @@ class FEDFrame(pd.DataFrame):
 
     @property
     def _constructor(self):
+        &#39;&#39;&#39;Maintains the FEDFrame type for derivates created from self.
+        See https://pandas.pydata.org/docs/development/extending.html&#39;&#39;&#39;
         return FEDFrame
 
     @property
@@ -200,6 +228,43 @@ class FEDFrame(pd.DataFrame):
 
 
     def _load_init(self, name=None, path=None, deduplicate_index=None):
+        &#39;&#39;&#39;
+        Initialize FEDFrame attributes and apply some data cleaning.
+
+        This method is marked &#34;private&#34; because it is typically invoked
+        automatically when loading data from local files.  The only
+        use case is when you have existing pandas data which you want
+        to convert into FEDFrame data.  The following demonstrates this
+        use case, but note that **it is not recommended**
+        (use `fed3.core.load()` instead):
+
+        ```python
+        import fed3
+        import pandas as pd
+
+        data = pd.read_csv(&#34;/some/file.csv&#34;)
+        data = fed3.FEDFrame(data)
+
+        # do the following to get full functionality
+        data._load_init()
+        ```
+
+        Parameters
+        ----------
+        name : str, optional
+            Name to give the FEDFrame. The default is None.
+        path : str, optional
+            Set a local data path for the data. The default is None.
+        deduplicate_index : str, optional
+            When passed, applies a method for handling duplicate timestamps.
+            Not passed by default.  See `FEDFrame.deduplicate_index()` for
+            allowable methods.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
         self.name = name
         self.path = path
         self.fix_column_names()
@@ -216,9 +281,56 @@ class FEDFrame(pd.DataFrame):
     # ---- Public
 
     def check_duplicated_index(self):
+        &#39;&#39;&#39;
+        Checks if the data has duplicated timestamps.
+
+        Returns
+        -------
+        bool
+            `True` if duplicates found, else `False`.
+
+        &#39;&#39;&#39;
         return self.index.duplicated().any()
 
     def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+        &#39;&#39;&#39;
+        Apply a method to remove duplicate timestamps from the data.
+
+        With FEDFrames, the timestamp column (typically the column
+        &#39;MM:DD:YYYY hh:mm:ss&#39;) is used as the row labels (AKA the
+        `index` in pandas, [see here](https://pandas.pydata.org/docs/reference/api/pandas.Index.html)).
+        Some operations which invole selecting data based on this index
+        can fail when there are duplicate entries.
+
+        FED3 data should not generally have duplicated timestamps, however
+        they do arise due to two main causes.  One cause is transient
+        logging errors, which should be rare (but may be more common with
+        earlier FED software).  The other, more common, cause is
+        data editing with Microsoft Excel, which has been documented elsewhere
+        (see links below).
+
+        Note that this method does not recover any information that is lost;
+        it either removes duplicated indices or applies simple rules to alter
+        them.  When available, non-duplicated data should be loaded into
+        the program.
+
+        Parameters
+        ----------
+        method : str, optional
+            DESCRIPTION. The default is &#39;keep_first&#39;.
+        offset : TYPE, optional
+            DESCRIPTION. The default is &#39;1S&#39;.
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
 
         if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
                              &#39;offset&#39;, &#39;interpolate&#39;]:
@@ -392,13 +504,61 @@ class FEDFrame(pd.DataFrame):
 <span>(</span><span>data=None, index: Axes | None = None, columns: Axes | None = None, dtype: Dtype | None = None, copy: bool | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Test</p></div>
+<div class="desc"><p>The main object interface for FED3 data in the fed3 library.
+Provides
+a 2D table for storing FED3 data.</p>
+<p>FEDFrame is a subclass of the DataFrame, which allows for the highly-developed
+data manipulation operations provided by pandas.
+Most things you can do
+with a pandas DataFrame can also be done with a FEDFrame.</p>
+<p>Note there is no equivalent of the pandas Series which is specific to FEDs.</p>
+<p>FEDFrame provides additional attributes and methods which are specific
+to FED3 data.
+See additional documentation for these below.</p>
+<p>Most of the time, FED3 data will be accessed directly from the logged CSV
+files.
+In this case, using the FEDFrame constructor is not recommended;
+you should instead use <code><a title="fed3.core.load" href="index.html#fed3.core.load">load()</a>.</code>
+But if for some reason you already
+have FED3 data loaded into a pandas DataFrame, you can make use of the
+constructor and the <code><a title="fed3.core.fedframe.FEDFrame._load_init" href="#fed3.core.fedframe.FEDFrame._load_init">FEDFrame._load_init()</a></code> function to get full FEDFrame
+functionality.</p>
+<p>Other links:</p>
+<ul>
+<li>pandas: <a href="https://pandas.pydata.org/docs/index.html">https://pandas.pydata.org/docs/index.html</a></li>
+<li>pandas DataFrame: <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html</a></li>
+<li>Subclassing pandas: <a href="https://pandas.pydata.org/docs/development/extending.html">https://pandas.pydata.org/docs/development/extending.html</a></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FEDFrame(pd.DataFrame):
-    &#39;&#39;&#39;Test&#39;&#39;&#39;
+    &#39;&#39;&#39;The main object interface for FED3 data in the fed3 library.  Provides
+    a 2D table for storing FED3 data.
+
+    FEDFrame is a subclass of the DataFrame, which allows for the highly-developed
+    data manipulation operations provided by pandas.  Most things you can do
+    with a pandas DataFrame can also be done with a FEDFrame.
+
+    Note there is no equivalent of the pandas Series which is specific to FEDs.
+
+    FEDFrame provides additional attributes and methods which are specific
+    to FED3 data.  See additional documentation for these below.
+
+    Most of the time, FED3 data will be accessed directly from the logged CSV
+    files.  In this case, using the FEDFrame constructor is not recommended;
+    you should instead use `fed3.core.load().`  But if for some reason you already
+    have FED3 data loaded into a pandas DataFrame, you can make use of the
+    constructor and the `FEDFrame._load_init()` function to get full FEDFrame
+    functionality.
+
+    Other links:
+
+    - pandas: https://pandas.pydata.org/docs/index.html
+    - pandas DataFrame: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
+    - Subclassing pandas: https://pandas.pydata.org/docs/development/extending.html&#39;&#39;&#39;
+
     _metadata = [&#39;name&#39;, &#39;path&#39;, &#39;foreign_columns&#39;, &#39;missing_columns&#39;,
                  &#39;_alignment&#39;, &#39;_current_offset&#39;]
 
@@ -406,6 +566,8 @@ class FEDFrame(pd.DataFrame):
 
     @property
     def _constructor(self):
+        &#39;&#39;&#39;Maintains the FEDFrame type for derivates created from self.
+        See https://pandas.pydata.org/docs/development/extending.html&#39;&#39;&#39;
         return FEDFrame
 
     @property
@@ -520,6 +682,43 @@ class FEDFrame(pd.DataFrame):
 
 
     def _load_init(self, name=None, path=None, deduplicate_index=None):
+        &#39;&#39;&#39;
+        Initialize FEDFrame attributes and apply some data cleaning.
+
+        This method is marked &#34;private&#34; because it is typically invoked
+        automatically when loading data from local files.  The only
+        use case is when you have existing pandas data which you want
+        to convert into FEDFrame data.  The following demonstrates this
+        use case, but note that **it is not recommended**
+        (use `fed3.core.load()` instead):
+
+        ```python
+        import fed3
+        import pandas as pd
+
+        data = pd.read_csv(&#34;/some/file.csv&#34;)
+        data = fed3.FEDFrame(data)
+
+        # do the following to get full functionality
+        data._load_init()
+        ```
+
+        Parameters
+        ----------
+        name : str, optional
+            Name to give the FEDFrame. The default is None.
+        path : str, optional
+            Set a local data path for the data. The default is None.
+        deduplicate_index : str, optional
+            When passed, applies a method for handling duplicate timestamps.
+            Not passed by default.  See `FEDFrame.deduplicate_index()` for
+            allowable methods.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
         self.name = name
         self.path = path
         self.fix_column_names()
@@ -536,9 +735,56 @@ class FEDFrame(pd.DataFrame):
     # ---- Public
 
     def check_duplicated_index(self):
+        &#39;&#39;&#39;
+        Checks if the data has duplicated timestamps.
+
+        Returns
+        -------
+        bool
+            `True` if duplicates found, else `False`.
+
+        &#39;&#39;&#39;
         return self.index.duplicated().any()
 
     def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+        &#39;&#39;&#39;
+        Apply a method to remove duplicate timestamps from the data.
+
+        With FEDFrames, the timestamp column (typically the column
+        &#39;MM:DD:YYYY hh:mm:ss&#39;) is used as the row labels (AKA the
+        `index` in pandas, [see here](https://pandas.pydata.org/docs/reference/api/pandas.Index.html)).
+        Some operations which invole selecting data based on this index
+        can fail when there are duplicate entries.
+
+        FED3 data should not generally have duplicated timestamps, however
+        they do arise due to two main causes.  One cause is transient
+        logging errors, which should be rare (but may be more common with
+        earlier FED software).  The other, more common, cause is
+        data editing with Microsoft Excel, which has been documented elsewhere
+        (see links below).
+
+        Note that this method does not recover any information that is lost;
+        it either removes duplicated indices or applies simple rules to alter
+        them.  When available, non-duplicated data should be loaded into
+        the program.
+
+        Parameters
+        ----------
+        method : str, optional
+            DESCRIPTION. The default is &#39;keep_first&#39;.
+        offset : TYPE, optional
+            DESCRIPTION. The default is &#39;1S&#39;.
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
 
         if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
                              &#39;offset&#39;, &#39;interpolate&#39;]:
@@ -784,16 +1030,122 @@ def start_time(self):
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="fed3.core.fedframe.FEDFrame._load_init"><code class="name flex">
+<span>def <span class="ident">_load_init</span></span>(<span>self, name=None, path=None, deduplicate_index=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initialize FEDFrame attributes and apply some data cleaning.</p>
+<p>This method is marked "private" because it is typically invoked
+automatically when loading data from local files.
+The only
+use case is when you have existing pandas data which you want
+to convert into FEDFrame data.
+The following demonstrates this
+use case, but note that <strong>it is not recommended</strong>
+(use <code><a title="fed3.core.load" href="index.html#fed3.core.load">load()</a></code> instead):</p>
+<pre><code class="language-python">import fed3
+import pandas as pd
+
+data = pd.read_csv(&quot;/some/file.csv&quot;)
+data = fed3.FEDFrame(data)
+
+# do the following to get full functionality
+data._load_init()
+</code></pre>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name to give the FEDFrame. The default is None.</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Set a local data path for the data. The default is None.</dd>
+<dt><strong><code>deduplicate_index</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>When passed, applies a method for handling duplicate timestamps.
+Not passed by default.
+See <code><a title="fed3.core.fedframe.FEDFrame.deduplicate_index" href="#fed3.core.fedframe.FEDFrame.deduplicate_index">FEDFrame.deduplicate_index()</a></code> for
+allowable methods.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def _load_init(self, name=None, path=None, deduplicate_index=None):
+    &#39;&#39;&#39;
+    Initialize FEDFrame attributes and apply some data cleaning.
+
+    This method is marked &#34;private&#34; because it is typically invoked
+    automatically when loading data from local files.  The only
+    use case is when you have existing pandas data which you want
+    to convert into FEDFrame data.  The following demonstrates this
+    use case, but note that **it is not recommended**
+    (use `fed3.core.load()` instead):
+
+    ```python
+    import fed3
+    import pandas as pd
+
+    data = pd.read_csv(&#34;/some/file.csv&#34;)
+    data = fed3.FEDFrame(data)
+
+    # do the following to get full functionality
+    data._load_init()
+    ```
+
+    Parameters
+    ----------
+    name : str, optional
+        Name to give the FEDFrame. The default is None.
+    path : str, optional
+        Set a local data path for the data. The default is None.
+    deduplicate_index : str, optional
+        When passed, applies a method for handling duplicate timestamps.
+        Not passed by default.  See `FEDFrame.deduplicate_index()` for
+        allowable methods.
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
+    self.name = name
+    self.path = path
+    self.fix_column_names()
+    self._handle_retrieval_time()
+    self._alignment = &#39;datetime&#39;
+    self._current_offset = pd.Timedelta(0)
+    if deduplicate_index is not None:
+        self.deduplicate_index(method=deduplicate_index)
+    if self.check_duplicated_index():
+        warnings.warn(&#34;Index has duplicate values, which may prevent some &#34;
+                      &#34;fed3 operations.  Use the deuplicate_index() method &#34;
+                      &#34;to remove duplicate timestamps.&#34;, RuntimeWarning)</code></pre>
+</details>
+</dd>
 <dt id="fed3.core.fedframe.FEDFrame.check_duplicated_index"><code class="name flex">
 <span>def <span class="ident">check_duplicated_index</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Checks if the data has duplicated timestamps.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd><code>True</code> if duplicates found, else <code>False</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def check_duplicated_index(self):
+    &#39;&#39;&#39;
+    Checks if the data has duplicated timestamps.
+
+    Returns
+    -------
+    bool
+        `True` if duplicates found, else `False`.
+
+    &#39;&#39;&#39;
     return self.index.duplicated().any()</code></pre>
 </details>
 </dd>
@@ -801,12 +1153,82 @@ def start_time(self):
 <span>def <span class="ident">deduplicate_index</span></span>(<span>self, method='keep_first', offset='1S')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Apply a method to remove duplicate timestamps from the data.</p>
+<p>With FEDFrames, the timestamp column (typically the column
+'MM:DD:YYYY hh:mm:ss') is used as the row labels (AKA the
+<code>index</code> in pandas, <a href="https://pandas.pydata.org/docs/reference/api/pandas.Index.html">see here</a>).
+Some operations which invole selecting data based on this index
+can fail when there are duplicate entries.</p>
+<p>FED3 data should not generally have duplicated timestamps, however
+they do arise due to two main causes.
+One cause is transient
+logging errors, which should be rare (but may be more common with
+earlier FED software).
+The other, more common, cause is
+data editing with Microsoft Excel, which has been documented elsewhere
+(see links below).</p>
+<p>Note that this method does not recover any information that is lost;
+it either removes duplicated indices or applies simple rules to alter
+them.
+When available, non-duplicated data should be loaded into
+the program.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>method</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>DESCRIPTION. The default is 'keep_first'.</dd>
+<dt><strong><code>offset</code></strong> :&ensp;<code>TYPE</code>, optional</dt>
+<dd>DESCRIPTION. The default is '1S'.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>DESCRIPTION.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+    &#39;&#39;&#39;
+    Apply a method to remove duplicate timestamps from the data.
+
+    With FEDFrames, the timestamp column (typically the column
+    &#39;MM:DD:YYYY hh:mm:ss&#39;) is used as the row labels (AKA the
+    `index` in pandas, [see here](https://pandas.pydata.org/docs/reference/api/pandas.Index.html)).
+    Some operations which invole selecting data based on this index
+    can fail when there are duplicate entries.
+
+    FED3 data should not generally have duplicated timestamps, however
+    they do arise due to two main causes.  One cause is transient
+    logging errors, which should be rare (but may be more common with
+    earlier FED software).  The other, more common, cause is
+    data editing with Microsoft Excel, which has been documented elsewhere
+    (see links below).
+
+    Note that this method does not recover any information that is lost;
+    it either removes duplicated indices or applies simple rules to alter
+    them.  When available, non-duplicated data should be loaded into
+    the program.
+
+    Parameters
+    ----------
+    method : str, optional
+        DESCRIPTION. The default is &#39;keep_first&#39;.
+    offset : TYPE, optional
+        DESCRIPTION. The default is &#39;1S&#39;.
+
+    Raises
+    ------
+    ValueError
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
 
     if method not in [&#39;keep_first&#39;, &#39;keep_last&#39;, &#39;remove&#39;,
                          &#39;offset&#39;, &#39;interpolate&#39;]:
@@ -1096,6 +1518,7 @@ def start_time(self):
 <li>
 <h4><code><a title="fed3.core.fedframe.FEDFrame" href="#fed3.core.fedframe.FEDFrame">FEDFrame</a></code></h4>
 <ul class="">
+<li><code><a title="fed3.core.fedframe.FEDFrame._load_init" href="#fed3.core.fedframe.FEDFrame._load_init">_load_init</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.check_duplicated_index" href="#fed3.core.fedframe.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.columns" href="#fed3.core.fedframe.FEDFrame.columns">columns</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.deduplicate_index" href="#fed3.core.fedframe.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
@@ -1122,7 +1545,7 @@ def start_time(self):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
