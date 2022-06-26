@@ -1,9 +1,46 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 30 18:27:07 2021
+This modules defines functions which are called on individual FEDFrame
+objects to extract temporal variables of interest.  It also provides
+a small API for accessing them.
 
-@author: earnestt1234
+For a current list of available metrics, call:
+
+```python
+>>> fed3.list_metrics()
+['binary_pellets',
+ 'cumulative_pellets',
+ 'pellets',
+ 'binary_pokes',
+ 'cumulative_pokes',
+ 'pokes',
+ 'binary_left_pokes',
+ 'binary_right_pokes',
+ 'cumulative_left_pokes',
+ 'cumulative_right_pokes',
+ 'cumulative_left_percent',
+ 'cumulative_right_percent',
+ 'left_pokes',
+ 'right_pokes',
+ 'binary_correct_pokes',
+ 'binary_error_pokes',
+ 'cumulative_correct_pokes',
+ 'cumulative_error_pokes',
+ 'cumulative_correct_percent',
+ 'cumulative_error_percent',
+ 'correct_pokes',
+ 'error_pokes',
+ 'battery',
+ 'ipi',
+ 'motor',
+ 'rt']
+
+```
+
+Note that for now, the individual metric functions are not included
+in the default fed3 namespace, and are undocumented.  They can still
+be access with `get_metric`.
 """
 
 __all__ = ['get_metric', 'list_metrics']
@@ -17,7 +54,9 @@ import pandas as pd
 
 def _default_metric(fed, func, bins=None, origin='start',
                     agg='sum'):
-
+    '''Call a function of a FEDFrame in the "default manner".  It is
+    so-called "default" in that most metrics can be constructed using
+    this function.'''
     if bins is None:
         out = func(fed)
     else:
@@ -28,6 +67,7 @@ def _default_metric(fed, func, bins=None, origin='start',
     return out
 
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
+    '''Helper for cleaning up some metrics.'''
 
     if dropna:
         series = series.dropna()
@@ -41,6 +81,8 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 # ---- Helpers for computing metrics
 
 def _cumulative_poke_percentage_general(fed, kind):
+    '''General function which is used to compute either the cumulative
+    left, right, correct, or error poke percentage.'''
 
     kinds = ['left', 'right', 'correct', 'error']
     if kind not in kinds:
@@ -52,8 +94,12 @@ def _cumulative_poke_percentage_general(fed, kind):
     elif kind == 'right':
         a = cumulative_right_pokes(fed)
         b = cumulative_left_pokes(fed)
-    else:
-        raise NotImplementedError("Yet to add correct/error cumulative percentage")
+    elif kind == 'correct':
+        a = cumulative_correct_pokes(fed)
+        b = cumulative_error_pokes(fed)
+    elif kind == 'error':
+        a = cumulative_error_pokes(fed)
+        b = cumulative_correct_pokes(fed)
 
     idx = a.index.union(b.index)
 
@@ -221,21 +267,51 @@ def retrival_time(fed, bins=None, origin='start'):
 
 # ---- Metric access
 
-def get_metric(y, kind=None):
+def get_metric(y):
+    '''
+    Return a metric function from its key.
+
+    Parameters
+    ----------
+    y : str
+        Key for metric.
+
+    Raises
+    ------
+    KeyError
+        Metric key not recognized.
+
+    Returns
+    -------
+    namedtuple
+        Named tuple with a `func` and `nicename` attribute.  The `func`
+        is the actual metric function, which can be called on FEDFrames.
+        The `nicename` is a nicer version of the key, used for axis labels.
+
+    '''
 
     key = y.lower()
     try:
         return METRICS[key]
     except KeyError:
         metrics = str(list(METRICS.keys()))[1:-1]
-        raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
-                         f'{metrics}.')
+        raise KeyError(f'Metric key "{y}" is not recognized. Possible metrics are: '
+                       f'{metrics}.')
 
 def list_metrics():
+    '''
+    List all available metric keys.
+
+    Returns
+    -------
+    list
+
+    '''
     return list(METRICS.keys())
 
 # link keywords to their default function
 Metric = namedtuple("Metric", ['func', 'nicename'])
+"""Lightweight class for metric functions and their representation names."""
 
 METRICS = {'binary_pellets'             : Metric(binary_pellets, "Pellets"),
            'cumulative_pellets'         : Metric(cumulative_pellets, "Pellets"),
@@ -263,3 +339,4 @@ METRICS = {'binary_pellets'             : Metric(binary_pellets, "Pellets"),
            'ipi'                        : Metric(ipi, "Interpellet Intervals"),
            'motor'                      : Metric(motor_turns, "Motor Turns"),
            'rt'                         : Metric(retrival_time, "Retrieval Time (s)")}
+'''Dictionary for storing all metrics.'''

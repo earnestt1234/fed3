@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.metrics API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="This packages defines functions for extracting temporal variables from
+FED3Frames, and tools for collecting those variables into tables.
+This is
+…" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +25,23 @@
 <h1 class="title">Module <code>fed3.metrics</code></h1>
 </header>
 <section id="section-intro">
+<p>This packages defines functions for extracting temporal variables from
+FED3Frames, and tools for collecting those variables into tables.
+This is used
+extensively by <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a></code> for extracting the data to plot.</p>
+<p>Fed3 uses "metrics" to specifically return to temporal variables, which are
+represented as pandas Series objects (with timestamps in the index).</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+&#39;&#39;&#39;This packages defines functions for extracting temporal variables from
+FED3Frames, and tools for collecting those variables into tables.  This is used
+extensively by `fed3.plot` for extracting the data to plot.
+
+Fed3 uses &#34;metrics&#34; to specifically return to temporal variables, which are
+represented as pandas Series objects (with timestamps in the index).&#39;&#39;&#39;
 
 #imports for package namespace
 
@@ -40,7 +55,10 @@ __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]</code></pre>
 <dl>
 <dt><code class="name"><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code></dt>
 <dd>
-<div class="desc"><p>Created on Fri Apr 30 18:27:07 2021 …</p></div>
+<div class="desc"><p>This modules defines functions which are called on individual FEDFrame
+objects to extract temporal variables of interest.
+It also provides
+a small …</p></div>
 </dd>
 <dt><code class="name"><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code></dt>
 <dd>
@@ -54,35 +72,87 @@ __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]</code></pre>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.metrics.get_metric"><code class="name flex">
-<span>def <span class="ident">get_metric</span></span>(<span>y, kind=None)</span>
+<span>def <span class="ident">get_metric</span></span>(<span>y)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Return a metric function from its key.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Key for metric.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>Metric key not recognized.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>namedtuple</code></dt>
+<dd>Named tuple with a <code>func</code> and <code>nicename</code> attribute.
+The <code>func</code>
+is the actual metric function, which can be called on FEDFrames.
+The <code>nicename</code> is a nicer version of the key, used for axis labels.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_metric(y, kind=None):
+<pre><code class="python">def get_metric(y):
+    &#39;&#39;&#39;
+    Return a metric function from its key.
+
+    Parameters
+    ----------
+    y : str
+        Key for metric.
+
+    Raises
+    ------
+    KeyError
+        Metric key not recognized.
+
+    Returns
+    -------
+    namedtuple
+        Named tuple with a `func` and `nicename` attribute.  The `func`
+        is the actual metric function, which can be called on FEDFrames.
+        The `nicename` is a nicer version of the key, used for axis labels.
+
+    &#39;&#39;&#39;
 
     key = y.lower()
     try:
         return METRICS[key]
     except KeyError:
         metrics = str(list(METRICS.keys()))[1:-1]
-        raise ValueError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
-                         f&#39;{metrics}.&#39;)</code></pre>
+        raise KeyError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
+                       f&#39;{metrics}.&#39;)</code></pre>
 </details>
 </dd>
 <dt id="fed3.metrics.list_metrics"><code class="name flex">
 <span>def <span class="ident">list_metrics</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>List all available metric keys.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def list_metrics():
+    &#39;&#39;&#39;
+    List all available metric keys.
+
+    Returns
+    -------
+    list
+
+    &#39;&#39;&#39;
     return list(METRICS.keys())</code></pre>
 </details>
 </dd>

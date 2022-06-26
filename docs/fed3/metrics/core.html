@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.metrics.core API documentation</title>
-<meta name="description" content="Created on Fri Apr 30 18:27:07 2021 …" />
+<meta name="description" content="This modules defines functions which are called on individual FEDFrame
+objects to extract temporal variables of interest.
+It also provides
+a small …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,8 +25,44 @@
 <h1 class="title">Module <code>fed3.metrics.core</code></h1>
 </header>
 <section id="section-intro">
-<p>Created on Fri Apr 30 18:27:07 2021</p>
-<p>@author: earnestt1234</p>
+<p>This modules defines functions which are called on individual FEDFrame
+objects to extract temporal variables of interest.
+It also provides
+a small API for accessing them.</p>
+<p>For a current list of available metrics, call:</p>
+<pre><code class="python">&gt;&gt;&gt; fed3.list_metrics()
+['binary_pellets',
+ 'cumulative_pellets',
+ 'pellets',
+ 'binary_pokes',
+ 'cumulative_pokes',
+ 'pokes',
+ 'binary_left_pokes',
+ 'binary_right_pokes',
+ 'cumulative_left_pokes',
+ 'cumulative_right_pokes',
+ 'cumulative_left_percent',
+ 'cumulative_right_percent',
+ 'left_pokes',
+ 'right_pokes',
+ 'binary_correct_pokes',
+ 'binary_error_pokes',
+ 'cumulative_correct_pokes',
+ 'cumulative_error_pokes',
+ 'cumulative_correct_percent',
+ 'cumulative_error_percent',
+ 'correct_pokes',
+ 'error_pokes',
+ 'battery',
+ 'ipi',
+ 'motor',
+ 'rt']
+
+</code></pre>
+<p>Note that for now, the individual metric functions are not included
+in the default fed3 namespace, and are undocumented.
+They can still
+be access with <code><a title="fed3.metrics.core.get_metric" href="#fed3.metrics.core.get_metric">get_metric()</a></code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -31,9 +70,46 @@
 <pre><code class="python">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 &#34;&#34;&#34;
-Created on Fri Apr 30 18:27:07 2021
+This modules defines functions which are called on individual FEDFrame
+objects to extract temporal variables of interest.  It also provides
+a small API for accessing them.
 
-@author: earnestt1234
+For a current list of available metrics, call:
+
+```python
+&gt;&gt;&gt; fed3.list_metrics()
+[&#39;binary_pellets&#39;,
+ &#39;cumulative_pellets&#39;,
+ &#39;pellets&#39;,
+ &#39;binary_pokes&#39;,
+ &#39;cumulative_pokes&#39;,
+ &#39;pokes&#39;,
+ &#39;binary_left_pokes&#39;,
+ &#39;binary_right_pokes&#39;,
+ &#39;cumulative_left_pokes&#39;,
+ &#39;cumulative_right_pokes&#39;,
+ &#39;cumulative_left_percent&#39;,
+ &#39;cumulative_right_percent&#39;,
+ &#39;left_pokes&#39;,
+ &#39;right_pokes&#39;,
+ &#39;binary_correct_pokes&#39;,
+ &#39;binary_error_pokes&#39;,
+ &#39;cumulative_correct_pokes&#39;,
+ &#39;cumulative_error_pokes&#39;,
+ &#39;cumulative_correct_percent&#39;,
+ &#39;cumulative_error_percent&#39;,
+ &#39;correct_pokes&#39;,
+ &#39;error_pokes&#39;,
+ &#39;battery&#39;,
+ &#39;ipi&#39;,
+ &#39;motor&#39;,
+ &#39;rt&#39;]
+
+```
+
+Note that for now, the individual metric functions are not included
+in the default fed3 namespace, and are undocumented.  They can still
+be access with `get_metric`.
 &#34;&#34;&#34;
 
 __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]
@@ -47,7 +123,9 @@ import pandas as pd
 
 def _default_metric(fed, func, bins=None, origin=&#39;start&#39;,
                     agg=&#39;sum&#39;):
-
+    &#39;&#39;&#39;Call a function of a FEDFrame in the &#34;default manner&#34;.  It is
+    so-called &#34;default&#34; in that most metrics can be constructed using
+    this function.&#39;&#39;&#39;
     if bins is None:
         out = func(fed)
     else:
@@ -58,6 +136,7 @@ def _default_metric(fed, func, bins=None, origin=&#39;start&#39;,
     return out
 
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
+    &#39;&#39;&#39;Helper for cleaning up some metrics.&#39;&#39;&#39;
 
     if dropna:
         series = series.dropna()
@@ -71,6 +150,8 @@ def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
 # ---- Helpers for computing metrics
 
 def _cumulative_poke_percentage_general(fed, kind):
+    &#39;&#39;&#39;General function which is used to compute either the cumulative
+    left, right, correct, or error poke percentage.&#39;&#39;&#39;
 
     kinds = [&#39;left&#39;, &#39;right&#39;, &#39;correct&#39;, &#39;error&#39;]
     if kind not in kinds:
@@ -82,8 +163,12 @@ def _cumulative_poke_percentage_general(fed, kind):
     elif kind == &#39;right&#39;:
         a = cumulative_right_pokes(fed)
         b = cumulative_left_pokes(fed)
-    else:
-        raise NotImplementedError(&#34;Yet to add correct/error cumulative percentage&#34;)
+    elif kind == &#39;correct&#39;:
+        a = cumulative_correct_pokes(fed)
+        b = cumulative_error_pokes(fed)
+    elif kind == &#39;error&#39;:
+        a = cumulative_error_pokes(fed)
+        b = cumulative_correct_pokes(fed)
 
     idx = a.index.union(b.index)
 
@@ -251,21 +336,51 @@ def retrival_time(fed, bins=None, origin=&#39;start&#39;):
 
 # ---- Metric access
 
-def get_metric(y, kind=None):
+def get_metric(y):
+    &#39;&#39;&#39;
+    Return a metric function from its key.
+
+    Parameters
+    ----------
+    y : str
+        Key for metric.
+
+    Raises
+    ------
+    KeyError
+        Metric key not recognized.
+
+    Returns
+    -------
+    namedtuple
+        Named tuple with a `func` and `nicename` attribute.  The `func`
+        is the actual metric function, which can be called on FEDFrames.
+        The `nicename` is a nicer version of the key, used for axis labels.
+
+    &#39;&#39;&#39;
 
     key = y.lower()
     try:
         return METRICS[key]
     except KeyError:
         metrics = str(list(METRICS.keys()))[1:-1]
-        raise ValueError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
-                         f&#39;{metrics}.&#39;)
+        raise KeyError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
+                       f&#39;{metrics}.&#39;)
 
 def list_metrics():
+    &#39;&#39;&#39;
+    List all available metric keys.
+
+    Returns
+    -------
+    list
+
+    &#39;&#39;&#39;
     return list(METRICS.keys())
 
 # link keywords to their default function
 Metric = namedtuple(&#34;Metric&#34;, [&#39;func&#39;, &#39;nicename&#39;])
+&#34;&#34;&#34;Lightweight class for metric functions and their representation names.&#34;&#34;&#34;
 
 METRICS = {&#39;binary_pellets&#39;             : Metric(binary_pellets, &#34;Pellets&#34;),
            &#39;cumulative_pellets&#39;         : Metric(cumulative_pellets, &#34;Pellets&#34;),
@@ -292,7 +407,8 @@ METRICS = {&#39;binary_pellets&#39;             : Metric(binary_pellets, &#34;Pe
            &#39;battery&#39;                    : Metric(battery, &#34;Battery Life (V)&#34;),
            &#39;ipi&#39;                        : Metric(ipi, &#34;Interpellet Intervals&#34;),
            &#39;motor&#39;                      : Metric(motor_turns, &#34;Motor Turns&#34;),
-           &#39;rt&#39;                         : Metric(retrival_time, &#34;Retrieval Time (s)&#34;)}</code></pre>
+           &#39;rt&#39;                         : Metric(retrival_time, &#34;Retrieval Time (s)&#34;)}
+&#39;&#39;&#39;Dictionary for storing all metrics.&#39;&#39;&#39;</code></pre>
 </details>
 </section>
 <section>
@@ -303,35 +419,87 @@ METRICS = {&#39;binary_pellets&#39;             : Metric(binary_pellets, &#34;Pe
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.metrics.core.get_metric"><code class="name flex">
-<span>def <span class="ident">get_metric</span></span>(<span>y, kind=None)</span>
+<span>def <span class="ident">get_metric</span></span>(<span>y)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Return a metric function from its key.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Key for metric.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>Metric key not recognized.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>namedtuple</code></dt>
+<dd>Named tuple with a <code>func</code> and <code>nicename</code> attribute.
+The <code>func</code>
+is the actual metric function, which can be called on FEDFrames.
+The <code>nicename</code> is a nicer version of the key, used for axis labels.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_metric(y, kind=None):
+<pre><code class="python">def get_metric(y):
+    &#39;&#39;&#39;
+    Return a metric function from its key.
+
+    Parameters
+    ----------
+    y : str
+        Key for metric.
+
+    Raises
+    ------
+    KeyError
+        Metric key not recognized.
+
+    Returns
+    -------
+    namedtuple
+        Named tuple with a `func` and `nicename` attribute.  The `func`
+        is the actual metric function, which can be called on FEDFrames.
+        The `nicename` is a nicer version of the key, used for axis labels.
+
+    &#39;&#39;&#39;
 
     key = y.lower()
     try:
         return METRICS[key]
     except KeyError:
         metrics = str(list(METRICS.keys()))[1:-1]
-        raise ValueError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
-                         f&#39;{metrics}.&#39;)</code></pre>
+        raise KeyError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
+                       f&#39;{metrics}.&#39;)</code></pre>
 </details>
 </dd>
 <dt id="fed3.metrics.core.list_metrics"><code class="name flex">
 <span>def <span class="ident">list_metrics</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>List all available metric keys.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def list_metrics():
+    &#39;&#39;&#39;
+    List all available metric keys.
+
+    Returns
+    -------
+    list
+
+    &#39;&#39;&#39;
     return list(METRICS.keys())</code></pre>
 </details>
 </dd>
