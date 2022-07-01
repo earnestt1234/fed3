@@ -5,42 +5,24 @@ This modules defines functions which are called on individual FEDFrame
 objects to extract temporal variables of interest.  It also provides
 a small API for accessing them.
 
-For a current list of available metrics, call:
+The metric functions defined here all follow the same priniciples:
 
-```python
->>> fed3.list_metrics()
-['binary_pellets',
- 'cumulative_pellets',
- 'pellets',
- 'binary_pokes',
- 'cumulative_pokes',
- 'pokes',
- 'binary_left_pokes',
- 'binary_right_pokes',
- 'cumulative_left_pokes',
- 'cumulative_right_pokes',
- 'cumulative_left_percent',
- 'cumulative_right_percent',
- 'left_pokes',
- 'right_pokes',
- 'binary_correct_pokes',
- 'binary_error_pokes',
- 'cumulative_correct_pokes',
- 'cumulative_error_pokes',
- 'cumulative_correct_percent',
- 'cumulative_error_percent',
- 'correct_pokes',
- 'error_pokes',
- 'battery',
- 'ipi',
- 'motor',
- 'rt']
+- They take a FEDFrame object as a single, positional argument
+- They return timeseries data, in the form of a pandas Series with a
+datetime index.
+- They allow for resampling, or "binning" in time
+    - The metric functions accept `bins` and `origin` arguments,
+    which are passed to `pandas.Series.groupby()` as the `freq` and
+    `origin` arguments.  These arguments allow for the time series
+    data to be downsampled.
+    - By default, data are not downsampled.
 
-```
+For a current list of available metrics, call `fed3.metrics.core.list_metrics()`.
 
 Note that for now, the individual metric functions are not included
 in the default fed3 namespace, and are undocumented.  They can still
 be access with `get_metric`.
+
 """
 
 __all__ = ['get_metric', 'list_metrics']
