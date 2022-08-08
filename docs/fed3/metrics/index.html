@@ -29,8 +29,47 @@ This is
 FED3Frames, and tools for collecting those variables into tables.
 This is used
 extensively by <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a></code> for extracting the data to plot.</p>
-<p>Fed3 uses "metrics" to specifically return to temporal variables, which are
-represented as pandas Series objects (with timestamps in the index).</p>
+<p>Namely, for plotting functions which accept a paremeter for designating the
+variable to be plotted (usually <code>y</code>), this package defines the functions for
+calculating those variables for individual FEDFrames.</p>
+<p>There are two main modules contained here: <code><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code> defines
+the actual functions which compute variables from FEDFrame objects,
+while <code><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code> defines code for reshaping the returned
+objects into more concise tables.</p>
+<p>There are two main public functions for accessing metric functions, if desired:
+<code><a title="fed3.metrics.get_metric" href="#fed3.metrics.get_metric">get_metric()</a></code> and <code><a title="fed3.metrics.list_metrics" href="#fed3.metrics.list_metrics">list_metrics()</a></code>.
+The
+latter will report the current metric functions available in fed3:</p>
+<pre><code class="language-python">&gt;&gt;&gt; import fed3
+&gt;&gt;&gt; fed3.list_metrics()
+['binary_pellets',
+ 'cumulative_pellets',
+ 'pellets',
+ 'binary_pokes',
+ 'cumulative_pokes',
+ 'pokes',
+ 'binary_left_pokes',
+ 'binary_right_pokes',
+ 'cumulative_left_pokes',
+ 'cumulative_right_pokes',
+ 'cumulative_left_percent',
+ 'cumulative_right_percent',
+ 'left_pokes',
+ 'right_pokes',
+ 'binary_correct_pokes',
+ 'binary_error_pokes',
+ 'cumulative_correct_pokes',
+ 'cumulative_error_pokes',
+ 'cumulative_correct_percent',
+ 'cumulative_error_percent',
+ 'correct_pokes',
+ 'error_pokes',
+ 'battery',
+ 'ipi',
+ 'motor',
+ 'rt']
+
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -40,8 +79,52 @@ represented as pandas Series objects (with timestamps in the index).</p>
 FED3Frames, and tools for collecting those variables into tables.  This is used
 extensively by `fed3.plot` for extracting the data to plot.
 
-Fed3 uses &#34;metrics&#34; to specifically return to temporal variables, which are
-represented as pandas Series objects (with timestamps in the index).&#39;&#39;&#39;
+Namely, for plotting functions which accept a paremeter for designating the
+variable to be plotted (usually `y`), this package defines the functions for
+calculating those variables for individual FEDFrames.
+
+There are two main modules contained here: `fed3.metrics.core` defines
+the actual functions which compute variables from FEDFrame objects,
+while `fed3.metrics.tables` defines code for reshaping the returned
+objects into more concise tables.
+
+There are two main public functions for accessing metric functions, if desired:
+`fed3.metrics.get_metric()` and `fed3.metrics.list_metrics()`.  The
+latter will report the current metric functions available in fed3:
+
+```python
+&gt;&gt;&gt; import fed3
+&gt;&gt;&gt; fed3.list_metrics()
+[&#39;binary_pellets&#39;,
+ &#39;cumulative_pellets&#39;,
+ &#39;pellets&#39;,
+ &#39;binary_pokes&#39;,
+ &#39;cumulative_pokes&#39;,
+ &#39;pokes&#39;,
+ &#39;binary_left_pokes&#39;,
+ &#39;binary_right_pokes&#39;,
+ &#39;cumulative_left_pokes&#39;,
+ &#39;cumulative_right_pokes&#39;,
+ &#39;cumulative_left_percent&#39;,
+ &#39;cumulative_right_percent&#39;,
+ &#39;left_pokes&#39;,
+ &#39;right_pokes&#39;,
+ &#39;binary_correct_pokes&#39;,
+ &#39;binary_error_pokes&#39;,
+ &#39;cumulative_correct_pokes&#39;,
+ &#39;cumulative_error_pokes&#39;,
+ &#39;cumulative_correct_percent&#39;,
+ &#39;cumulative_error_percent&#39;,
+ &#39;correct_pokes&#39;,
+ &#39;error_pokes&#39;,
+ &#39;battery&#39;,
+ &#39;ipi&#39;,
+ &#39;motor&#39;,
+ &#39;rt&#39;]
+
+```
+
+&#39;&#39;&#39;
 
 #imports for package namespace
 
@@ -56,9 +139,7 @@ __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]</code></pre>
 <dt><code class="name"><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code></dt>
 <dd>
 <div class="desc"><p>This modules defines functions which are called on individual FEDFrame
-objects to extract temporal variables of interest.
-It also provides
-a small …</p></div>
+objects to extract temporal variables of interest …</p></div>
 </dd>
 <dt><code class="name"><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code></dt>
 <dd>

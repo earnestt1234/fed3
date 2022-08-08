@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 This modules defines functions which are called on individual FEDFrame
-objects to extract temporal variables of interest.  It also provides
-a small API for accessing them.
+objects to extract temporal variables of interest.
 
 The metric functions defined here all follow the same priniciples:
 
-- They take a FEDFrame object as a single, positional argument
+- They take a FEDFrame object as a single, positional argument (`fed`)
 - They return timeseries data, in the form of a pandas Series with a
 datetime index.
 - They allow for resampling, or "binning" in time
@@ -17,15 +16,11 @@ datetime index.
     data to be downsampled.
     - By default, data are not downsampled.
 
-For a current list of available metrics, call `fed3.metrics.core.list_metrics()`.
-
-Note that for now, the individual metric functions are not included
-in the default fed3 namespace, and are undocumented.  They can still
-be access with `get_metric`.
-
 """
 
-__all__ = ['get_metric', 'list_metrics']
+__pdoc__ = {'Metric': False,
+            'get_metric': False,
+            'list_metrics': False}
 
 from collections import namedtuple
 import warnings
@@ -108,22 +103,31 @@ def _cumulative_poke_percentage_general(fed, kind):
 # ---- Pellets
 
 def binary_pellets(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of pellet retrieval.
+    When binned, returns sum of pellets taken per bin.'''
     func = lambda f: f.pellets(cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_pellets(fed, bins=None, origin='start'):
+    '''Returns a running total of pellet retrieval, essentially the FED3
+    "Pellet_Count" column.  When binned, returns the maximum of the running
+    total within each bin.'''
     func = lambda f: f.pellets(cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def pellets(fed, bins=None, origin='start'):
+    '''Default metric for plotting pellets.  Returns `cumulative_pellets()`
+    when not binned, and `binary_pellets()` otherwise.'''
     func = cumulative_pellets if bins is None else binary_pellets
     return func(fed, bins=bins, origin=origin)
 
 # ---- Any sided pokes
 
 def binary_pokes(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of pokes (of any kind).
+    When binned, returns sum of pokes per bin.'''
     func = lambda f: f.pokes(kind='any', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
@@ -321,4 +325,8 @@ METRICS = {'binary_pellets'             : Metric(binary_pellets, "Pellets"),
            'ipi'                        : Metric(ipi, "Interpellet Intervals"),
            'motor'                      : Metric(motor_turns, "Motor Turns"),
            'rt'                         : Metric(retrival_time, "Retrieval Time (s)")}
-'''Dictionary for storing all metrics.'''
+'''Dictionary for storing all metrics.  Keys of the dictionary are the
+fed3 key for referring to the metric.  The values are a `namedtuple` of
+type `Metric`.  The `Metric` objects have two attributes: `func` and `nicename`;
+`func` is the metric function defined in this module, and `nicename` is a
+readable name for the metric, used on axis labels.'''
