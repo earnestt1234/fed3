@@ -32,14 +32,12 @@ extensively by <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a
 <p>Namely, for plotting functions which accept a paremeter for designating the
 variable to be plotted (usually <code>y</code>), this package defines the functions for
 calculating those variables for individual FEDFrames.</p>
-<p>There are two main modules contained here: <code><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code> defines
-the actual functions which compute variables from FEDFrame objects,
-while <code><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code> defines code for reshaping the returned
-objects into more concise tables.</p>
-<p>There are two main public functions for accessing metric functions, if desired:
-<code><a title="fed3.metrics.get_metric" href="#fed3.metrics.get_metric">get_metric()</a></code> and <code><a title="fed3.metrics.list_metrics" href="#fed3.metrics.list_metrics">list_metrics()</a></code>.
-The
-latter will report the current metric functions available in fed3:</p>
+<p><code><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code> defines the actual functions which compute variables from
+FEDFrame objects. There are two main public functions for accessing metric
+functions, if desired: <code><a title="fed3.metrics.get_metric" href="#fed3.metrics.get_metric">get_metric()</a></code> and
+<code><a title="fed3.metrics.list_metrics" href="#fed3.metrics.list_metrics">list_metrics()</a></code>.
+The latter will report the current metric
+functions available in fed3:</p>
 <pre><code class="language-python">&gt;&gt;&gt; import fed3
 &gt;&gt;&gt; fed3.list_metrics()
 ['binary_pellets',
@@ -83,14 +81,11 @@ Namely, for plotting functions which accept a paremeter for designating the
 variable to be plotted (usually `y`), this package defines the functions for
 calculating those variables for individual FEDFrames.
 
-There are two main modules contained here: `fed3.metrics.core` defines
-the actual functions which compute variables from FEDFrame objects,
-while `fed3.metrics.tables` defines code for reshaping the returned
-objects into more concise tables.
-
-There are two main public functions for accessing metric functions, if desired:
-`fed3.metrics.get_metric()` and `fed3.metrics.list_metrics()`.  The
-latter will report the current metric functions available in fed3:
+`fed3.metrics.core` defines the actual functions which compute variables from
+FEDFrame objects. There are two main public functions for accessing metric
+functions, if desired: `fed3.metrics.get_metric()` and
+`fed3.metrics.list_metrics()`.  The latter will report the current metric
+functions available in fed3:
 
 ```python
 &gt;&gt;&gt; import fed3
@@ -130,6 +125,8 @@ latter will report the current metric functions available in fed3:
 
 from .core import get_metric, list_metrics
 
+__pdoc__ = {&#39;tables&#39;: False}
+
 __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]</code></pre>
 </details>
 </section>
@@ -140,10 +137,6 @@ __all__ = [&#39;get_metric&#39;, &#39;list_metrics&#39;]</code></pre>
 <dd>
 <div class="desc"><p>This modules defines functions which are called on individual FEDFrame
 objects to extract temporal variables of interest …</p></div>
-</dd>
-<dt><code class="name"><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code></dt>
-<dd>
-<div class="desc"><p>Created on Fri Feb 25 22:13:44 2022 …</p></div>
 </dd>
 </dl>
 </section>
@@ -256,7 +249,6 @@ The <code>nicename</code> is a nicer version of the key, used for axis labels.</
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="fed3.metrics.core" href="core.html">fed3.metrics.core</a></code></li>
-<li><code><a title="fed3.metrics.tables" href="tables.html">fed3.metrics.tables</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>

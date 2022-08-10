@@ -7,14 +7,11 @@ Namely, for plotting functions which accept a paremeter for designating the
 variable to be plotted (usually `y`), this package defines the functions for
 calculating those variables for individual FEDFrames.
 
-There are two main modules contained here: `fed3.metrics.core` defines
-the actual functions which compute variables from FEDFrame objects,
-while `fed3.metrics.tables` defines code for reshaping the returned
-objects into more concise tables.
-
-There are two main public functions for accessing metric functions, if desired:
-`fed3.metrics.get_metric()` and `fed3.metrics.list_metrics()`.  The
-latter will report the current metric functions available in fed3:
+`fed3.metrics.core` defines the actual functions which compute variables from
+FEDFrame objects. There are two main public functions for accessing metric
+functions, if desired: `fed3.metrics.get_metric()` and
+`fed3.metrics.list_metrics()`.  The latter will report the current metric
+functions available in fed3:
 
 ```python
 >>> import fed3
@@ -53,5 +50,7 @@ latter will report the current metric functions available in fed3:
 #imports for package namespace
 
 from .core import get_metric, list_metrics
+
+__pdoc__ = {'tables': False}
 
 __all__ = ['get_metric', 'list_metrics']
