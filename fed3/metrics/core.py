@@ -133,51 +133,75 @@ def binary_pokes(fed, bins=None, origin='start'):
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_pokes(fed, bins=None, origin='start'):
+    '''Returns a running total of pokes (of any kind).  When binned,
+    returns the maximum of the running total within each bin.'''
     func = lambda f: f.pokes(kind='any', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def pokes(fed, bins=None, origin='start'):
+    '''Default metric for plotting pokes.  Returns `cumulative_pokes()` when
+    not binned, else `binary_pokes()`.'''
     func = cumulative_pokes if bins is None else binary_pokes
     return func(fed, bins=bins, origin=origin)
 
 # ---- L/R pokes
 
 def binary_left_pokes(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of left-sided pokes.
+    When binned, returns sum of pokes per bin.'''
     func = lambda f: f.pokes(kind='left', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_right_pokes(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of right-sided pokes.
+    When binned, returns sum of pokes per bin.'''
     func = lambda f: f.pokes(kind='right', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_pokes(fed, bins=None, origin='start'):
+    '''Returns a running total of left pokes.  When binned,
+    returns the maximum of the running total within each bin.'''
     func = lambda f: f.pokes(kind='left', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_pokes(fed, bins=None, origin='start'):
+    '''Returns a running total of right pokes.  When binned,
+    returns the maximum of the running total within each bin.'''
     func = lambda f: f.pokes(kind='right', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_percent(fed, bins=None, origin='start'):
+    '''Returns a cumulative percentage of left-sided pokes.  That is,
+    returns `(#left_pokes / #total_pokes) * 100`, where `#left_pokes` and
+    `#total_pokes` are the running total of left and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.'''
     func = lambda f: _cumulative_poke_percentage_general(f, 'left')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_percent(fed, bins=None, origin='start'):
+    '''Returns a cumulative percentage of right-sided pokes.  That is,
+    returns `(#right_pokes / #total_pokes) * 100`, where `#right_pokes` and
+    `#total_pokes` are the running total of right and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.'''
     func = lambda f: _cumulative_poke_percentage_general(f, 'right')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def left_pokes(fed, bins=None, origin='start'):
+    '''Default metric for plotting left-sided pokes.  Returns `cumulative_left_pokes()`
+    when not binned, else `binary_left_pokes()`.'''
     func = cumulative_left_pokes if bins is None else binary_left_pokes
     return func(fed, bins=bins, origin=origin)
 
 def right_pokes(fed, bins=None, origin='start'):
+    '''Default metric for plotting right-sided pokes.  Returns `cumulative_right_pokes()`
+    when not binned, else `binary_right_pokes()`.'''
     func = cumulative_right_pokes if bins is None else binary_right_pokes
     return func(fed, bins=bins, origin=origin)
 
@@ -186,56 +210,82 @@ def right_pokes(fed, bins=None, origin='start'):
 # you can do a find and replace on the left/right ...
 
 def binary_correct_pokes(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of correct pokes.
+    When binned, returns sum of pokes per bin.'''
     func = lambda f: f.pokes(kind='correct', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_error_pokes(fed, bins=None, origin='start'):
+    '''Returns a binary (0/1) indication of error pokes.
+    When binned, returns sum of pokes per bin.'''
     func = lambda f: f.pokes(kind='error', cumulative=False, condense=True)
     agg = 'sum'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_correct_pokes(fed, bins=None, origin='start'):
+    '''Returns a running total of correct pokes.  When binned,
+    returns the maximum of the running total within each bin.'''
     func = lambda f: f.pokes(kind='correct', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_error_pokes(fed, bins=None, origin='start'):
+    '''Returns a running total of error pokes.  When binned,
+    returns the maximum of the running total within each bin.'''
     func = lambda f: f.pokes(kind='error', cumulative=True, condense=True)
     agg = 'max'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_correct_percent(fed, bins=None, origin='start'):
+    '''Returns a cumulative percentage of correct pokes.  That is,
+    returns `(#correct_pokes / #total_pokes) * 100`, where `#correct_pokes` and
+    `#total_pokes` are the running total of correct and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.'''
     func = lambda f: _cumulative_poke_percentage_general(f, 'correct')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_error_percent(fed, bins=None, origin='start'):
+    '''Returns a cumulative percentage of error pokes.  That is,
+    returns `(#error_pokes / #total_pokes) * 100`, where `#error_pokes` and
+    `#total_pokes` are the running total of error and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.'''
     func = lambda f: _cumulative_poke_percentage_general(f, 'error')
     agg = 'last'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def correct_pokes(fed, bins=None, origin='start'):
+    '''Default metric for plotting right-sided pokes.  Returns `cumulative_correct_pokes()`
+    when not binned, else `binary_correct_pokes()`.'''
     func = cumulative_correct_pokes if bins is None else binary_correct_pokes
     return func(fed, bins=bins, origin=origin)
 
 def error_pokes(fed, bins=None, origin='start'):
+    '''Default metric for plotting right-sided pokes.  Returns `cumulative_error_pokes()`
+    when not binned, else `binary_error_pokes()`.'''
     func = cumulative_error_pokes if bins is None else binary_error_pokes
     return func(fed, bins=bins, origin=origin)
 
 # ---- Other
 
 def battery(fed, bins=None, origin='start'):
+    '''Returns the battery voltage reading.  When binned, returns
+    the mean within each bin.'''
     func = lambda f: f['Battery_Voltage']
     agg = 'mean'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def ipi(fed, bins=None, origin='start'):
+    '''Returns the interpellet intervals (time between each successive pellet
+    retrieval).  When binned, returns the mean within each bin.'''
     func = lambda f: f.ipi(condense=True)
     agg = 'mean'
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def motor_turns(fed, bins=None, origin='start'):
+    '''Returns the number of motor turns for each pellet dispensal.
+    When binned, returns the mean within each bin.'''
     def func(fed):
         pellets = fed.binary_pellets().astype(bool)
         y = fed.loc[pellets, 'Motor_Turns']
@@ -244,6 +294,8 @@ def motor_turns(fed, bins=None, origin='start'):
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def retrival_time(fed, bins=None, origin='start'):
+    '''Returns the time (seconds) any dispensed pellets remained in well before
+    retrieval.  When binned, returns the mean within each bin.'''
     def func(fed):
         y = fed['Retrieval_Time']
         y = _filterout(y, dropna=True)

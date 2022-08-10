@@ -179,51 +179,75 @@ def binary_pokes(fed, bins=None, origin=&#39;start&#39;):
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of pokes (of any kind).  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;any&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting pokes.  Returns `cumulative_pokes()` when
+    not binned, else `binary_pokes()`.&#39;&#39;&#39;
     func = cumulative_pokes if bins is None else binary_pokes
     return func(fed, bins=bins, origin=origin)
 
 # ---- L/R pokes
 
 def binary_left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of left-sided pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;left&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of right-sided pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;right&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of left pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;left&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of right pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;right&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_left_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of left-sided pokes.  That is,
+    returns `(#left_pokes / #total_pokes) * 100`, where `#left_pokes` and
+    `#total_pokes` are the running total of left and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;left&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_right_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of right-sided pokes.  That is,
+    returns `(#right_pokes / #total_pokes) * 100`, where `#right_pokes` and
+    `#total_pokes` are the running total of right and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;right&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting left-sided pokes.  Returns `cumulative_left_pokes()`
+    when not binned, else `binary_left_pokes()`.&#39;&#39;&#39;
     func = cumulative_left_pokes if bins is None else binary_left_pokes
     return func(fed, bins=bins, origin=origin)
 
 def right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_right_pokes()`
+    when not binned, else `binary_right_pokes()`.&#39;&#39;&#39;
     func = cumulative_right_pokes if bins is None else binary_right_pokes
     return func(fed, bins=bins, origin=origin)
 
@@ -232,56 +256,82 @@ def right_pokes(fed, bins=None, origin=&#39;start&#39;):
 # you can do a find and replace on the left/right ...
 
 def binary_correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of correct pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;correct&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def binary_error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of error pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;error&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of correct pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;correct&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of error pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;error&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_correct_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of correct pokes.  That is,
+    returns `(#correct_pokes / #total_pokes) * 100`, where `#correct_pokes` and
+    `#total_pokes` are the running total of correct and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;correct&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def cumulative_error_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of error pokes.  That is,
+    returns `(#error_pokes / #total_pokes) * 100`, where `#error_pokes` and
+    `#total_pokes` are the running total of error and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;error&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_correct_pokes()`
+    when not binned, else `binary_correct_pokes()`.&#39;&#39;&#39;
     func = cumulative_correct_pokes if bins is None else binary_correct_pokes
     return func(fed, bins=bins, origin=origin)
 
 def error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_error_pokes()`
+    when not binned, else `binary_error_pokes()`.&#39;&#39;&#39;
     func = cumulative_error_pokes if bins is None else binary_error_pokes
     return func(fed, bins=bins, origin=origin)
 
 # ---- Other
 
 def battery(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the battery voltage reading.  When binned, returns
+    the mean within each bin.&#39;&#39;&#39;
     func = lambda f: f[&#39;Battery_Voltage&#39;]
     agg = &#39;mean&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def ipi(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the interpellet intervals (time between each successive pellet
+    retrieval).  When binned, returns the mean within each bin.&#39;&#39;&#39;
     func = lambda f: f.ipi(condense=True)
     agg = &#39;mean&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def motor_turns(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the number of motor turns for each pellet dispensal.
+    When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
         pellets = fed.binary_pellets().astype(bool)
         y = fed.loc[pellets, &#39;Motor_Turns&#39;]
@@ -290,6 +340,8 @@ def motor_turns(fed, bins=None, origin=&#39;start&#39;):
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)
 
 def retrival_time(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the time (seconds) any dispensed pellets remained in well before
+    retrieval.  When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
         y = fed[&#39;Retrieval_Time&#39;]
         y = _filterout(y, dropna=True)
@@ -403,12 +455,16 @@ readable name for the metric, used on axis labels.</p></div>
 <span>def <span class="ident">battery</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the battery voltage reading.
+When binned, returns
+the mean within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def battery(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the battery voltage reading.  When binned, returns
+    the mean within each bin.&#39;&#39;&#39;
     func = lambda f: f[&#39;Battery_Voltage&#39;]
     agg = &#39;mean&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -418,12 +474,15 @@ readable name for the metric, used on axis labels.</p></div>
 <span>def <span class="ident">binary_correct_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a binary (0/1) indication of correct pokes.
+When binned, returns sum of pokes per bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def binary_correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of correct pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;correct&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -433,12 +492,15 @@ readable name for the metric, used on axis labels.</p></div>
 <span>def <span class="ident">binary_error_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a binary (0/1) indication of error pokes.
+When binned, returns sum of pokes per bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def binary_error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of error pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;error&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -448,12 +510,15 @@ readable name for the metric, used on axis labels.</p></div>
 <span>def <span class="ident">binary_left_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a binary (0/1) indication of left-sided pokes.
+When binned, returns sum of pokes per bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def binary_left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of left-sided pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;left&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -499,12 +564,15 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">binary_right_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a binary (0/1) indication of right-sided pokes.
+When binned, returns sum of pokes per bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def binary_right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a binary (0/1) indication of right-sided pokes.
+    When binned, returns sum of pokes per bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;right&#39;, cumulative=False, condense=True)
     agg = &#39;sum&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -514,12 +582,16 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">correct_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Default metric for plotting right-sided pokes.
+Returns <code><a title="fed3.metrics.core.cumulative_correct_pokes" href="#fed3.metrics.core.cumulative_correct_pokes">cumulative_correct_pokes()</a></code>
+when not binned, else <code><a title="fed3.metrics.core.binary_correct_pokes" href="#fed3.metrics.core.binary_correct_pokes">binary_correct_pokes()</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_correct_pokes()`
+    when not binned, else `binary_correct_pokes()`.&#39;&#39;&#39;
     func = cumulative_correct_pokes if bins is None else binary_correct_pokes
     return func(fed, bins=bins, origin=origin)</code></pre>
 </details>
@@ -528,12 +600,20 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_correct_percent</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a cumulative percentage of correct pokes.
+That is,
+returns <code>(#correct_pokes / #total_pokes) * 100</code>, where <code>#correct_pokes</code> and
+<code>#total_pokes</code> are the running total of correct and total pokes, respectively.
+When binned, the latest cumulative percentage within each bin is returned.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_correct_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of correct pokes.  That is,
+    returns `(#correct_pokes / #total_pokes) * 100`, where `#correct_pokes` and
+    `#total_pokes` are the running total of correct and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;correct&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -543,12 +623,16 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_correct_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a running total of correct pokes.
+When binned,
+returns the maximum of the running total within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_correct_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of correct pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;correct&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -558,12 +642,20 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_error_percent</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a cumulative percentage of error pokes.
+That is,
+returns <code>(#error_pokes / #total_pokes) * 100</code>, where <code>#error_pokes</code> and
+<code>#total_pokes</code> are the running total of error and total pokes, respectively.
+When binned, the latest cumulative percentage within each bin is returned.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_error_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of error pokes.  That is,
+    returns `(#error_pokes / #total_pokes) * 100`, where `#error_pokes` and
+    `#total_pokes` are the running total of error and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;error&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -573,12 +665,16 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_error_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a running total of error pokes.
+When binned,
+returns the maximum of the running total within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of error pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;error&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -588,12 +684,20 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_left_percent</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a cumulative percentage of left-sided pokes.
+That is,
+returns <code>(#left_pokes / #total_pokes) * 100</code>, where <code>#left_pokes</code> and
+<code>#total_pokes</code> are the running total of left and total pokes, respectively.
+When binned, the latest cumulative percentage within each bin is returned.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_left_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of left-sided pokes.  That is,
+    returns `(#left_pokes / #total_pokes) * 100`, where `#left_pokes` and
+    `#total_pokes` are the running total of left and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;left&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -603,12 +707,16 @@ When binned, returns sum of pokes per bin.</p></div>
 <span>def <span class="ident">cumulative_left_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a running total of left pokes.
+When binned,
+returns the maximum of the running total within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of left pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;left&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -639,12 +747,16 @@ total within each bin.</p></div>
 <span>def <span class="ident">cumulative_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a running total of pokes (of any kind).
+When binned,
+returns the maximum of the running total within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of pokes (of any kind).  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;any&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -654,12 +766,20 @@ total within each bin.</p></div>
 <span>def <span class="ident">cumulative_right_percent</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a cumulative percentage of right-sided pokes.
+That is,
+returns <code>(#right_pokes / #total_pokes) * 100</code>, where <code>#right_pokes</code> and
+<code>#total_pokes</code> are the running total of right and total pokes, respectively.
+When binned, the latest cumulative percentage within each bin is returned.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_right_percent(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a cumulative percentage of right-sided pokes.  That is,
+    returns `(#right_pokes / #total_pokes) * 100`, where `#right_pokes` and
+    `#total_pokes` are the running total of right and total pokes, respectively.
+    When binned, the latest cumulative percentage within each bin is returned.&#39;&#39;&#39;
     func = lambda f: _cumulative_poke_percentage_general(f, &#39;right&#39;)
     agg = &#39;last&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -669,12 +789,16 @@ total within each bin.</p></div>
 <span>def <span class="ident">cumulative_right_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a running total of right pokes.
+When binned,
+returns the maximum of the running total within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cumulative_right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns a running total of right pokes.  When binned,
+    returns the maximum of the running total within each bin.&#39;&#39;&#39;
     func = lambda f: f.pokes(kind=&#39;right&#39;, cumulative=True, condense=True)
     agg = &#39;max&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -684,12 +808,16 @@ total within each bin.</p></div>
 <span>def <span class="ident">error_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Default metric for plotting right-sided pokes.
+Returns <code><a title="fed3.metrics.core.cumulative_error_pokes" href="#fed3.metrics.core.cumulative_error_pokes">cumulative_error_pokes()</a></code>
+when not binned, else <code><a title="fed3.metrics.core.binary_error_pokes" href="#fed3.metrics.core.binary_error_pokes">binary_error_pokes()</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def error_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_error_pokes()`
+    when not binned, else `binary_error_pokes()`.&#39;&#39;&#39;
     func = cumulative_error_pokes if bins is None else binary_error_pokes
     return func(fed, bins=bins, origin=origin)</code></pre>
 </details>
@@ -698,12 +826,16 @@ total within each bin.</p></div>
 <span>def <span class="ident">ipi</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the interpellet intervals (time between each successive pellet
+retrieval).
+When binned, returns the mean within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ipi(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the interpellet intervals (time between each successive pellet
+    retrieval).  When binned, returns the mean within each bin.&#39;&#39;&#39;
     func = lambda f: f.ipi(condense=True)
     agg = &#39;mean&#39;
     return _default_metric(fed=fed, func=func, bins=bins, origin=origin, agg=agg)</code></pre>
@@ -713,12 +845,16 @@ total within each bin.</p></div>
 <span>def <span class="ident">left_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Default metric for plotting left-sided pokes.
+Returns <code><a title="fed3.metrics.core.cumulative_left_pokes" href="#fed3.metrics.core.cumulative_left_pokes">cumulative_left_pokes()</a></code>
+when not binned, else <code><a title="fed3.metrics.core.binary_left_pokes" href="#fed3.metrics.core.binary_left_pokes">binary_left_pokes()</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def left_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting left-sided pokes.  Returns `cumulative_left_pokes()`
+    when not binned, else `binary_left_pokes()`.&#39;&#39;&#39;
     func = cumulative_left_pokes if bins is None else binary_left_pokes
     return func(fed, bins=bins, origin=origin)</code></pre>
 </details>
@@ -727,12 +863,15 @@ total within each bin.</p></div>
 <span>def <span class="ident">motor_turns</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the number of motor turns for each pellet dispensal.
+When binned, returns the mean within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def motor_turns(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the number of motor turns for each pellet dispensal.
+    When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
         pellets = fed.binary_pellets().astype(bool)
         y = fed.loc[pellets, &#39;Motor_Turns&#39;]
@@ -763,12 +902,16 @@ when not binned, and <code><a title="fed3.metrics.core.binary_pellets" href="#fe
 <span>def <span class="ident">pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Default metric for plotting pokes.
+Returns <code><a title="fed3.metrics.core.cumulative_pokes" href="#fed3.metrics.core.cumulative_pokes">cumulative_pokes()</a></code> when
+not binned, else <code><a title="fed3.metrics.core.binary_pokes" href="#fed3.metrics.core.binary_pokes">binary_pokes()</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting pokes.  Returns `cumulative_pokes()` when
+    not binned, else `binary_pokes()`.&#39;&#39;&#39;
     func = cumulative_pokes if bins is None else binary_pokes
     return func(fed, bins=bins, origin=origin)</code></pre>
 </details>
@@ -777,12 +920,16 @@ when not binned, and <code><a title="fed3.metrics.core.binary_pellets" href="#fe
 <span>def <span class="ident">retrival_time</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the time (seconds) any dispensed pellets remained in well before
+retrieval.
+When binned, returns the mean within each bin.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def retrival_time(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Returns the time (seconds) any dispensed pellets remained in well before
+    retrieval.  When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
         y = fed[&#39;Retrieval_Time&#39;]
         y = _filterout(y, dropna=True)
@@ -795,12 +942,16 @@ when not binned, and <code><a title="fed3.metrics.core.binary_pellets" href="#fe
 <span>def <span class="ident">right_pokes</span></span>(<span>fed, bins=None, origin='start')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Default metric for plotting right-sided pokes.
+Returns <code><a title="fed3.metrics.core.cumulative_right_pokes" href="#fed3.metrics.core.cumulative_right_pokes">cumulative_right_pokes()</a></code>
+when not binned, else <code><a title="fed3.metrics.core.binary_right_pokes" href="#fed3.metrics.core.binary_right_pokes">binary_right_pokes()</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def right_pokes(fed, bins=None, origin=&#39;start&#39;):
+    &#39;&#39;&#39;Default metric for plotting right-sided pokes.  Returns `cumulative_right_pokes()`
+    when not binned, else `binary_right_pokes()`.&#39;&#39;&#39;
     func = cumulative_right_pokes if bins is None else binary_right_pokes
     return func(fed, bins=bins, origin=origin)</code></pre>
 </details>
