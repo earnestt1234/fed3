@@ -287,7 +287,7 @@ def motor_turns(fed, bins=None, origin='start'):
     '''Returns the number of motor turns for each pellet dispensal.
     When binned, returns the mean within each bin.'''
     def func(fed):
-        pellets = fed.binary_pellets().astype(bool)
+        pellets = fed.pellets(cumulative=False).astype(bool)
         y = fed.loc[pellets, 'Motor_Turns']
         return y
     agg = 'mean'
