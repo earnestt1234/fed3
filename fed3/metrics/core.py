@@ -332,9 +332,9 @@ def get_metric(y):
     try:
         return METRICS[key]
     except KeyError:
-        metrics = str(list(METRICS.keys()))[1:-1]
-        raise KeyError(f'Metric key "{y}" is not recognized. Possible metrics are: '
-                       f'{metrics}.')
+        metrics = ', '.join(f"'{m}'" for m in METRICS.keys())
+        raise ValueError(f'Metric key "{y}" is not recognized. Possible metrics are: '
+                         f'{metrics}.')
 
 def list_metrics():
     '''
