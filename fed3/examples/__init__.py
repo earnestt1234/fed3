@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
-'''Example FED3 data for practice & demonstration of fed3.'''
+'''This package provides example data for fed3.  The package comes
+bundled with some CSV files of FED3 data.  These can be loaded via
+fed3, returning FEDFrames.
+
+fed3 uses this package to create reproducible examples for the documentation.
+
+Data included in the package are all intended to be taken from real fed3
+experiments.  If you have data you would like to contribute as an example,
+please raise an issue on GitHub.
+
+### Datasets
+
+#### `justin`
+
+Seven FEDs with data collected over a long-term experiment (10 days).
+These were collected in a "ProRat2" mode.  The data show pellet
+retrieval in response to an active left poke.'''
 
 __all__ = ['load_examples']
 
