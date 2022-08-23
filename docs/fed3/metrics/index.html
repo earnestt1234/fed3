@@ -38,7 +38,7 @@ functions, if desired: <code><a title="fed3.metrics.get_metric" href="#fed3.metr
 <code><a title="fed3.metrics.list_metrics" href="#fed3.metrics.list_metrics">list_metrics()</a></code>.
 The latter will report the current metric
 functions available in fed3:</p>
-<pre><code class="language-python">&gt;&gt;&gt; import fed3
+<pre><code class="python">&gt;&gt;&gt; import fed3
 &gt;&gt;&gt; fed3.list_metrics()
 ['binary_pellets',
  'cumulative_pellets',
@@ -199,9 +199,9 @@ The <code>nicename</code> is a nicer version of the key, used for axis labels.</
     try:
         return METRICS[key]
     except KeyError:
-        metrics = str(list(METRICS.keys()))[1:-1]
-        raise KeyError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
-                       f&#39;{metrics}.&#39;)</code></pre>
+        metrics = &#39;, &#39;.join(f&#34;&#39;{m}&#39;&#34; for m in METRICS.keys())
+        raise ValueError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
+                         f&#39;{metrics}.&#39;)</code></pre>
 </details>
 </dd>
 <dt id="fed3.metrics.list_metrics"><code class="name flex">

@@ -19,7 +19,7 @@ from fed3.core import (FEDFrame,
                        split,
                        timecrop)
 
-from fed3.examples import load_examples
+from fed3.examples import list_examples, load_examples
 
 from fed3.lightcycle import set_lightcycle
 

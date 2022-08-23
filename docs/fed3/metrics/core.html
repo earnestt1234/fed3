@@ -333,7 +333,7 @@ def motor_turns(fed, bins=None, origin=&#39;start&#39;):
     &#39;&#39;&#39;Returns the number of motor turns for each pellet dispensal.
     When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
-        pellets = fed.binary_pellets().astype(bool)
+        pellets = fed.pellets(cumulative=False).astype(bool)
         y = fed.loc[pellets, &#39;Motor_Turns&#39;]
         return y
     agg = &#39;mean&#39;
@@ -378,9 +378,9 @@ def get_metric(y):
     try:
         return METRICS[key]
     except KeyError:
-        metrics = str(list(METRICS.keys()))[1:-1]
-        raise KeyError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
-                       f&#39;{metrics}.&#39;)
+        metrics = &#39;, &#39;.join(f&#34;&#39;{m}&#39;&#34; for m in METRICS.keys())
+        raise ValueError(f&#39;Metric key &#34;{y}&#34; is not recognized. Possible metrics are: &#39;
+                         f&#39;{metrics}.&#39;)
 
 def list_metrics():
     &#39;&#39;&#39;
@@ -873,7 +873,7 @@ When binned, returns the mean within each bin.</p></div>
     &#39;&#39;&#39;Returns the number of motor turns for each pellet dispensal.
     When binned, returns the mean within each bin.&#39;&#39;&#39;
     def func(fed):
-        pellets = fed.binary_pellets().astype(bool)
+        pellets = fed.pellets(cumulative=False).astype(bool)
         y = fed.loc[pellets, &#39;Motor_Turns&#39;]
         return y
     agg = &#39;mean&#39;

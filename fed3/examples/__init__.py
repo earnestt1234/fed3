@@ -9,15 +9,15 @@ Data included in the package are all intended to be taken from real fed3
 experiments.  If you have data you would like to contribute as an example,
 please raise an issue on GitHub.
 
-### Datasets
+Datasets
+-----
 
-#### `justin`
+- `justin`: Seven FEDs with data collected over a long-term experiment (10 days).
+These data represent FED3 data from multiple recordings, already concatenated.
+Data were collected in "ProRat2" mode.  The data show pellet
+retrieval in response to an active left poke.  '''
 
-Seven FEDs with data collected over a long-term experiment (10 days).
-These were collected in a "ProRat2" mode.  The data show pellet
-retrieval in response to an active left poke.'''
-
-__all__ = ['load_examples']
+__all__ = ['list_examples', 'load_examples']
 
 import os
 import sys
@@ -28,6 +28,19 @@ from fed3.core.fedfuncs import load
 # module variables
 DATADIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 DATA = {}
+
+def list_examples():
+    '''
+    List all the available example data sets - specifically the string
+    keys which can be provided to `load_examples()`.
+
+    Returns
+    -------
+    list
+        All avaiable keys.
+    '''
+
+    return list(DATA.keys())
 
 def load_examples(key):
     '''
@@ -55,6 +68,7 @@ def load_examples(key):
     except KeyError:
         raise KeyError(f"No matching key '{key}'; options are: "
                        f"{list(DATA.keys())}")
+
 
 def _build_examples():
     '''Load all the FED3 example data.  To be called on start up.'''

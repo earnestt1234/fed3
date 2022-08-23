@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.examples API documentation</title>
-<meta name="description" content="Example FED3 data for practice &amp; demonstration of fed3." />
+<meta name="description" content="This package provides example data for fed3.
+The package comes
+bundled with some CSV files of FED3 data.
+These can be loaded via
+fed3, returning …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,15 +26,48 @@
 <h1 class="title">Module <code>fed3.examples</code></h1>
 </header>
 <section id="section-intro">
-<p>Example FED3 data for practice &amp; demonstration of fed3.</p>
+<p>This package provides example data for fed3.
+The package comes
+bundled with some CSV files of FED3 data.
+These can be loaded via
+fed3, returning FEDFrames.</p>
+<p>fed3 uses this package to create reproducible examples for the documentation.</p>
+<p>Data included in the package are all intended to be taken from real fed3
+experiments.
+If you have data you would like to contribute as an example,
+please raise an issue on GitHub.</p>
+<h2 id="datasets">Datasets</h2>
+<ul>
+<li><code>justin</code>: Seven FEDs with data collected over a long-term experiment (10 days).
+These data represent FED3 data from multiple recordings, already concatenated.
+Data were collected in "ProRat2" mode.
+The data show pellet
+retrieval in response to an active left poke.</li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
-&#39;&#39;&#39;Example FED3 data for practice &amp; demonstration of fed3.&#39;&#39;&#39;
+&#39;&#39;&#39;This package provides example data for fed3.  The package comes
+bundled with some CSV files of FED3 data.  These can be loaded via
+fed3, returning FEDFrames.
 
-__all__ = [&#39;load_examples&#39;]
+fed3 uses this package to create reproducible examples for the documentation.
+
+Data included in the package are all intended to be taken from real fed3
+experiments.  If you have data you would like to contribute as an example,
+please raise an issue on GitHub.
+
+Datasets
+-----
+
+- `justin`: Seven FEDs with data collected over a long-term experiment (10 days).
+These data represent FED3 data from multiple recordings, already concatenated.
+Data were collected in &#34;ProRat2&#34; mode.  The data show pellet
+retrieval in response to an active left poke.  &#39;&#39;&#39;
+
+__all__ = [&#39;list_examples&#39;, &#39;load_examples&#39;]
 
 import os
 import sys
@@ -41,6 +78,19 @@ from fed3.core.fedfuncs import load
 # module variables
 DATADIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), &#39;data&#39;)
 DATA = {}
+
+def list_examples():
+    &#39;&#39;&#39;
+    List all the available example data sets - specifically the string
+    keys which can be provided to `load_examples()`.
+
+    Returns
+    -------
+    list
+        All avaiable keys.
+    &#39;&#39;&#39;
+
+    return list(DATA.keys())
 
 def load_examples(key):
     &#39;&#39;&#39;
@@ -68,6 +118,7 @@ def load_examples(key):
     except KeyError:
         raise KeyError(f&#34;No matching key &#39;{key}&#39;; options are: &#34;
                        f&#34;{list(DATA.keys())}&#34;)
+
 
 def _build_examples():
     &#39;&#39;&#39;Load all the FED3 example data.  To be called on start up.&#39;&#39;&#39;
@@ -102,6 +153,35 @@ _build_examples()</code></pre>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="fed3.examples.list_examples"><code class="name flex">
+<span>def <span class="ident">list_examples</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all the available example data sets - specifically the string
+keys which can be provided to <code><a title="fed3.examples.load_examples" href="#fed3.examples.load_examples">load_examples()</a></code>.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>All avaiable keys.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list_examples():
+    &#39;&#39;&#39;
+    List all the available example data sets - specifically the string
+    keys which can be provided to `load_examples()`.
+
+    Returns
+    -------
+    list
+        All avaiable keys.
+    &#39;&#39;&#39;
+
+    return list(DATA.keys())</code></pre>
+</details>
+</dd>
 <dt id="fed3.examples.load_examples"><code class="name flex">
 <span>def <span class="ident">load_examples</span></span>(<span>key)</span>
 </code></dt>
@@ -162,7 +242,9 @@ _build_examples()</code></pre>
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#datasets">Datasets</a></li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>
@@ -172,6 +254,7 @@ _build_examples()</code></pre>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="fed3.examples.list_examples" href="#fed3.examples.list_examples">list_examples</a></code></li>
 <li><code><a title="fed3.examples.load_examples" href="#fed3.examples.load_examples">load_examples</a></code></li>
 </ul>
 </li>
