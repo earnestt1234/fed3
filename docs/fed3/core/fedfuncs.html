@@ -43,6 +43,7 @@ __all__ = [&#39;align&#39;,
            &#39;can_concat&#39;,
            &#39;concat&#39;,
            &#39;load&#39;,
+           &#39;screen_mixed_alignment&#39;,
            &#39;split&#39;,
            &#39;timecrop&#39;]
 
@@ -788,6 +789,81 @@ See
     return f</code></pre>
 </details>
 </dd>
+<dt id="fed3.core.fedfuncs.screen_mixed_alignment"><code class="name flex">
+<span>def <span class="ident">screen_mixed_alignment</span></span>(<span>feds, option='raise')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check FEDFrames for having mixed alignment styles (see <code><a title="fed3.core.fedfuncs.align" href="#fed3.core.fedfuncs.align">align()</a></code>).
+This is called by most plots witin <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a></code> for the <code>mixed_align</code>
+parameter.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt>feds : FEDFrame or list of such.</dt>
+<dt>FED3 data to screen.</dt>
+<dt><strong><code>option</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Method for screening data. The default is 'raise', which will raise
+an error for mixed alignment.
+'warn' will only show a warning, while
+'ignore' will pass silently.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>Screening method not recognized, or 'raise' option being used.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>alignment</code></strong> :&ensp;<code>str</code></dt>
+<dd>Alignment string returned by <code>determine_alignment()</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def screen_mixed_alignment(feds, option=&#39;raise&#39;):
+    &#39;&#39;&#39;
+    Check FEDFrames for having mixed alignment styles (see `align()`).
+    This is called by most plots witin `fed3.plot` for the `mixed_align`
+    parameter.
+
+    Parameters
+    ----------
+    feds : FEDFrame or list of such.
+        FED3 data to screen.
+    option : str, optional
+        Method for screening data. The default is &#39;raise&#39;, which will raise
+        an error for mixed alignment.  &#39;warn&#39; will only show a warning, while
+        &#39;ignore&#39; will pass silently.
+
+    Raises
+    ------
+    ValueError
+        Screening method not recognized, or &#39;raise&#39; option being used.
+
+    Returns
+    -------
+    alignment : str
+        Alignment string returned by `determine_alignment()`.
+
+    &#39;&#39;&#39;
+
+    alignment = determine_alignment(feds)
+
+    if alignment != &#39;mixed&#39;:
+        return alignment
+
+    if option == &#39;raise&#39;:
+        raise ValueError(&#39;The passed FEDFrames have mixed alignment.&#39;)
+
+    elif option == &#39;warn&#39;:
+        warnings.warn(&#34;The passed FEDFrames have mixed alignment.&#34;)
+
+    elif option != &#39;ignore&#39;:
+        raise ValueError(&#39;Mixed alignment option must be &#34;ignore&#34;, &#34;warn&#34;, or &#34;raise&#34;&#39;)
+
+    return alignment</code></pre>
+</details>
+</dd>
 <dt id="fed3.core.fedfuncs.split"><code class="name flex">
 <span>def <span class="ident">split</span></span>(<span>fed, dates, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'), return_empty=False, tag_name=True)</span>
 </code></dt>
@@ -949,11 +1025,12 @@ The default is ('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count').</dd>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="fed3.core.fedfuncs.align" href="#fed3.core.fedfuncs.align">align</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.can_concat" href="#fed3.core.fedfuncs.can_concat">can_concat</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.concat" href="#fed3.core.fedfuncs.concat">concat</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.load" href="#fed3.core.fedfuncs.load">load</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.screen_mixed_alignment" href="#fed3.core.fedfuncs.screen_mixed_alignment">screen_mixed_alignment</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.split" href="#fed3.core.fedfuncs.split">split</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.timecrop" href="#fed3.core.fedfuncs.timecrop">timecrop</a></code></li>
 </ul>

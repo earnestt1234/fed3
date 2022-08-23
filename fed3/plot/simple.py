@@ -27,6 +27,8 @@ from fed3.plot.shadedark import shade_darkness
 # ---- low level plotting
 
 def _plot_timeseries_line(ax, data, **kwargs):
+    '''Plot a pandas Series with a datetime index on a given
+    matplotlib Axes, as a line.'''
 
     y = data.dropna()
     x = y.index
@@ -35,6 +37,8 @@ def _plot_timeseries_line(ax, data, **kwargs):
     return ax.get_figure()
 
 def _plot_timeseries_scatter(ax, data, **kwargs):
+    '''Plot a pandas Series with a datetime index on a given
+    matplotlib Axes, as a scatter.'''
 
     y = data.dropna()
     x = y.index
@@ -43,6 +47,7 @@ def _plot_timeseries_scatter(ax, data, **kwargs):
     return ax.get_figure()
 
 def _plot_timeseries_shade(ax, aggdata, vardata, **kwargs):
+    '''Plot the shaded error bar around a line.'''
     x = aggdata.index
     y = aggdata
     ymin = y - vardata
@@ -50,6 +55,7 @@ def _plot_timeseries_shade(ax, aggdata, vardata, **kwargs):
     ax.fill_between(x=x, y1=ymin, y2=ymax, **kwargs)
 
 def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
+    '''Plot vertical error bars around timeseries points.'''
     x = aggdata.index
     y = aggdata
     yerr = vardata
@@ -61,6 +67,11 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
                  var='std', omit_na=False, mixed_align='raise', output='plot',
                  xaxis='auto', shadedark=True, ax=None, legend=True,
                  plot_kwargs=None, error_kwargs=None, **kwargs):
+    '''Underlying method used by `line()` and `scatter()`.  Both
+    these methods involve identical data processing - the only
+    major difference is how they are represented.  The parameter `kind`
+    handles the small differences needed.  Users should not need to
+    use this function.'''
 
     # determine general plotting function
     if kind == 'line':
@@ -180,9 +191,99 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
 # ---- public plotting functions
 
 def line(feds, y='pellets', bins=None, agg='mean', var='std',
-            omit_na=False, mixed_align='raise', output='plot',
-            xaxis='auto', shadedark=True, ax=None, legend=True,
-            line_kwargs=None, error_kwargs=None, **kwargs):
+         omit_na=False, mixed_align='raise', output='plot',
+         xaxis='auto', shadedark=True, ax=None, legend=True,
+         line_kwargs=None, error_kwargs=None, **kwargs):
+    '''
+    Create a line plot, with time on the x-axis and a variable
+    of interest on the y-axis.
+
+    Parameters
+    ----------
+    feds : FEDFrame, list-like, or dict
+        FED3 data to be plotted.
+        - **FEDFrame**: A single line is plotted for this object
+        - **list-like**: If a collection of FEDFrames is passed,
+        an individual line is plotted for every FEDFrame within `feds`
+        - **dict**: If a `dict` is passed, the data are treated as being
+        grouped, and average lines are plotted.  The dict should have
+        group labels as keys, and FEDFrame objects as values.  Note that
+        the values can be either single FEDFrame objects or list-like collections
+        of them.  Though if all the values of the `dict` are single FEDFrame
+        objects, the data will be treated as if there are no groups.
+    y : str, optional
+        Metric to plot on y-axis. See `fed3.metrics` or `fed3.metrics.list_metrics()`
+        for available options.  The default is 'pellets'.
+    bins : pandas time offset string, optional
+        Frequency string denoting how data should be binned when plotting.
+        The default is None, in which case there is no binnings.  Examples
+        are '1H' for 1 hour or '15T' for 15 minutes.  When group data are passed
+        (see `feds`) and `bins` is not specified, defaults to `1H`.
+    agg : str or callable, optional
+        Function to aggregate data from multiple FEDFrames in a group (for each
+        temporal bin).  The default is 'mean'.  Only relevant when grouped
+        data are being plotted.
+    var : str or callable, optional
+        Function to measure variation of data from multiple FEDFrames in a group
+        (for each temporal bin).  The default is 'std'.  The output of this
+        callable is represented as a shaded error bar around the line.
+        Only relevant when grouped data are being plotted. The default is 'std'.
+    omit_na : bool, optional
+        When True, omits bins in a group where at least one FEDFrame has
+        missing data. Only relevant when grouped data are being plotted.
+        The default is False.
+    mixed_align : str, optional
+        Protocol when encountering FEDFrames with mixed aligment being plotted.
+        The default is 'raise'.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
+        for options.
+    output : str, optional
+        Specify function behavior and return value. The default is 'plot'.
+        - **plot**: Plot is created and the matplotlib Figure is returned.
+        - **data**: Plot is created, and underlying processed data are returned
+        (as a pandas DataFrame).
+        - **both**: Plot is created, and the return value is a 2-tuple with
+        the first element being the Figure, and second element being the data.
+        - **dataonly**: Plot is NOT created; only the processed data are returned.
+        - anything else: a `ValueError` is raised.
+    xaxis : str, optional
+        X-axis type to used for plotting. This is usually determined by the
+        alignment of the FEDFrames, and should be handled by 'auto' (default).
+        Other options are 'datetime', 'time', and 'elapsed'.
+    shadedark : bool, optional
+        When applicable based on the FEDFrame alignment, create shaded
+        boxes indicating when the lights were off. The default is True.
+    ax : matplotlib Axes, optional
+        Axes to direct the plotting to. The default is None, in which case
+        `plt.gca()` is used.
+    legend : bool, optional
+        Create a legend. The default is True.
+    line_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.plot()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.plot()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    error_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.fill_between()`.
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.fill_between()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.fill_between()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    **kwargs : dict-like
+        Passed to updated `line_kwargs`.
+
+    Returns
+    -------
+    variable
+        Dependent on parameter `output`.
+
+    '''
 
     feds_dict = _parse_feds(feds)
     is_group = any(len(v) > 1 for v in feds_dict.values())

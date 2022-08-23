@@ -609,15 +609,204 @@ __all__ = [&#39;COLORCYCLE&#39;,
 <span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=True, ax=None, legend=True, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Create a line plot, with time on the x-axis and a variable
+of interest on the y-axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>feds</code></strong> :&ensp;<code>FEDFrame, list-like,</code> or <code>dict</code></dt>
+<dd>FED3 data to be plotted.
+- <strong>FEDFrame</strong>: A single line is plotted for this object
+- <strong>list-like</strong>: If a collection of FEDFrames is passed,
+an individual line is plotted for every FEDFrame within <code>feds</code>
+- <strong>dict</strong>: If a <code>dict</code> is passed, the data are treated as being
+grouped, and average lines are plotted.
+The dict should have
+group labels as keys, and FEDFrame objects as values.
+Note that
+the values can be either single FEDFrame objects or list-like collections
+of them.
+Though if all the values of the <code>dict</code> are single FEDFrame
+objects, the data will be treated as if there are no groups.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Metric to plot on y-axis. See <code><a title="fed3.metrics" href="../metrics/index.html">fed3.metrics</a></code> or <code><a title="fed3.metrics.list_metrics" href="../metrics/index.html#fed3.metrics.list_metrics">list_metrics()</a></code>
+for available options.
+The default is 'pellets'.</dd>
+<dt><strong><code>bins</code></strong> :&ensp;<code>pandas time offset string</code>, optional</dt>
+<dd>Frequency string denoting how data should be binned when plotting.
+The default is None, in which case there is no binnings.
+Examples
+are '1H' for 1 hour or '15T' for 15 minutes.
+When group data are passed
+(see <code>feds</code>) and <code>bins</code> is not specified, defaults to <code>1H</code>.</dd>
+<dt><strong><code>agg</code></strong> :&ensp;<code>str</code> or <code>callable</code>, optional</dt>
+<dd>Function to aggregate data from multiple FEDFrames in a group (for each
+temporal bin).
+The default is 'mean'.
+Only relevant when grouped
+data are being plotted.</dd>
+<dt><strong><code>var</code></strong> :&ensp;<code>str</code> or <code>callable</code>, optional</dt>
+<dd>Function to measure variation of data from multiple FEDFrames in a group
+(for each temporal bin).
+The default is 'std'.
+The output of this
+callable is represented as a shaded error bar around the line.
+Only relevant when grouped data are being plotted. The default is 'std'.</dd>
+<dt><strong><code>omit_na</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When True, omits bins in a group where at least one FEDFrame has
+missing data. Only relevant when grouped data are being plotted.
+The default is False.</dd>
+<dt><strong><code>mixed_align</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Protocol when encountering FEDFrames with mixed aligment being plotted.
+The default is 'raise'.
+See <code><a title="fed3.core.fedfuncs.screen_mixed_alignment" href="../core/fedfuncs.html#fed3.core.fedfuncs.screen_mixed_alignment">screen_mixed_alignment()</a></code>
+for options.</dd>
+<dt><strong><code>output</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Specify function behavior and return value. The default is 'plot'.
+- <strong>plot</strong>: Plot is created and the matplotlib Figure is returned.
+- <strong>data</strong>: Plot is created, and underlying processed data are returned
+(as a pandas DataFrame).
+- <strong>both</strong>: Plot is created, and the return value is a 2-tuple with
+the first element being the Figure, and second element being the data.
+- <strong>dataonly</strong>: Plot is NOT created; only the processed data are returned.
+- anything else: a <code>ValueError</code> is raised.</dd>
+<dt><strong><code>xaxis</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>X-axis type to used for plotting. This is usually determined by the
+alignment of the FEDFrames, and should be handled by 'auto' (default).
+Other options are 'datetime', 'time', and 'elapsed'.</dd>
+<dt><strong><code>shadedark</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When applicable based on the FEDFrame alignment, create shaded
+boxes indicating when the lights were off. The default is True.</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, optional</dt>
+<dd>Axes to direct the plotting to. The default is None, in which case
+<code>plt.gca()</code> is used.</dd>
+<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Create a legend. The default is True.</dd>
+<dt><strong><code>line_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
+<dd>Dictionary for providing kwargs to matplotlib, specifically <code>ax.plot()</code>.
+- If the dictionary key corresponds to the name of a FEDFrame being plotted,
+or the name of a group of FEDFrames being plotted, then the value
+should be another dictionary mapping keyword arguments for <code>ax.plot()</code>
+to their values.
+- Otherwise, the keys are assumed to be keywords arguments for <code>ax.plot()</code>,
+and values are the argument values.
+In this case, the kwargs are applied
+to all lines being plotted.</dd>
+<dt><strong><code>error_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
+<dd>Dictionary for providing kwargs to matplotlib, specifically <code>ax.fill_between()</code>.
+- If the dictionary key corresponds to the name of a FEDFrame being plotted,
+or the name of a group of FEDFrames being plotted, then the value
+should be another dictionary mapping keyword arguments for <code>ax.fill_between()</code>
+to their values.
+- Otherwise, the keys are assumed to be keywords arguments for <code>ax.fill_between()</code>,
+and values are the argument values.
+In this case, the kwargs are applied
+to all lines being plotted.</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict-like</code></dt>
+<dd>Passed to updated <code>line_kwargs</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>variable</code></dt>
+<dd>Dependent on parameter <code>output</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-            omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-            xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
-            line_kwargs=None, error_kwargs=None, **kwargs):
+         omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+         xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+         line_kwargs=None, error_kwargs=None, **kwargs):
+    &#39;&#39;&#39;
+    Create a line plot, with time on the x-axis and a variable
+    of interest on the y-axis.
+
+    Parameters
+    ----------
+    feds : FEDFrame, list-like, or dict
+        FED3 data to be plotted.
+        - **FEDFrame**: A single line is plotted for this object
+        - **list-like**: If a collection of FEDFrames is passed,
+        an individual line is plotted for every FEDFrame within `feds`
+        - **dict**: If a `dict` is passed, the data are treated as being
+        grouped, and average lines are plotted.  The dict should have
+        group labels as keys, and FEDFrame objects as values.  Note that
+        the values can be either single FEDFrame objects or list-like collections
+        of them.  Though if all the values of the `dict` are single FEDFrame
+        objects, the data will be treated as if there are no groups.
+    y : str, optional
+        Metric to plot on y-axis. See `fed3.metrics` or `fed3.metrics.list_metrics()`
+        for available options.  The default is &#39;pellets&#39;.
+    bins : pandas time offset string, optional
+        Frequency string denoting how data should be binned when plotting.
+        The default is None, in which case there is no binnings.  Examples
+        are &#39;1H&#39; for 1 hour or &#39;15T&#39; for 15 minutes.  When group data are passed
+        (see `feds`) and `bins` is not specified, defaults to `1H`.
+    agg : str or callable, optional
+        Function to aggregate data from multiple FEDFrames in a group (for each
+        temporal bin).  The default is &#39;mean&#39;.  Only relevant when grouped
+        data are being plotted.
+    var : str or callable, optional
+        Function to measure variation of data from multiple FEDFrames in a group
+        (for each temporal bin).  The default is &#39;std&#39;.  The output of this
+        callable is represented as a shaded error bar around the line.
+        Only relevant when grouped data are being plotted. The default is &#39;std&#39;.
+    omit_na : bool, optional
+        When True, omits bins in a group where at least one FEDFrame has
+        missing data. Only relevant when grouped data are being plotted.
+        The default is False.
+    mixed_align : str, optional
+        Protocol when encountering FEDFrames with mixed aligment being plotted.
+        The default is &#39;raise&#39;.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
+        for options.
+    output : str, optional
+        Specify function behavior and return value. The default is &#39;plot&#39;.
+        - **plot**: Plot is created and the matplotlib Figure is returned.
+        - **data**: Plot is created, and underlying processed data are returned
+        (as a pandas DataFrame).
+        - **both**: Plot is created, and the return value is a 2-tuple with
+        the first element being the Figure, and second element being the data.
+        - **dataonly**: Plot is NOT created; only the processed data are returned.
+        - anything else: a `ValueError` is raised.
+    xaxis : str, optional
+        X-axis type to used for plotting. This is usually determined by the
+        alignment of the FEDFrames, and should be handled by &#39;auto&#39; (default).
+        Other options are &#39;datetime&#39;, &#39;time&#39;, and &#39;elapsed&#39;.
+    shadedark : bool, optional
+        When applicable based on the FEDFrame alignment, create shaded
+        boxes indicating when the lights were off. The default is True.
+    ax : matplotlib Axes, optional
+        Axes to direct the plotting to. The default is None, in which case
+        `plt.gca()` is used.
+    legend : bool, optional
+        Create a legend. The default is True.
+    line_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.plot()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.plot()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    error_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.fill_between()`.
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.fill_between()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.fill_between()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    **kwargs : dict-like
+        Passed to updated `line_kwargs`.
+
+    Returns
+    -------
+    variable
+        Dependent on parameter `output`.
+
+    &#39;&#39;&#39;
 
     feds_dict = _parse_feds(feds)
     is_group = any(len(v) &gt; 1 for v in feds_dict.values())

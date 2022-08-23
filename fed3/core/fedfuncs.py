@@ -10,6 +10,7 @@ __all__ = ['align',
            'can_concat',
            'concat',
            'load',
+           'screen_mixed_alignment',
            'split',
            'timecrop']
 
