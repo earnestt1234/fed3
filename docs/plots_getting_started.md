@@ -16,6 +16,7 @@ For the purposes of this documentation, matplotlib will be used to set the defau
 ```python
 import matplotlib
 matplotlib.rcParams['figure.figsize'] = [7, 5]
+matplotlib.rcParams['figure.dpi'] = 100
 ```
 
 ## Example data
