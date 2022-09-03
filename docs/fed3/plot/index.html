@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>fed3.plot API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Plotting with fed3 …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,50 @@
 <h1 class="title">Module <code>fed3.plot</code></h1>
 </header>
 <section id="section-intro">
+<h1 id="plotting-with-fed3">Plotting with fed3</h1>
+<h2 id="importing">Importing</h2>
+<p>The plotting package within fed3, <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code> is not imported by default.
+Make an explicit call to import it:</p>
+<pre><code class="language-python">import fed3
+import fed3.plot as fplot
+</code></pre>
+<p>For the purposes of this documentation, matplotlib will be used to set the default figure size.</p>
+<pre><code class="language-python">import matplotlib
+matplotlib.rcParams['figure.figsize'] = [7, 5]
+matplotlib.rcParams['figure.dpi'] = 100
+</code></pre>
+<h2 id="example-data">Example data</h2>
+<p>The following sections will make use of some example data, provided by the <a href="https://earnestt1234.github.io/fed3/fed3/examples/index.html"><code>fed3.examples</code></a> package:</p>
+<pre><code class="language-python">fedlist = fed3.load_examples('justin')
+f = fedlist[0]
+</code></pre>
+<h2 id="basic-plotting">Basic plotting</h2>
+<h3 id="line-plots">Line Plots</h3>
+<p>The following section will intoduce the basics of plotting with fed3.
+The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
+Pass the FEDFrame to be plotted, and the desired variable:</p>
+<pre><code class="language-python">fig = fplot.line(f, y='pellets')
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_8_0.png"></p>
+<p>Many other <code>y</code> values can be specified - they link to the functions defined within <a href="https://earnestt1234.github.io/fed3/fed3/metrics/index.html"><code>fed3.metrics</code></a> (call <a href="https://earnestt1234.github.io/fed3/fed3/index.html#fed3.list_metrics"><code>fed3.list_metrics()</code></a> to see all available options).</p>
+<pre><code class="language-python">fig = fplot.line(f, y='left_pokes')
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_10_0.png"></p>
+<pre><code class="language-python">fig = fplot.line(f, y='battery')
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_11_0.png"></p>
+<pre><code class="language-python">fig = fplot.line(f, y='rt') # retrieval time
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_12_0.png"></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+
+&#39;&#39;&#39;
+.. include:: ../../docs/plots_getting_started.md
+&#39;&#39;&#39;
 
 # color cycle
 import matplotlib.pyplot as plt
@@ -889,7 +928,17 @@ to all lines being plotted.</dd>
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#plotting-with-fed3">Plotting with fed3</a><ul>
+<li><a href="#importing">Importing</a></li>
+<li><a href="#example-data">Example data</a></li>
+<li><a href="#basic-plotting">Basic plotting</a><ul>
+<li><a href="#line-plots">Line Plots</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>

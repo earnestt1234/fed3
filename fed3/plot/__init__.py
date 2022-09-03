@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+'''
+.. include:: ../../docs/plots_getting_started.md
+'''
+
 # color cycle
 import matplotlib.pyplot as plt
 

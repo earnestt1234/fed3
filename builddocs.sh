@@ -46,4 +46,4 @@ rm ${IPYNB_FILES_DIR}/*
 rmdir ${IPYNB_FILES_DIR}
 
 # finally, build with pdoc
-# pdoc --html -o docs fed3 --force
+pdoc --html -o docs fed3 --force
