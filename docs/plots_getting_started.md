@@ -10,6 +10,14 @@ import fed3
 import fed3.plot as fplot
 ```
 
+For the purposes of this documentation, matplotlib will be used to set the default figure size.
+
+
+```python
+import matplotlib
+matplotlib.rcParams['figure.figsize'] = [7, 5]
+```
+
 ## Example data
 
 The following sections will make use of some example data, provided by the [`fed3.examples`](https://earnestt1234.github.io/fed3/fed3/examples/index.html) package:
@@ -33,7 +41,7 @@ fig = fplot.line(f, y='pellets')
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_6_0.png)
+![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_8_0.png)
     
 
 
@@ -46,7 +54,7 @@ fig = fplot.line(f, y='left_pokes')
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_8_0.png)
+![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_10_0.png)
     
 
 
@@ -57,7 +65,7 @@ fig = fplot.line(f, y='battery')
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_9_0.png)
+![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_11_0.png)
     
 
 
@@ -68,6 +76,6 @@ fig = fplot.line(f, y='rt') # retrieval time
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_10_0.png)
+![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_12_0.png)
     
 
