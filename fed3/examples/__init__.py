@@ -78,7 +78,7 @@ def _build_examples():
         sys.exit()
 
     # main loop for loading data
-    for folder in sorted(os.listdir(DATADIR)):
+    for folder in os.listdir(DATADIR):
 
         fullfolder = os.path.join(DATADIR, folder)
         if not os.path.isdir(fullfolder): continue;
