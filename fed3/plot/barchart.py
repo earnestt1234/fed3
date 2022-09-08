@@ -64,6 +64,7 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
 
     # parse inputs
     feds_dict = _parse_feds(feds)
+    not_group = all(len(f) == 1 for f in feds_dict.values())
 
     # set the outputs
     FIG = None
@@ -162,5 +163,12 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
 
         if legend:
             ax.legend()
+
+    # output was weird for lists without this step -
+    # treated each single FED as group, and created
+    # a DF with lots of unhelpful info
+    if not_group:
+        DATA = DATA.drop(DATA.index, axis=1)
+        DATA = DATA.iloc[:, :-1]
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
