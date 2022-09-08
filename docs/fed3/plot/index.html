@@ -23,38 +23,45 @@
 </header>
 <section id="section-intro">
 <h1 id="plotting-with-fed3">Plotting with fed3</h1>
-<h2 id="importing">Importing</h2>
+<h2 id="import-fed3plot">Import <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code></h2>
 <p>The plotting package within fed3, <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code> is not imported by default.
 Make an explicit call to import it:</p>
-<pre><code class="language-python">import fed3
+<pre><code class="python">import fed3
 import fed3.plot as fplot
 </code></pre>
 <p>For the purposes of this documentation, matplotlib will be used to set the default figure size.</p>
-<pre><code class="language-python">import matplotlib
+<pre><code class="python">import matplotlib
 matplotlib.rcParams['figure.figsize'] = [7, 5]
 matplotlib.rcParams['figure.dpi'] = 100
 </code></pre>
 <h2 id="example-data">Example data</h2>
 <p>The following sections will make use of some example data, provided by the <a href="https://earnestt1234.github.io/fed3/fed3/examples/index.html"><code>fed3.examples</code></a> package:</p>
-<pre><code class="language-python">fedlist = fed3.load_examples('justin')
+<pre><code class="python">fedlist = fed3.load_examples('justin')
 f = fedlist[0]
 </code></pre>
 <h2 id="basic-plotting">Basic plotting</h2>
-<h3 id="line-plots">Line Plots</h3>
 <p>The following section will intoduce the basics of plotting with fed3.
-The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
-Pass the FEDFrame to be plotted, and the desired variable:</p>
-<pre><code class="language-python">fig = fplot.line(f, y='pellets')
+</p>
+<h3 id="the-hello-world-plot">The "Hello World" plot</h3>
+<p>The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
+This demonstrates the syntax that applies to almost all plotting functions: pass the data to be plotted as the first argument (the FEDFrame(s)) followed by any options.
+In this case, the <code>y</code> parameter specifies the variable to be plotted: </p>
+<pre><code class="python">fig = fplot.line(feds=f, y='pellets')
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_8_0.png"></p>
-<p>Many other <code>y</code> values can be specified - they link to the functions defined within <a href="https://earnestt1234.github.io/fed3/fed3/metrics/index.html"><code>fed3.metrics</code></a> (call <a href="https://earnestt1234.github.io/fed3/fed3/index.html#fed3.list_metrics"><code>fed3.list_metrics()</code></a> to see all available options).</p>
-<pre><code class="language-python">fig = fplot.line(f, y='left_pokes')
-</code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_10_0.png"></p>
-<pre><code class="language-python">fig = fplot.line(f, y='battery')
-</code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_11_0.png"></p>
-<pre><code class="language-python">fig = fplot.line(f, y='rt') # retrieval time
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_9_0.png"></p>
+<p>Many other <code>y</code> values can be specified - they link to the functions defined within <a href="https://earnestt1234.github.io/fed3/fed3/metrics/index.html"><code>fed3.metrics</code></a>.
+Call <a href="https://earnestt1234.github.io/fed3/fed3/index.html#fed3.list_metrics"><code>fed3.list_metrics()</code></a> to see all available options.</p>
+<h3 id="plotting-multiple-feds">Plotting multiple FEDs</h3>
+<p>Most plots are able to plot data from multiple FEDs, either as separate or aggregated curves.
+The structure of the passed data determines this behavior:</p>
+<ul>
+<li>A single FEDFrame (<a href="https://earnestt1234.github.io/fed3/fed3/core/fedframe.html#fed3.core.fedframe.FEDFrame"><code>fed3.core.fedframe.FEDFrame</code></a>) specifies a single line to be plotted (as shown above)</li>
+<li>A <code>list</code> (or other 1D collection) of FEDFrames will plot each as separate curves</li>
+<li>A <code>dict</code> is used to aggregate data.
+Within each dictionary, the key is the group label, and the value is the collection of FEDFrames belonging to that group.</li>
+</ul>
+<p>The following is an example of the second option - data for each FED are </p>
+<pre><code class="python">fig = fplot.line(feds=fedlist, y='pellets')
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_12_0.png"></p>
 <details class="source">
@@ -930,10 +937,11 @@ to all lines being plotted.</dd>
 <div class="toc">
 <ul>
 <li><a href="#plotting-with-fed3">Plotting with fed3</a><ul>
-<li><a href="#importing">Importing</a></li>
+<li><a href="#import-fed3plot">Import fed3.plot</a></li>
 <li><a href="#example-data">Example data</a></li>
 <li><a href="#basic-plotting">Basic plotting</a><ul>
-<li><a href="#line-plots">Line Plots</a></li>
+<li><a href="#the-hello-world-plot">The "Hello World" plot</a></li>
+<li><a href="#plotting-multiple-feds">Plotting multiple FEDs</a></li>
 </ul>
 </li>
 </ul>

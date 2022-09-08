@@ -44,7 +44,7 @@ fig = fplot.line(feds=f, y='pellets')
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_9_0.png)
+![png](plots_getting_started_files/plots_getting_started_9_0.png)
     
 
 
@@ -67,6 +67,6 @@ fig = fplot.line(feds=fedlist, y='pellets')
 
 
     
-![png](https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_12_0.png)
+![png](plots_getting_started_files/plots_getting_started_12_0.png)
     
 
