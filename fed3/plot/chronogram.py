@@ -19,8 +19,8 @@ from fed3.lightcycle import LIGHTCYCLE, time_to_float
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
-from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import (_get_return_value,
+from fed3.plot.helpers import (_get_most_recent_color,
+                               _get_return_value,
                                _parse_feds,
                                _raise_name_clash,
                                _process_plot_kwargs)
@@ -84,22 +84,22 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
-            # set keyword args passed
+            # set kwargs for main plot
             this_kwargs = {}
-            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(line_kwargs[col])
-
-            this_error_kwargs = {}
-            this_error_kwargs['color'] = COLORCYCLE[i]
-            this_error_kwargs['alpha'] = 0.3
-            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             y = np.append(y, y[0])
             x = np.linspace(0, 2*np.pi, len(y))
             ax.plot(x, y, **this_kwargs)
+
+            # set error_kwargs, grabbing most recent color
+            this_error_kwargs = {}
+            this_error_kwargs['color'] = _get_most_recent_color(ax=ax, kind='line')
+            this_error_kwargs['alpha'] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot error
             if not VARDATA.empty:
@@ -206,21 +206,20 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
-            # set keyword args passed
+            # set kwargs for main plot
             this_kwargs = {}
-            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(line_kwargs[col])
-
-            this_error_kwargs = {}
-            this_error_kwargs['color'] = COLORCYCLE[i]
-            this_error_kwargs['alpha'] = 0.3
-            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             x = AGGDATA.index
             ax.plot(x, y, **this_kwargs)
+
+            this_error_kwargs = {}
+            this_error_kwargs['color'] = _get_most_recent_color(ax=ax, kind='line')
+            this_error_kwargs['alpha'] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot error
             if not VARDATA.empty:

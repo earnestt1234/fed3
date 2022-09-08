@@ -19,9 +19,11 @@ from fed3.metrics.tables import (_create_group_metric_df,  _create_metric_df,)
 
 from fed3.metrics.core import get_metric
 
-from fed3.plot import COLORCYCLE
 from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
-from fed3.plot.helpers import (_get_return_value, _parse_feds, _process_plot_kwargs)
+from fed3.plot.helpers import (_get_most_recent_color,
+                               _get_return_value,
+                               _parse_feds,
+                               _process_plot_kwargs)
 from fed3.plot.shadedark import shade_darkness
 
 # ---- low level plotting
@@ -142,19 +144,20 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
-            # set keyword args passed
+            # set kwargs for main curve plot
             this_kwargs = {}
-            this_kwargs['color'] = COLORCYCLE[i]
             this_kwargs['label'] = col
             this_kwargs.update(plot_kwargs[col])
 
+            # plot
+            plotfunc(ax=ax, data=AGGDATA[col], **this_kwargs)
+
+            # update error_kwargs, grabbing most recent color
             this_error_kwargs = {}
-            this_error_kwargs['color'] = COLORCYCLE[i]
+            this_error_kwargs['color'] = _get_most_recent_color(ax=ax, kind=kind)
             this_error_kwargs['alpha'] = 0.3 if kind == 'line' else 1
             this_error_kwargs.update(error_kwargs[col])
 
-            # plot
-            plotfunc(ax=ax, data=AGGDATA[col], **this_kwargs)
 
             # plot error - errorbar / shade
             if not VARDATA.empty:

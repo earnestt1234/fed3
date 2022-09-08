@@ -17,8 +17,10 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import _bar_metric_df
 
-from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import _get_return_value, _parse_feds, _process_plot_kwargs
+from fed3.plot.helpers import (_get_most_recent_color,
+                               _get_return_value,
+                               _parse_feds,
+                               _process_plot_kwargs)
 
 def _assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0.75):
 
@@ -56,7 +58,7 @@ def _jitter_ys(ys, xcenter, spread):
     return xs
 
 def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
-        mixed_align='raise', show_individual=True, spread=0.3, positions=None,
+        mixed_align='raise', show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
@@ -116,28 +118,30 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
 
         for i, label in enumerate(DATA.index):
 
-            # set keyword args passed
-            this_bar_kwargs = {'color':COLORCYCLE[i],
-                               'label':label,
+            # set keyword args for main bar (first plotted)
+            this_bar_kwargs = {'label':label,
                                'zorder':0,
                                'width': bar_widths[i]}
             this_bar_kwargs.update(bar_kwargs[label])
 
+            # plot the bars
+            x = positions[i]
+            y = barvals[i]
+            ax.bar(x, y, **this_bar_kwargs)
+
+            # now set keyword args for error, grabbing most recent color
             this_error_kwargs = {'color':'grey',
                                  'ls':'none',
                                  'capsize':5,
                                  'zorder':2}
             this_error_kwargs.update(error_kwargs[label])
 
-            this_scatter_kwargs = {'color':COLORCYCLE[i],
+            this_scatter_kwargs = {'color':_get_most_recent_color(ax=ax, kind='bar'),
                                    'zorder':1,
                                    'edgecolor':'k'}
             this_scatter_kwargs.update(scatter_kwargs[label])
 
-            # plot the bars
-            x = positions[i]
-            y = barvals[i]
-            ax.bar(x, y, **this_bar_kwargs)
+
 
             # error bars
             if var is not None:
@@ -150,13 +154,13 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
                 xs = _jitter_ys(ys, x, w)
                 ax.scatter(xs, ys, **this_scatter_kwargs)
 
-    # format the axes
-    ax.set_ylabel(metricname)
-    ax.set_xticks(centers)
-    if position_labels is not None:
-        ax.set_xticklabels(position_labels)
+        # format the axes
+        ax.set_ylabel(metricname)
+        ax.set_xticks(centers)
+        if position_labels is not None:
+            ax.set_xticklabels(position_labels)
 
-    if legend:
-        ax.legend()
+        if legend:
+            ax.legend()
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)
