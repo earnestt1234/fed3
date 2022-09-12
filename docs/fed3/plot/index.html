@@ -30,14 +30,15 @@ Make an explicit call to import it:</p>
 import fed3.plot as fplot
 </code></pre>
 <p>For the purposes of this documentation, matplotlib will be used to set the default figure size.</p>
-<pre><code class="python">import matplotlib
-matplotlib.rcParams['figure.figsize'] = [7, 5]
-matplotlib.rcParams['figure.dpi'] = 100
+<pre><code class="python">import matplotlib.pyplot as plt
+
+plt.rcParams['figure.figsize'] = [7, 5]
+plt.rcParams['figure.dpi'] = 100
 </code></pre>
 <h2 id="example-data">Example data</h2>
 <p>The following sections will make use of some example data, provided by the <a href="https://earnestt1234.github.io/fed3/fed3/examples/index.html"><code>fed3.examples</code></a> package:</p>
-<pre><code class="python">fedlist = fed3.load_examples('justin')
-f = fedlist[0]
+<pre><code class="python">feds = fed3.load_examples('justin')
+f = feds[0]
 </code></pre>
 <h2 id="basic-plotting">Basic plotting</h2>
 <p>The following section will intoduce the basics of plotting with fed3.
@@ -46,9 +47,11 @@ f = fedlist[0]
 <p>The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
 This demonstrates the syntax that applies to almost all plotting functions: pass the data to be plotted as the first argument (the FEDFrame(s)) followed by any options.
 In this case, the <code>y</code> parameter specifies the variable to be plotted: </p>
-<pre><code class="python">fig = fplot.line(feds=f, y='pellets')
+<pre><code class="python">fplot.line(f, y='pellets')
+
+plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_9_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_9_0.png"></p>
 <p>Many other <code>y</code> values can be specified - they link to the functions defined within <a href="https://earnestt1234.github.io/fed3/fed3/metrics/index.html"><code>fed3.metrics</code></a>.
 Call <a href="https://earnestt1234.github.io/fed3/fed3/index.html#fed3.list_metrics"><code>fed3.list_metrics()</code></a> to see all available options.</p>
 <h3 id="plotting-multiple-feds">Plotting multiple FEDs</h3>
@@ -60,10 +63,72 @@ The structure of the passed data determines this behavior:</p>
 <li>A <code>dict</code> is used to aggregate data.
 Within each dictionary, the key is the group label, and the value is the collection of FEDFrames belonging to that group.</li>
 </ul>
-<p>The following is an example of the second option - data for each FED are </p>
-<pre><code class="python">fig = fplot.line(feds=fedlist, y='pellets')
+<h4 id="list-of-feds">List of FEDs</h4>
+<p>The following is an example of the second option - data for each FED are plotted as individual lines.</p>
+<pre><code class="python">fplot.line(feds, y='pellets')
+plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/plots_docs/img/plots_getting_started/plots_getting_started_12_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_12_0.png"></p>
+<h4 id="grouping">Grouping</h4>
+<p>To create a group average, pass a dictionary indicating group membership:</p>
+<pre><code class="python">groups = {'A' : feds[0:3], 'B' : feds[3:]}
+
+fplot.line(groups, y='pellets')
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_14_0.png"></p>
+<p>A few things have changed in the above plot:</p>
+<ul>
+<li><strong>There are two curves plotted only</strong>; one for each member of the dictionary passed.
+The curves correspond to the average pellet retrieval, and the shaded error bar correspond to the standard deviation.</li>
+<li><strong>The measure of pellet retrieval has changed from cumulative to absolute</strong>.
+I.e., the y-axis corresponds to the number of pellets retrieved (on average) within each temporal bin (by default, 1 hour).
+This is the default behavior of the <code>y='pellets'</code> metric (<a href="https://earnestt1234.github.io/fed3/fed3/metrics/core.html#fed3.metrics.core.pellets">see here</a>).</li>
+</ul>
+<p>There are options to tweak the behavior for grouping.
+<code>agg</code> sets the aggregation method for the grouped data, and <code>var</code> sets the measure of error.
+Furthermore, the <code>bins</code> parameter sets the resolution of temporal averaging:</p>
+<pre><code class="python">fplot.line(groups, y='pellets', bins='4H', agg='median')
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_16_0.png"></p>
+<h2 id="integrating-with-matplotlib">Integrating with matplotlib</h2>
+<p>Plotting with fed3 is all implemented through calls to <a href="https://matplotlib.org/">matplotlib</a>.
+Thus, you can make use of typical matplotlib routines to customize your plots:</p>
+<pre><code class="python">import matplotlib.pyplot as plt
+
+fplot.scatter(f, y='rt')
+
+plt.title('Retrieval Time for FED1')
+plt.xlabel('Custom X')
+plt.ylabel('Custom Y')
+plt.axhline(20, color='red', linestyle='dashed')
+
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_18_0.png"></p>
+<p>Most plots can also be directed to a given <a href="https://matplotlib.org/stable/api/axes_api.html">matplotlib axis</a>, using the <code>ax</code> argument:</p>
+<pre><code class="python"># create layout
+fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
+
+# plot
+fplot.line(f, y='pellets', ax=ax1)
+fplot.ipi(f, ax=ax2)
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_20_0.png"></p>
+<p>This can also be used to plot different metrics from one FED on the same axis.
+Note that the <code><a title="fed3.plot.shadedark" href="shadedark.html">fed3.plot.shadedark</a></code> option will be specified for both calls if not otherwise specified:</p>
+<pre><code class="python"># create figure and axis
+fig = plt.figure()
+ax = plt.subplot()
+
+fplot.line(f, y='left_pokes', ax=ax, shadedark=False, label='Left')
+fplot.line(f, y='right_pokes', ax=ax, label='Right')
+plt.ylabel('Pokes')
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_22_0.png"></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -74,15 +139,6 @@ Within each dictionary, the key is the group label, and the value is the collect
 .. include:: ../../docs/plots_getting_started.md
 &#39;&#39;&#39;
 
-# color cycle
-import matplotlib.pyplot as plt
-
-prop_cycle = plt.rcParams[&#39;axes.prop_cycle&#39;]
-COLORCYCLE = list(prop_cycle.by_key()[&#39;color&#39;])
-
-def set_colorcycle(colors):
-    COLORCYCLE[:] = list(colors)
-
 #imports for package namespace
 
 from .barchart import bar
@@ -90,15 +146,13 @@ from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
 from .ipi import (ipi)
 from .simple import (line, scatter)
 
-__all__ = [&#39;COLORCYCLE&#39;,
-           &#39;bar&#39;,
+__all__ = [&#39;bar&#39;,
            &#39;chronogram_circle&#39;,
            &#39;chronogram_line&#39;,
            &#39;chronogram_spiny&#39;,
            &#39;ipi&#39;,
            &#39;line&#39;,
-           &#39;scatter&#39;,
-           &#39;set_colorcycle&#39;]</code></pre>
+           &#39;scatter&#39;]</code></pre>
 </details>
 </section>
 <section>
@@ -140,7 +194,7 @@ __all__ = [&#39;COLORCYCLE&#39;,
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.bar"><code class="name flex">
-<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=True, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -149,12 +203,13 @@ __all__ = [&#39;COLORCYCLE&#39;,
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-        mixed_align=&#39;raise&#39;, show_individual=True, spread=0.3, positions=None,
+        mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
     feds_dict = _parse_feds(feds)
+    not_group = all(len(f) == 1 for f in feds_dict.values())
 
     # set the outputs
     FIG = None
@@ -209,28 +264,30 @@ __all__ = [&#39;COLORCYCLE&#39;,
 
         for i, label in enumerate(DATA.index):
 
-            # set keyword args passed
-            this_bar_kwargs = {&#39;color&#39;:COLORCYCLE[i],
-                               &#39;label&#39;:label,
+            # set keyword args for main bar (first plotted)
+            this_bar_kwargs = {&#39;label&#39;:label,
                                &#39;zorder&#39;:0,
                                &#39;width&#39;: bar_widths[i]}
             this_bar_kwargs.update(bar_kwargs[label])
 
+            # plot the bars
+            x = positions[i]
+            y = barvals[i]
+            ax.bar(x, y, **this_bar_kwargs)
+
+            # now set keyword args for error, grabbing most recent color
             this_error_kwargs = {&#39;color&#39;:&#39;grey&#39;,
                                  &#39;ls&#39;:&#39;none&#39;,
                                  &#39;capsize&#39;:5,
                                  &#39;zorder&#39;:2}
             this_error_kwargs.update(error_kwargs[label])
 
-            this_scatter_kwargs = {&#39;color&#39;:COLORCYCLE[i],
+            this_scatter_kwargs = {&#39;color&#39;:_get_most_recent_color(ax=ax, kind=&#39;bar&#39;),
                                    &#39;zorder&#39;:1,
                                    &#39;edgecolor&#39;:&#39;k&#39;}
             this_scatter_kwargs.update(scatter_kwargs[label])
 
-            # plot the bars
-            x = positions[i]
-            y = barvals[i]
-            ax.bar(x, y, **this_bar_kwargs)
+
 
             # error bars
             if var is not None:
@@ -243,14 +300,21 @@ __all__ = [&#39;COLORCYCLE&#39;,
                 xs = _jitter_ys(ys, x, w)
                 ax.scatter(xs, ys, **this_scatter_kwargs)
 
-    # format the axes
-    ax.set_ylabel(metricname)
-    ax.set_xticks(centers)
-    if position_labels is not None:
-        ax.set_xticklabels(position_labels)
+        # format the axes
+        ax.set_ylabel(metricname)
+        ax.set_xticks(centers)
+        if position_labels is not None:
+            ax.set_xticklabels(position_labels)
 
-    if legend:
-        ax.legend()
+        if legend:
+            ax.legend()
+
+    # output was weird for lists without this step -
+    # treated each single FED as group, and created
+    # a DF with lots of unhelpful info
+    if not_group:
+        DATA = DATA.drop(DATA.index, axis=1)
+        DATA = DATA.iloc[:, :-1]
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)</code></pre>
 </details>
@@ -323,22 +387,22 @@ __all__ = [&#39;COLORCYCLE&#39;,
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
-            # set keyword args passed
+            # set kwargs for main plot
             this_kwargs = {}
-            this_kwargs[&#39;color&#39;] = COLORCYCLE[i]
             this_kwargs[&#39;label&#39;] = col
             this_kwargs.update(line_kwargs[col])
-
-            this_error_kwargs = {}
-            this_error_kwargs[&#39;color&#39;] = COLORCYCLE[i]
-            this_error_kwargs[&#39;alpha&#39;] = 0.3
-            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             y = np.append(y, y[0])
             x = np.linspace(0, 2*np.pi, len(y))
             ax.plot(x, y, **this_kwargs)
+
+            # set error_kwargs, grabbing most recent color
+            this_error_kwargs = {}
+            this_error_kwargs[&#39;color&#39;] = _get_most_recent_color(ax=ax, kind=&#39;line&#39;)
+            this_error_kwargs[&#39;alpha&#39;] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot error
             if not VARDATA.empty:
@@ -455,21 +519,20 @@ __all__ = [&#39;COLORCYCLE&#39;,
         # plot group level data
         for i, col in enumerate(AGGDATA.columns):
 
-            # set keyword args passed
+            # set kwargs for main plot
             this_kwargs = {}
-            this_kwargs[&#39;color&#39;] = COLORCYCLE[i]
             this_kwargs[&#39;label&#39;] = col
             this_kwargs.update(line_kwargs[col])
-
-            this_error_kwargs = {}
-            this_error_kwargs[&#39;color&#39;] = COLORCYCLE[i]
-            this_error_kwargs[&#39;alpha&#39;] = 0.3
-            this_error_kwargs.update(error_kwargs[col])
 
             # plot
             y = AGGDATA[col]
             x = AGGDATA.index
             ax.plot(x, y, **this_kwargs)
+
+            this_error_kwargs = {}
+            this_error_kwargs[&#39;color&#39;] = _get_most_recent_color(ax=ax, kind=&#39;line&#39;)
+            this_error_kwargs[&#39;alpha&#39;] = 0.3
+            this_error_kwargs.update(error_kwargs[col])
 
             # plot error
             if not VARDATA.empty:
@@ -914,19 +977,6 @@ to all lines being plotted.</dd>
                         **kwargs)</code></pre>
 </details>
 </dd>
-<dt id="fed3.plot.set_colorcycle"><code class="name flex">
-<span>def <span class="ident">set_colorcycle</span></span>(<span>colors)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_colorcycle(colors):
-    COLORCYCLE[:] = list(colors)</code></pre>
-</details>
-</dd>
 </dl>
 </section>
 <section>
@@ -941,9 +991,14 @@ to all lines being plotted.</dd>
 <li><a href="#example-data">Example data</a></li>
 <li><a href="#basic-plotting">Basic plotting</a><ul>
 <li><a href="#the-hello-world-plot">The "Hello World" plot</a></li>
-<li><a href="#plotting-multiple-feds">Plotting multiple FEDs</a></li>
+<li><a href="#plotting-multiple-feds">Plotting multiple FEDs</a><ul>
+<li><a href="#list-of-feds">List of FEDs</a></li>
+<li><a href="#grouping">Grouping</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a href="#integrating-with-matplotlib">Integrating with matplotlib</a></li>
 </ul>
 </li>
 </ul>
@@ -973,7 +1028,6 @@ to all lines being plotted.</dd>
 <li><code><a title="fed3.plot.ipi" href="#fed3.plot.ipi">ipi</a></code></li>
 <li><code><a title="fed3.plot.line" href="#fed3.plot.line">line</a></code></li>
 <li><code><a title="fed3.plot.scatter" href="#fed3.plot.scatter">scatter</a></code></li>
-<li><code><a title="fed3.plot.set_colorcycle" href="#fed3.plot.set_colorcycle">set_colorcycle</a></code></li>
 </ul>
 </li>
 </ul>

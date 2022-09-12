@@ -27,8 +27,12 @@ def _plot_hist_data(ax, data, logx, kde, legend=True, **kwargs):
                    var_name="FED",
                    value_name='ipi').dropna()
 
-    sns.histplot(data=data, x='ipi', hue='FED', log_scale=logx, kde=kde,
-                 legend=legend, **kwargs)
+    a = sns.histplot(data=data, x='ipi', hue='FED', log_scale=logx, kde=kde,
+                     legend=legend, **kwargs)
+
+    # https://stackoverflow.com/a/64346251/13386979
+    if legend:
+        a.get_legend().set_title(None)
 
     return ax.get_figure()
 

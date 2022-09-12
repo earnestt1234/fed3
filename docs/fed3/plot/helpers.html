@@ -38,7 +38,25 @@ Created on Wed Feb  2 12:34:52 2022
 @author: earnestt1234
 &#34;&#34;&#34;
 
+from matplotlib import colors
 import pandas as pd
+
+def _get_most_recent_color(ax, kind=&#39;line&#39;, default=&#39;gray&#39;):
+
+    if kind == &#39;line&#39;:
+        color = ax.get_lines()[-1].get_color()
+    elif kind == &#39;scatter&#39;:
+        color = ax.collections[-1].get_facecolor()
+    elif kind == &#39;bar&#39;:
+        color = ax.patches[-1].get_facecolor()
+
+    try:
+        color = colors.to_hex(color)
+    except ValueError:
+        color = default
+
+    return color
+
 
 def _get_return_value(FIG, DATA, output):
 

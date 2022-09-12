@@ -47,8 +47,10 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import _bar_metric_df
 
-from fed3.plot import COLORCYCLE
-from fed3.plot.helpers import _get_return_value, _parse_feds, _process_plot_kwargs
+from fed3.plot.helpers import (_get_most_recent_color,
+                               _get_return_value,
+                               _parse_feds,
+                               _process_plot_kwargs)
 
 def _assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0.75):
 
@@ -86,12 +88,13 @@ def _jitter_ys(ys, xcenter, spread):
     return xs
 
 def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-        mixed_align=&#39;raise&#39;, show_individual=True, spread=0.3, positions=None,
+        mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
     feds_dict = _parse_feds(feds)
+    not_group = all(len(f) == 1 for f in feds_dict.values())
 
     # set the outputs
     FIG = None
@@ -146,28 +149,30 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 
         for i, label in enumerate(DATA.index):
 
-            # set keyword args passed
-            this_bar_kwargs = {&#39;color&#39;:COLORCYCLE[i],
-                               &#39;label&#39;:label,
+            # set keyword args for main bar (first plotted)
+            this_bar_kwargs = {&#39;label&#39;:label,
                                &#39;zorder&#39;:0,
                                &#39;width&#39;: bar_widths[i]}
             this_bar_kwargs.update(bar_kwargs[label])
 
+            # plot the bars
+            x = positions[i]
+            y = barvals[i]
+            ax.bar(x, y, **this_bar_kwargs)
+
+            # now set keyword args for error, grabbing most recent color
             this_error_kwargs = {&#39;color&#39;:&#39;grey&#39;,
                                  &#39;ls&#39;:&#39;none&#39;,
                                  &#39;capsize&#39;:5,
                                  &#39;zorder&#39;:2}
             this_error_kwargs.update(error_kwargs[label])
 
-            this_scatter_kwargs = {&#39;color&#39;:COLORCYCLE[i],
+            this_scatter_kwargs = {&#39;color&#39;:_get_most_recent_color(ax=ax, kind=&#39;bar&#39;),
                                    &#39;zorder&#39;:1,
                                    &#39;edgecolor&#39;:&#39;k&#39;}
             this_scatter_kwargs.update(scatter_kwargs[label])
 
-            # plot the bars
-            x = positions[i]
-            y = barvals[i]
-            ax.bar(x, y, **this_bar_kwargs)
+
 
             # error bars
             if var is not None:
@@ -180,14 +185,21 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
                 xs = _jitter_ys(ys, x, w)
                 ax.scatter(xs, ys, **this_scatter_kwargs)
 
-    # format the axes
-    ax.set_ylabel(metricname)
-    ax.set_xticks(centers)
-    if position_labels is not None:
-        ax.set_xticklabels(position_labels)
+        # format the axes
+        ax.set_ylabel(metricname)
+        ax.set_xticks(centers)
+        if position_labels is not None:
+            ax.set_xticklabels(position_labels)
 
-    if legend:
-        ax.legend()
+        if legend:
+            ax.legend()
+
+    # output was weird for lists without this step -
+    # treated each single FED as group, and created
+    # a DF with lots of unhelpful info
+    if not_group:
+        DATA = DATA.drop(DATA.index, axis=1)
+        DATA = DATA.iloc[:, :-1]
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)</code></pre>
 </details>
@@ -200,7 +212,7 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.barchart.bar"><code class="name flex">
-<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=True, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -209,12 +221,13 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-        mixed_align=&#39;raise&#39;, show_individual=True, spread=0.3, positions=None,
+        mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
     feds_dict = _parse_feds(feds)
+    not_group = all(len(f) == 1 for f in feds_dict.values())
 
     # set the outputs
     FIG = None
@@ -269,28 +282,30 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 
         for i, label in enumerate(DATA.index):
 
-            # set keyword args passed
-            this_bar_kwargs = {&#39;color&#39;:COLORCYCLE[i],
-                               &#39;label&#39;:label,
+            # set keyword args for main bar (first plotted)
+            this_bar_kwargs = {&#39;label&#39;:label,
                                &#39;zorder&#39;:0,
                                &#39;width&#39;: bar_widths[i]}
             this_bar_kwargs.update(bar_kwargs[label])
 
+            # plot the bars
+            x = positions[i]
+            y = barvals[i]
+            ax.bar(x, y, **this_bar_kwargs)
+
+            # now set keyword args for error, grabbing most recent color
             this_error_kwargs = {&#39;color&#39;:&#39;grey&#39;,
                                  &#39;ls&#39;:&#39;none&#39;,
                                  &#39;capsize&#39;:5,
                                  &#39;zorder&#39;:2}
             this_error_kwargs.update(error_kwargs[label])
 
-            this_scatter_kwargs = {&#39;color&#39;:COLORCYCLE[i],
+            this_scatter_kwargs = {&#39;color&#39;:_get_most_recent_color(ax=ax, kind=&#39;bar&#39;),
                                    &#39;zorder&#39;:1,
                                    &#39;edgecolor&#39;:&#39;k&#39;}
             this_scatter_kwargs.update(scatter_kwargs[label])
 
-            # plot the bars
-            x = positions[i]
-            y = barvals[i]
-            ax.bar(x, y, **this_bar_kwargs)
+
 
             # error bars
             if var is not None:
@@ -303,14 +318,21 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
                 xs = _jitter_ys(ys, x, w)
                 ax.scatter(xs, ys, **this_scatter_kwargs)
 
-    # format the axes
-    ax.set_ylabel(metricname)
-    ax.set_xticks(centers)
-    if position_labels is not None:
-        ax.set_xticklabels(position_labels)
+        # format the axes
+        ax.set_ylabel(metricname)
+        ax.set_xticks(centers)
+        if position_labels is not None:
+            ax.set_xticklabels(position_labels)
 
-    if legend:
-        ax.legend()
+        if legend:
+            ax.legend()
+
+    # output was weird for lists without this step -
+    # treated each single FED as group, and created
+    # a DF with lots of unhelpful info
+    if not_group:
+        DATA = DATA.drop(DATA.index, axis=1)
+        DATA = DATA.iloc[:, :-1]
 
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)</code></pre>
 </details>
