@@ -118,7 +118,7 @@ plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_20_0.png"></p>
 <p>This can also be used to plot different metrics from one FED on the same axis.
-Note that the <code><a title="fed3.plot.shadedark" href="shadedark.html">fed3.plot.shadedark</a></code> option will be specified for both calls if not otherwise specified:</p>
+Note that shading of dark periods will be repeated, if not specified:</p>
 <pre><code class="python"># create figure and axis
 fig = plt.figure()
 ax = plt.subplot()
@@ -129,6 +129,197 @@ plt.ylabel('Pokes')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_22_0.png"></p>
+<h3 id="matplotlib-keywords">matplotlib keywords</h3>
+<p>Most plots also accept keyword arguments which are passed to drawing functions from matplotlib, allowing for more specific customizations.
+For example, <code><a title="fed3.plot.line" href="#fed3.plot.line">line()</a></code> passes arguments to <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html"><code>matplotlib.axes.Axes.plot</code></a>:</p>
+<pre><code class="python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_24_0.png"></p>
+<p>When plotting multiple FEDs, specifying a single value for a keyword argument applies it to all FEDs.
+To specify particular styles for particular FEDs, dictionaries can be used:</p>
+<pre><code class="python">styles = {
+    feds[0].name : {'color': 'cyan'},
+    feds[1].name : {'color': 'yellow'},
+    feds[2].name : {'color': 'magenta'}
+}
+
+fplot.line(feds[0:3], y='correct_pokes', lw=3, line_kwargs=styles)
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_26_0.png"></p>
+<p>When plotting grouped data, the group names are used as keys instead of individual FED names.
+Also, depending on the plotting function, there may be specific arguments to manage keywords directed at different elements:</p>
+<pre><code class="python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
+           line_kwargs={'color':'black'}, error_kwargs={'color':'gray', 'alpha':0.8})
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_28_0.png"></p>
+<h2 id="getting-plot-data">Getting plot data</h2>
+<p>Plotting functions from fed3 can also be used as jumping off points for analyses or other plotting code.
+Most functions have an <code>output</code> argument which determines the object returned.
+Options are typically:</p>
+<ul>
+<li>'plot': the matplotlib Figure</li>
+<li>'data': a pandas DataFrame containing the data being plotted</li>
+<li>'dataonly': similar to 'data', except the plot is not created</li>
+<li>'both': a tuple of the figure and data</li>
+</ul>
+<pre><code class="python">data = fplot.line(feds, y='cumulative_left_percent', output='data')
+plt.show()
+display(data)
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_31_0.png"></p>
+<div>
+<style scoped>
+.dataframe tbody tr th:only-of-type {
+vertical-align: middle;
+}
+.dataframe tbody tr th {
+vertical-align: top;
+}
+.dataframe thead th {
+text-align: right;
+}
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>FED1Cat</th>
+<th>FED2Cat</th>
+<th>FED3Cat</th>
+<th>FED4Cat</th>
+<th>FED5Cat</th>
+<th>FED6Cat</th>
+<th>FED7Cat</th>
+</tr>
+<tr>
+<th>MM:DD:YYYY hh:mm:ss</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2021-01-29 15:59:31</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>100.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-01-29 15:59:53</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>100.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-01-29 16:01:01</th>
+<td>NaN</td>
+<td>100.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-01-29 16:01:52</th>
+<td>NaN</td>
+<td>100.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-01-29 16:02:50</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>100.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>...</th>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<th>2021-02-09 14:09:31</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>91.213188</td>
+</tr>
+<tr>
+<th>2021-02-09 14:12:00</th>
+<td>95.412602</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-02-09 14:13:56</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>91.214594</td>
+</tr>
+<tr>
+<th>2021-02-09 14:14:00</th>
+<td>95.413005</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2021-02-09 14:14:04</th>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>91.216000</td>
+</tr>
+</tbody>
+</table>
+<p>45488 rows × 7 columns</p>
+</div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -998,7 +1189,11 @@ to all lines being plotted.</dd>
 </li>
 </ul>
 </li>
-<li><a href="#integrating-with-matplotlib">Integrating with matplotlib</a></li>
+<li><a href="#integrating-with-matplotlib">Integrating with matplotlib</a><ul>
+<li><a href="#matplotlib-keywords">matplotlib keywords</a></li>
+</ul>
+</li>
+<li><a href="#getting-plot-data">Getting plot data</a></li>
 </ul>
 </li>
 </ul>
