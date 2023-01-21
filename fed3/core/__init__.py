@@ -7,7 +7,7 @@ Other functions are defined for manipulating FEDFrames.'''
 
 from .fedframe import FEDFrame
 
-from .fedfuncs import (align,
+from .fedfuncs import (as_aligned,
                        can_concat,
                        concat,
                        load,
@@ -15,7 +15,7 @@ from .fedfuncs import (align,
                        timecrop)
 
 __all__ = ['FEDFrame',
-           'align',
+           'as_aligned',
            'can_concat',
            'concat',
            'load',

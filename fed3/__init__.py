@@ -12,7 +12,7 @@ __warnings.formatwarning = __warning_on_one_line
 
 #imports for package namespace
 from fed3.core import (FEDFrame,
-                       align,
+                       as_aligned,
                        can_concat,
                        concat,
                        load,
@@ -27,12 +27,13 @@ from fed3.metrics import get_metric, list_metrics
 
 __all__ = [
     'FEDFrame',
-    'align',
+    'as_aligned',
     'can_concat',
     'concat',
     'load',
     'split',
     'timecrop',
+    'list_examples',
     'load_examples',
     'set_lightcycle',
     'get_metric',

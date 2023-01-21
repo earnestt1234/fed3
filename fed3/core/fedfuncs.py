@@ -6,7 +6,7 @@ Key operations include concatenating/splitting data, filtering, and
 temporal alignment.
 """
 
-__all__ = ['align',
+__all__ = ['as_aligned',
            'can_concat',
            'concat',
            'load',
@@ -22,7 +22,6 @@ import pandas as pd
 
 from fed3.core import FEDFrame
 
-ZERO_DATE = pd.Timestamp(year=2000, month=1, day=1)
 '''Date to use when aligning data based on elapsed time or time of day.'''
 
 def _split_handle_dates(dates):
@@ -37,78 +36,33 @@ def _split_handle_dates(dates):
 
     return dates
 
-def align(fed, alignment, inplace=False):
+def as_aligned(feds, alignment, inplace=False):
     '''
-    Shift the timestamps of a FEDFrame to allow for comparisons with other data
-    recorded at different times.
-
-    This is particularly intended for plotting with `fed3.plot`.  By default,
-    fed3 will plot fed3 data over the timestamps they were recorded.  For
-    temporal plots (with time on the x-axis), this disallows combination
-    (e.g. averaging) of data recorded on different dates.  To combine
-    these sorts of data, this function will shift the timestamps FEDFrames
-    to a common time.
-
-    There are three options for temporal alignment, 'datetime', 'time',
-    and 'elapsed'.  Note that these are the equivalents of 'shared date & time',
-    'shared time', and 'elapsed time' from FED3_Viz.
-
-    - 'datetime': Use the original recorded timestamps for plotting.  This is
-    the default behavior for plotting.  This is generally useful when
-    all your data were collected at the same time, when you want to show
-    exactly when data were recorded, or when working with plots where
-    the time of recording does not matter.
-    - 'time': Shift the timestamps so that they have the same start date,
-    but preserved time of day information.  This is useful for when you
-    want to compare or average data recorded on different dates, but want
-    to preserve circadian patterns.
-    - 'elapsed': Shift the timestamps such that the first recorded timestamp
-    is equal to a single, shared date.  This is useful for comparing data
-    relative to the initiation of the recording, and you do not need
-    to preserve circadian information.
-
-    Note that for 'elapsed' and 'time' alignment, the common date is set
-    by the `ZERO_DATE` variable in this module.
+    Helper function for setting the alignment of one or more FEDFrames.
+    See `fed3.core.fedframe.FEDFrame.set_alignment()` for more information.
 
     Parameters
     ----------
-    fed : fed3.FEDFrame
-        FED3 data.
-    alignment : str, 'datetime', 'time', or 'elapsed'
-        Option for temporal alignment.  See above for more information.
-    inplace : bool, optional
-        When True, the object passed to `fed` is modified.  When False (default),
-        a new FEDFrame is created.
-
-    Raises
-    ------
-    ValueError
-        Option for alignment not recognized.
+    feds : FEDFrame or collection of FEDFrames
+        FEDFrames to set alignment for
+    alignment: 'str':
+        Alignment string.
+    inplace : bool
+        When True, the FEDFrames are modified in place; otherwise,
+        new copies are created.
 
     Returns
     -------
-    newfed : fed3.FEDFrame
-        FED3 data with new alignment.
+    aligned or None
+        Either one FEDFrame or a list of FEDFrames with new alignment..
 
     '''
-    options = ['datetime', 'time', 'elapsed']
+    if isinstance(feds, FEDFrame):
+        aligned = feds.set_alignment(alignment, inplace=inplace)
+    else:
+        aligned = [f.set_alignment(alignment) for f in feds]
 
-    if alignment not in options:
-        raise ValueError(f'`alignment` must be one of {options}, '
-                         f'not "{alignment}"')
-    if alignment == 'datetime':
-        new_diff = fed._current_offset
-    elif alignment == 'time':
-        new_diff = fed.index[0].date() - ZERO_DATE.date()
-    elif alignment == 'elapsed':
-        new_diff = fed.index[0] - ZERO_DATE
-
-    newfed = fed if inplace else fed.copy()
-    newfed.index -= new_diff
-    newfed._current_offset -= new_diff
-    newfed._alignment = alignment
-
-    return newfed
+    return aligned
 
 def can_concat(feds):
     """

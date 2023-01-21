@@ -33,6 +33,8 @@ NEEDED_COLS = ['Pellet_Count',
                'Left_Poke_Count',
                'Right_Poke_Count',]
 
+ZERO_DATE = pd.Timestamp(year=2000, month=1, day=1)
+
 def _filterout(series, dropna=False, dropzero=False, deduplicate=False):
     """Helper func for condensing series returned from FEDFrame methods."""
 
@@ -621,6 +623,79 @@ class FEDFrame(pd.DataFrame):
             events = np.where(self._binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
 
+    def set_alignment(self, alignment, inplace=True):
+        '''
+        Shift the timestamps of a FEDFrame to allow for comparisons with other data
+        recorded at different times.
+
+        This is particularly intended for plotting with `fed3.plot`.  By default,
+        fed3 will plot fed3 data over the timestamps they were recorded.  For
+        temporal plots (with time on the x-axis), this disallows combination
+        (e.g. averaging) of data recorded on different dates.  To combine
+        these sorts of data, this function will shift the timestamps FEDFrames
+        to a common time.
+
+        There are three options for temporal alignment, 'datetime', 'time',
+        and 'elapsed'.  Note that these are the equivalents of 'shared date & time',
+        'shared time', and 'elapsed time' from FED3_Viz.
+
+        - 'datetime': Use the original recorded timestamps for plotting.  This is
+        the default behavior for plotting.  This is generally useful when
+        all your data were collected at the same time, when you want to show
+        exactly when data were recorded, or when working with plots where
+        the time of recording does not matter.
+        - 'time': Shift the timestamps so that they have the same start date,
+        but preserved time of day information.  This is useful for when you
+        want to compare or average data recorded on different dates, but want
+        to preserve circadian patterns.
+        - 'elapsed': Shift the timestamps such that the first recorded timestamp
+        is equal to a single, shared date.  This is useful for comparing data
+        relative to the initiation of the recording, and you do not need
+        to preserve circadian information.
+
+        Note that for 'elapsed' and 'time' alignment, the common date is set
+        by the `ZERO_DATE` variable in this module.
+
+        Parameters
+        ----------
+        alignment : str, 'datetime', 'time', or 'elapsed'
+            Option for temporal alignment.  See above for more information.
+        inplace : bool, optional
+            When True, the current FEDFrame is modified.  Else, a copy is
+            returned with the new alignment.
+
+        Raises
+        ------
+        ValueError
+            Option for alignment not recognized.
+
+        Returns
+        -------
+        newfed : fed3.FEDFrame
+            FED3 data with new alignment.
+
+        '''
+        options = ['datetime', 'time', 'elapsed']
+
+        if alignment not in options:
+            raise ValueError(f'`alignment` must be one of {options}, '
+                             f'not "{alignment}"')
+        if alignment == 'datetime':
+            new_diff = self._current_offset
+        elif alignment == 'time':
+            new_diff = self.index[0].date() - ZERO_DATE.date()
+        elif alignment == 'elapsed':
+            new_diff = self.index[0] - ZERO_DATE
+
+        newfed = self if inplace else self.copy()
+        newfed.index -= new_diff
+        newfed._current_offset -= new_diff
+        newfed._alignment = alignment
+
+        return newfed
+
     # ---- Aliases
     ipi = interpellet_intervals
+
+
 

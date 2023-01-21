@@ -39,7 +39,7 @@ Key operations include concatenating/splitting data, filtering, and
 temporal alignment.
 &#34;&#34;&#34;
 
-__all__ = [&#39;align&#39;,
+__all__ = [&#39;as_aligned&#39;,
            &#39;can_concat&#39;,
            &#39;concat&#39;,
            &#39;load&#39;,
@@ -55,7 +55,6 @@ import pandas as pd
 
 from fed3.core import FEDFrame
 
-ZERO_DATE = pd.Timestamp(year=2000, month=1, day=1)
 &#39;&#39;&#39;Date to use when aligning data based on elapsed time or time of day.&#39;&#39;&#39;
 
 def _split_handle_dates(dates):
@@ -70,78 +69,33 @@ def _split_handle_dates(dates):
 
     return dates
 
-def align(fed, alignment, inplace=False):
+def as_aligned(feds, alignment, inplace=False):
     &#39;&#39;&#39;
-    Shift the timestamps of a FEDFrame to allow for comparisons with other data
-    recorded at different times.
-
-    This is particularly intended for plotting with `fed3.plot`.  By default,
-    fed3 will plot fed3 data over the timestamps they were recorded.  For
-    temporal plots (with time on the x-axis), this disallows combination
-    (e.g. averaging) of data recorded on different dates.  To combine
-    these sorts of data, this function will shift the timestamps FEDFrames
-    to a common time.
-
-    There are three options for temporal alignment, &#39;datetime&#39;, &#39;time&#39;,
-    and &#39;elapsed&#39;.  Note that these are the equivalents of &#39;shared date &amp; time&#39;,
-    &#39;shared time&#39;, and &#39;elapsed time&#39; from FED3_Viz.
-
-    - &#39;datetime&#39;: Use the original recorded timestamps for plotting.  This is
-    the default behavior for plotting.  This is generally useful when
-    all your data were collected at the same time, when you want to show
-    exactly when data were recorded, or when working with plots where
-    the time of recording does not matter.
-    - &#39;time&#39;: Shift the timestamps so that they have the same start date,
-    but preserved time of day information.  This is useful for when you
-    want to compare or average data recorded on different dates, but want
-    to preserve circadian patterns.
-    - &#39;elapsed&#39;: Shift the timestamps such that the first recorded timestamp
-    is equal to a single, shared date.  This is useful for comparing data
-    relative to the initiation of the recording, and you do not need
-    to preserve circadian information.
-
-    Note that for &#39;elapsed&#39; and &#39;time&#39; alignment, the common date is set
-    by the `ZERO_DATE` variable in this module.
+    Helper function for setting the alignment of one or more FEDFrames.
+    See `fed3.core.fedframe.FEDFrame.set_alignment()` for more information.
 
     Parameters
     ----------
-    fed : fed3.FEDFrame
-        FED3 data.
-    alignment : str, &#39;datetime&#39;, &#39;time&#39;, or &#39;elapsed&#39;
-        Option for temporal alignment.  See above for more information.
-    inplace : bool, optional
-        When True, the object passed to `fed` is modified.  When False (default),
-        a new FEDFrame is created.
-
-    Raises
-    ------
-    ValueError
-        Option for alignment not recognized.
+    feds : FEDFrame or collection of FEDFrames
+        FEDFrames to set alignment for
+    alignment: &#39;str&#39;:
+        Alignment string.
+    inplace : bool
+        When True, the FEDFrames are modified in place; otherwise,
+        new copies are created.
 
     Returns
     -------
-    newfed : fed3.FEDFrame
-        FED3 data with new alignment.
+    aligned or None
+        Either one FEDFrame or a list of FEDFrames with new alignment..
 
     &#39;&#39;&#39;
-    options = [&#39;datetime&#39;, &#39;time&#39;, &#39;elapsed&#39;]
+    if isinstance(feds, FEDFrame):
+        aligned = feds.set_alignment(alignment, inplace=inplace)
+    else:
+        aligned = [f.set_alignment(alignment) for f in feds]
 
-    if alignment not in options:
-        raise ValueError(f&#39;`alignment` must be one of {options}, &#39;
-                         f&#39;not &#34;{alignment}&#34;&#39;)
-    if alignment == &#39;datetime&#39;:
-        new_diff = fed._current_offset
-    elif alignment == &#39;time&#39;:
-        new_diff = fed.index[0].date() - ZERO_DATE.date()
-    elif alignment == &#39;elapsed&#39;:
-        new_diff = fed.index[0] - ZERO_DATE
-
-    newfed = fed if inplace else fed.copy()
-    newfed.index -= new_diff
-    newfed._current_offset -= new_diff
-    newfed._alignment = alignment
-
-    return newfed
+    return aligned
 
 def can_concat(feds):
     &#34;&#34;&#34;
@@ -429,144 +383,58 @@ def timecrop(fed, start, end,
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="fed3.core.fedfuncs.align"><code class="name flex">
-<span>def <span class="ident">align</span></span>(<span>fed, alignment, inplace=False)</span>
+<dt id="fed3.core.fedfuncs.as_aligned"><code class="name flex">
+<span>def <span class="ident">as_aligned</span></span>(<span>feds, alignment, inplace=False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Shift the timestamps of a FEDFrame to allow for comparisons with other data
-recorded at different times.</p>
-<p>This is particularly intended for plotting with <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a></code>.
-By default,
-fed3 will plot fed3 data over the timestamps they were recorded.
-For
-temporal plots (with time on the x-axis), this disallows combination
-(e.g. averaging) of data recorded on different dates.
-To combine
-these sorts of data, this function will shift the timestamps FEDFrames
-to a common time.</p>
-<p>There are three options for temporal alignment, 'datetime', 'time',
-and 'elapsed'.
-Note that these are the equivalents of 'shared date &amp; time',
-'shared time', and 'elapsed time' from FED3_Viz.</p>
-<ul>
-<li>'datetime': Use the original recorded timestamps for plotting.
-This is
-the default behavior for plotting.
-This is generally useful when
-all your data were collected at the same time, when you want to show
-exactly when data were recorded, or when working with plots where
-the time of recording does not matter.</li>
-<li>'time': Shift the timestamps so that they have the same start date,
-but preserved time of day information.
-This is useful for when you
-want to compare or average data recorded on different dates, but want
-to preserve circadian patterns.</li>
-<li>'elapsed': Shift the timestamps such that the first recorded timestamp
-is equal to a single, shared date.
-This is useful for comparing data
-relative to the initiation of the recording, and you do not need
-to preserve circadian information.</li>
-</ul>
-<p>Note that for 'elapsed' and 'time' alignment, the common date is set
-by the <code>ZERO_DATE</code> variable in this module.</p>
+<div class="desc"><p>Helper function for setting the alignment of one or more FEDFrames.
+See <code><a title="fed3.core.fedframe.FEDFrame.set_alignment" href="fedframe.html#fed3.core.fedframe.FEDFrame.set_alignment">FEDFrame.set_alignment()</a></code> for more information.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>fed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="../index.html#fed3.FEDFrame">FEDFrame</a></code></dt>
-<dd>FED3 data.</dd>
-<dt><strong><code>alignment</code></strong> :&ensp;<code>str, 'datetime', 'time',</code> or <code>'elapsed'</code></dt>
-<dd>Option for temporal alignment.
-See above for more information.</dd>
-<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>When True, the object passed to <code>fed</code> is modified.
-When False (default),
-a new FEDFrame is created.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>ValueError</code></dt>
-<dd>Option for alignment not recognized.</dd>
+<dt><strong><code>feds</code></strong> :&ensp;<code>FEDFrame</code> or <code>collection</code> of <code>FEDFrames</code></dt>
+<dd>FEDFrames to set alignment for</dd>
+<dt><strong><code>alignment</code></strong> :&ensp;<code>'str':</code></dt>
+<dd>Alignment string.</dd>
+<dt><strong><code>inplace</code></strong> :&ensp;<code>bool</code></dt>
+<dd>When True, the FEDFrames are modified in place; otherwise,
+new copies are created.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>newfed</code></strong> :&ensp;<code><a title="fed3.FEDFrame" href="../index.html#fed3.FEDFrame">FEDFrame</a></code></dt>
-<dd>FED3 data with new alignment.</dd>
+<dt><code>aligned</code> or <code>None</code></dt>
+<dd>Either one FEDFrame or a list of FEDFrames with new alignment..</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def align(fed, alignment, inplace=False):
+<pre><code class="python">def as_aligned(feds, alignment, inplace=False):
     &#39;&#39;&#39;
-    Shift the timestamps of a FEDFrame to allow for comparisons with other data
-    recorded at different times.
-
-    This is particularly intended for plotting with `fed3.plot`.  By default,
-    fed3 will plot fed3 data over the timestamps they were recorded.  For
-    temporal plots (with time on the x-axis), this disallows combination
-    (e.g. averaging) of data recorded on different dates.  To combine
-    these sorts of data, this function will shift the timestamps FEDFrames
-    to a common time.
-
-    There are three options for temporal alignment, &#39;datetime&#39;, &#39;time&#39;,
-    and &#39;elapsed&#39;.  Note that these are the equivalents of &#39;shared date &amp; time&#39;,
-    &#39;shared time&#39;, and &#39;elapsed time&#39; from FED3_Viz.
-
-    - &#39;datetime&#39;: Use the original recorded timestamps for plotting.  This is
-    the default behavior for plotting.  This is generally useful when
-    all your data were collected at the same time, when you want to show
-    exactly when data were recorded, or when working with plots where
-    the time of recording does not matter.
-    - &#39;time&#39;: Shift the timestamps so that they have the same start date,
-    but preserved time of day information.  This is useful for when you
-    want to compare or average data recorded on different dates, but want
-    to preserve circadian patterns.
-    - &#39;elapsed&#39;: Shift the timestamps such that the first recorded timestamp
-    is equal to a single, shared date.  This is useful for comparing data
-    relative to the initiation of the recording, and you do not need
-    to preserve circadian information.
-
-    Note that for &#39;elapsed&#39; and &#39;time&#39; alignment, the common date is set
-    by the `ZERO_DATE` variable in this module.
+    Helper function for setting the alignment of one or more FEDFrames.
+    See `fed3.core.fedframe.FEDFrame.set_alignment()` for more information.
 
     Parameters
     ----------
-    fed : fed3.FEDFrame
-        FED3 data.
-    alignment : str, &#39;datetime&#39;, &#39;time&#39;, or &#39;elapsed&#39;
-        Option for temporal alignment.  See above for more information.
-    inplace : bool, optional
-        When True, the object passed to `fed` is modified.  When False (default),
-        a new FEDFrame is created.
-
-    Raises
-    ------
-    ValueError
-        Option for alignment not recognized.
+    feds : FEDFrame or collection of FEDFrames
+        FEDFrames to set alignment for
+    alignment: &#39;str&#39;:
+        Alignment string.
+    inplace : bool
+        When True, the FEDFrames are modified in place; otherwise,
+        new copies are created.
 
     Returns
     -------
-    newfed : fed3.FEDFrame
-        FED3 data with new alignment.
+    aligned or None
+        Either one FEDFrame or a list of FEDFrames with new alignment..
 
     &#39;&#39;&#39;
-    options = [&#39;datetime&#39;, &#39;time&#39;, &#39;elapsed&#39;]
+    if isinstance(feds, FEDFrame):
+        aligned = feds.set_alignment(alignment, inplace=inplace)
+    else:
+        aligned = [f.set_alignment(alignment) for f in feds]
 
-    if alignment not in options:
-        raise ValueError(f&#39;`alignment` must be one of {options}, &#39;
-                         f&#39;not &#34;{alignment}&#34;&#39;)
-    if alignment == &#39;datetime&#39;:
-        new_diff = fed._current_offset
-    elif alignment == &#39;time&#39;:
-        new_diff = fed.index[0].date() - ZERO_DATE.date()
-    elif alignment == &#39;elapsed&#39;:
-        new_diff = fed.index[0] - ZERO_DATE
-
-    newfed = fed if inplace else fed.copy()
-    newfed.index -= new_diff
-    newfed._current_offset -= new_diff
-    newfed._alignment = alignment
-
-    return newfed</code></pre>
+    return aligned</code></pre>
 </details>
 </dd>
 <dt id="fed3.core.fedfuncs.can_concat"><code class="name flex">
@@ -793,7 +661,7 @@ See
 <span>def <span class="ident">screen_mixed_alignment</span></span>(<span>feds, option='raise')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Check FEDFrames for having mixed alignment styles (see <code><a title="fed3.core.fedfuncs.align" href="#fed3.core.fedfuncs.align">align()</a></code>).
+<div class="desc"><p>Check FEDFrames for having mixed alignment styles (see <code>align()</code>).
 This is called by most plots witin <code><a title="fed3.plot" href="../plot/index.html">fed3.plot</a></code> for the <code>mixed_align</code>
 parameter.</p>
 <h2 id="parameters">Parameters</h2>
@@ -1026,7 +894,7 @@ The default is ('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count').</dd>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="fed3.core.fedfuncs.align" href="#fed3.core.fedfuncs.align">align</a></code></li>
+<li><code><a title="fed3.core.fedfuncs.as_aligned" href="#fed3.core.fedfuncs.as_aligned">as_aligned</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.can_concat" href="#fed3.core.fedfuncs.can_concat">can_concat</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.concat" href="#fed3.core.fedfuncs.concat">concat</a></code></li>
 <li><code><a title="fed3.core.fedfuncs.load" href="#fed3.core.fedfuncs.load">load</a></code></li>
