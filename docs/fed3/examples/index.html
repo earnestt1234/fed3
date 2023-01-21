@@ -32,18 +32,63 @@ bundled with some CSV files of FED3 data.
 These can be loaded via
 fed3, returning FEDFrames.</p>
 <p>fed3 uses this package to create reproducible examples for the documentation.</p>
+<p><a href="https://github.com/KravitzLabDevices/FED3/tree/main/ExampleData">Most data &amp; descriptions are taken directly from the FED3 GitHub repo</a>.</p>
 <p>Data included in the package are all intended to be taken from real fed3
 experiments.
 If you have data you would like to contribute as an example,
 please raise an issue on GitHub.</p>
 <h2 id="datasets">Datasets</h2>
-<ul>
-<li><code>justin</code>: Seven FEDs with data collected over a long-term experiment (10 days).
+<h3 id="closed-economy-progressive-ratio-1-closed_economy_pr1">Closed Economy, Progressive Ratio 1 (<code>closed_economy_pr1</code>)</h3>
+<p>These are example FED3 data files collected from mice performing an PR1 task in
+which the number of required pokes increments each time they earn a pellet.
+For instance, the first pellet requires 1 poke, the second 2 pokes, etc.
+The trick is that if a mouse does not earn a pellet for 30 minutes the
+requirement resets.
+This allows mice to run on this task for days,
+without the requirement becoming too challenging for them to obtain their
+daily food requirements.</p>
+<h3 id="justins-data-justin">Justin's Data (<code>justin</code>)</h3>
+<p>Seven FEDs with data collected over a long-term experiment (10 days).
 These data represent FED3 data from multiple recordings, already concatenated.
 Data were collected in "ProRat2" mode.
 The data show pellet
-retrieval in response to an active left poke.</li>
-</ul>
+retrieval in response to an active left poke.</p>
+<h3 id="fixed-ratio-1-fr1">Fixed Ratio 1 (<code>fr1</code>)</h3>
+<p>These are example FED3 data files collected from mice performing an FR1 task for 12-24 hours</p>
+<h3 id="fixed-ratio-1-with-delay-fr1_4s_delay">Fixed Ratio 1 With Delay (<code>fr1_4s_delay</code>)</h3>
+<p>These are example FED3 data files collected from mice performing an FR1 task
+with a 4s delay between nosepoke and pellet delivery.
+This task is useful for
+synchronizing with brain recordings, to separate the nosepoke from the pellet
+retrievals to analyze brain activity around each.</p>
+<h3 id="dual-fixed-ratio-1-fr1_dual">Dual Fixed Ratio 1 (<code>fr1_dual</code>)</h3>
+<p>These are example FED3 data files collected from mice performing an FR1 task in
+which both right or left pokes are rewarded with a pellet.</p>
+<h3 id="optogenetic-self-stim-optogenetic_self_stim">Optogenetic Self Stim (<code>optogenetic_self_stim</code>)</h3>
+<p>These are example FED3 data files collected from mice performing an FR1 task
+for optogenetic stimulation. Trials were 1-2 hours in length, this is all from
+the same mouse trained across 6 sessions.
+The mouse acquires a preference for
+stimulation on the 4th session.</p>
+<h3 id="reversal-task-reversal_task">Reversal Task (<code>reversal_task</code>)</h3>
+<p>These are example FED3 data files collected from mice performing a reversal
+learning task.
+The rewarded nosepoke switches each time the mice earn 40
+pellets.
+For instance, the program starts with the Left poke delivering a
+pellet, but after the mouse earns 40 pellets it switches to the Right poke,
+after 80 pellets back to the Left poke, etc. Task was run for 4-5 days,
+resulting in several hundred earned pellets</p>
+<h3 id="punished-reversal-task-reversal_task_punished">Punished Reversal Task (<code>reversal_task_punished</code>)</h3>
+<p>These are example FED3 data files collected from mice performing a reversal
+learning task with a punishment.
+The punishment is that if an incorrect poke
+is made, the FED3 will enter a timeout for 30 seconds. The rewarded nosepoke
+switches each time the mice earn 40 pellets.
+For instance, the program starts
+with the Left poke delivering a pellet, but after the mouse earns 40 pellets it
+switches to the Right poke, after 80 pellets back to the Left poke, etc. Task
+was run for 4-5 days, resulting in several hundred earned pellets</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -55,6 +100,8 @@ fed3, returning FEDFrames.
 
 fed3 uses this package to create reproducible examples for the documentation.
 
+[Most data &amp; descriptions are taken directly from the FED3 GitHub repo](https://github.com/KravitzLabDevices/FED3/tree/main/ExampleData).
+
 Data included in the package are all intended to be taken from real fed3
 experiments.  If you have data you would like to contribute as an example,
 please raise an issue on GitHub.
@@ -62,10 +109,59 @@ please raise an issue on GitHub.
 Datasets
 -----
 
-- `justin`: Seven FEDs with data collected over a long-term experiment (10 days).
+### Closed Economy, Progressive Ratio 1 (`closed_economy_pr1`)
+These are example FED3 data files collected from mice performing an PR1 task in
+which the number of required pokes increments each time they earn a pellet.
+For instance, the first pellet requires 1 poke, the second 2 pokes, etc.
+The trick is that if a mouse does not earn a pellet for 30 minutes the
+requirement resets.  This allows mice to run on this task for days,
+without the requirement becoming too challenging for them to obtain their
+daily food requirements.
+
+### Justin&#39;s Data (`justin`)
+Seven FEDs with data collected over a long-term experiment (10 days).
 These data represent FED3 data from multiple recordings, already concatenated.
 Data were collected in &#34;ProRat2&#34; mode.  The data show pellet
-retrieval in response to an active left poke.  &#39;&#39;&#39;
+retrieval in response to an active left poke.
+
+### Fixed Ratio 1 (`fr1`)
+These are example FED3 data files collected from mice performing an FR1 task for 12-24 hours
+
+### Fixed Ratio 1 With Delay (`fr1_4s_delay`)
+These are example FED3 data files collected from mice performing an FR1 task
+with a 4s delay between nosepoke and pellet delivery.  This task is useful for
+synchronizing with brain recordings, to separate the nosepoke from the pellet
+retrievals to analyze brain activity around each.
+
+### Dual Fixed Ratio 1 (`fr1_dual`)
+These are example FED3 data files collected from mice performing an FR1 task in
+which both right or left pokes are rewarded with a pellet.
+
+### Optogenetic Self Stim (`optogenetic_self_stim`)
+These are example FED3 data files collected from mice performing an FR1 task
+for optogenetic stimulation. Trials were 1-2 hours in length, this is all from
+the same mouse trained across 6 sessions.  The mouse acquires a preference for
+stimulation on the 4th session.
+
+### Reversal Task (`reversal_task`)
+These are example FED3 data files collected from mice performing a reversal
+learning task.  The rewarded nosepoke switches each time the mice earn 40
+pellets.  For instance, the program starts with the Left poke delivering a
+pellet, but after the mouse earns 40 pellets it switches to the Right poke,
+after 80 pellets back to the Left poke, etc. Task was run for 4-5 days,
+resulting in several hundred earned pellets
+
+### Punished Reversal Task (`reversal_task_punished`)
+These are example FED3 data files collected from mice performing a reversal
+learning task with a punishment.  The punishment is that if an incorrect poke
+is made, the FED3 will enter a timeout for 30 seconds. The rewarded nosepoke
+switches each time the mice earn 40 pellets.  For instance, the program starts
+with the Left poke delivering a pellet, but after the mouse earns 40 pellets it
+switches to the Right poke, after 80 pellets back to the Left poke, etc. Task
+was run for 4-5 days, resulting in several hundred earned pellets
+
+&#39;&#39;&#39;
+
 
 __all__ = [&#39;list_examples&#39;, &#39;load_examples&#39;]
 
@@ -90,9 +186,16 @@ def list_examples():
         All avaiable keys.
     &#39;&#39;&#39;
 
-    return list(DATA.keys())
+    examples = []
+    for folder in sorted(os.listdir(DATADIR)):
+        fullfolder = os.path.join(DATADIR, folder)
+        if not os.path.isdir(fullfolder): continue;
+        examples.append(folder)
 
-def load_examples(key):
+    return examples
+
+
+def load_examples(key, verbose=False):
     &#39;&#39;&#39;
     Load the example data linked to a given key.
 
@@ -100,6 +203,8 @@ def load_examples(key):
     ----------
     key : str
         Example to load.
+    verbose : bool
+        Print status while loading
 
     Raises
     ------
@@ -112,38 +217,50 @@ def load_examples(key):
         FED3 example data, as a list of FEDFrame objects.
 
     &#39;&#39;&#39;
-
-    try:
-        return DATA[key]
-    except KeyError:
-        raise KeyError(f&#34;No matching key &#39;{key}&#39;; options are: &#34;
-                       f&#34;{list(DATA.keys())}&#34;)
+    vprint = print if verbose else lambda *args, **kwargs: None
 
 
-def _build_examples():
-    &#39;&#39;&#39;Load all the FED3 example data.  To be called on start up.&#39;&#39;&#39;
-    if not os.path.isdir(DATADIR):
-        warnings.warn(&#34;Unable to find fed3 example data directory; unable &#34;
-                      &#34;to load example data.&#34;, RuntimeWarning)
-        sys.exit()
+    example_path = os.path.join(DATADIR, key)
+    examples = []
+    vprint()
+    vprint(f&#39;Loading from data directory: {DATADIR}&#39;)
+    vprint()
+    vprint(f&#39;Example folder: {example_path}&#39;)
 
-    # main loop for loading data
-    for folder in sorted(os.listdir(DATADIR)):
+    vprint()
+    for file in sorted(os.listdir(example_path)):
+        name, ext = os.path.splitext(file)
+        if ext.lower() not in [&#39;.csv&#39;, &#39;.xlsx&#39;]: continue;
+        vprint(f&#39; - {file}...&#39;)
+        fullfile = os.path.join(example_path, file)
+        examples.append(load(fullfile, deduplicate_index=&#39;keep_first&#39;))
 
-        fullfolder = os.path.join(DATADIR, folder)
-        if not os.path.isdir(fullfolder): continue;
-        l = []
+    return examples
 
-        for file in sorted(os.listdir(fullfolder)):
+# def _build_examples():
+#     &#39;&#39;&#39;Load all the FED3 example data.  To be called on start up.&#39;&#39;&#39;
+#     if not os.path.isdir(DATADIR):
+#         warnings.warn(&#34;Unable to find fed3 example data directory; unable &#34;
+#                       &#34;to load example data.&#34;, RuntimeWarning)
+#         sys.exit()
 
-            name, ext = os.path.splitext(file)
-            if ext not in [&#39;.csv&#39;, &#39;.xlsx&#39;]: continue;
-            fullfile = os.path.join(fullfolder, file)
-            l.append(load(fullfile, deduplicate_index=&#39;keep_first&#39;))
+#     # main loop for loading data
+#     for folder in sorted(os.listdir(DATADIR)):
 
-        DATA[folder] = l
+#         fullfolder = os.path.join(DATADIR, folder)
+#         if not os.path.isdir(fullfolder): continue;
+#         l = []
 
-_build_examples()</code></pre>
+#         for file in sorted(os.listdir(fullfolder)):
+
+#             name, ext = os.path.splitext(file)
+#             if ext not in [&#39;.csv&#39;, &#39;.xlsx&#39;]: continue;
+#             fullfile = os.path.join(fullfolder, file)
+#             l.append(load(fullfile, deduplicate_index=&#39;keep_first&#39;))
+
+#         DATA[folder] = l
+
+# _build_examples()</code></pre>
 </details>
 </section>
 <section>
@@ -179,11 +296,17 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
         All avaiable keys.
     &#39;&#39;&#39;
 
-    return list(DATA.keys())</code></pre>
+    examples = []
+    for folder in sorted(os.listdir(DATADIR)):
+        fullfolder = os.path.join(DATADIR, folder)
+        if not os.path.isdir(fullfolder): continue;
+        examples.append(folder)
+
+    return examples</code></pre>
 </details>
 </dd>
 <dt id="fed3.examples.load_examples"><code class="name flex">
-<span>def <span class="ident">load_examples</span></span>(<span>key)</span>
+<span>def <span class="ident">load_examples</span></span>(<span>key, verbose=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Load the example data linked to a given key.</p>
@@ -191,6 +314,8 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
 <dl>
 <dt><strong><code>key</code></strong> :&ensp;<code>str</code></dt>
 <dd>Example to load.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Print status while loading</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -206,7 +331,7 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def load_examples(key):
+<pre><code class="python">def load_examples(key, verbose=False):
     &#39;&#39;&#39;
     Load the example data linked to a given key.
 
@@ -214,6 +339,8 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
     ----------
     key : str
         Example to load.
+    verbose : bool
+        Print status while loading
 
     Raises
     ------
@@ -226,12 +353,25 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
         FED3 example data, as a list of FEDFrame objects.
 
     &#39;&#39;&#39;
+    vprint = print if verbose else lambda *args, **kwargs: None
 
-    try:
-        return DATA[key]
-    except KeyError:
-        raise KeyError(f&#34;No matching key &#39;{key}&#39;; options are: &#34;
-                       f&#34;{list(DATA.keys())}&#34;)</code></pre>
+
+    example_path = os.path.join(DATADIR, key)
+    examples = []
+    vprint()
+    vprint(f&#39;Loading from data directory: {DATADIR}&#39;)
+    vprint()
+    vprint(f&#39;Example folder: {example_path}&#39;)
+
+    vprint()
+    for file in sorted(os.listdir(example_path)):
+        name, ext = os.path.splitext(file)
+        if ext.lower() not in [&#39;.csv&#39;, &#39;.xlsx&#39;]: continue;
+        vprint(f&#39; - {file}...&#39;)
+        fullfile = os.path.join(example_path, file)
+        examples.append(load(fullfile, deduplicate_index=&#39;keep_first&#39;))
+
+    return examples</code></pre>
 </details>
 </dd>
 </dl>
@@ -243,7 +383,17 @@ keys which can be provided to <code><a title="fed3.examples.load_examples" href=
 <h1>Index</h1>
 <div class="toc">
 <ul>
-<li><a href="#datasets">Datasets</a></li>
+<li><a href="#datasets">Datasets</a><ul>
+<li><a href="#closed-economy-progressive-ratio-1-closed_economy_pr1">Closed Economy, Progressive Ratio 1 (closed_economy_pr1)</a></li>
+<li><a href="#justins-data-justin">Justin's Data (justin)</a></li>
+<li><a href="#fixed-ratio-1-fr1">Fixed Ratio 1 (fr1)</a></li>
+<li><a href="#fixed-ratio-1-with-delay-fr1_4s_delay">Fixed Ratio 1 With Delay (fr1_4s_delay)</a></li>
+<li><a href="#dual-fixed-ratio-1-fr1_dual">Dual Fixed Ratio 1 (fr1_dual)</a></li>
+<li><a href="#optogenetic-self-stim-optogenetic_self_stim">Optogenetic Self Stim (optogenetic_self_stim)</a></li>
+<li><a href="#reversal-task-reversal_task">Reversal Task (reversal_task)</a></li>
+<li><a href="#punished-reversal-task-reversal_task_punished">Punished Reversal Task (reversal_task_punished)</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <ul id="index">

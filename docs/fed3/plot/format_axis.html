@@ -85,7 +85,7 @@ def format_xaxis_datetime(ax, start, end):
         major = mdates.DayLocator(interval=15)
         minor = mdates.DayLocator(interval=5)
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha=&#39;right&#39;)
-    elif datetime.timedelta(days=120) &lt;= d8_span &lt; datetime.timedelta(days=120):
+    elif datetime.timedelta(days=120) &lt;= d8_span:
         xfmt = mdates.DateFormatter(&#34;%b &#39;%y&#34;)
         major = mdates.MonthLocator()
         minor = mdates.DayLocator(bymonthday=[7,15,23])
@@ -194,7 +194,7 @@ FORMAT_XAXIS_OPTS = {&#39;datetime&#39;: format_xaxis_datetime,
         major = mdates.DayLocator(interval=15)
         minor = mdates.DayLocator(interval=5)
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha=&#39;right&#39;)
-    elif datetime.timedelta(days=120) &lt;= d8_span &lt; datetime.timedelta(days=120):
+    elif datetime.timedelta(days=120) &lt;= d8_span:
         xfmt = mdates.DateFormatter(&#34;%b &#39;%y&#34;)
         major = mdates.MonthLocator()
         minor = mdates.DayLocator(bymonthday=[7,15,23])

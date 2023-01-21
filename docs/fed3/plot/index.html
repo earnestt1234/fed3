@@ -26,18 +26,18 @@
 <h2 id="import-fed3plot">Import <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code></h2>
 <p>The plotting package within fed3, <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code> is not imported by default.
 Make an explicit call to import it:</p>
-<pre><code class="python">import fed3
+<pre><code class="language-python">import fed3
 import fed3.plot as fplot
 </code></pre>
 <p>For the purposes of this documentation, matplotlib will be used to set the default figure size.</p>
-<pre><code class="python">import matplotlib.pyplot as plt
+<pre><code class="language-python">import matplotlib.pyplot as plt
 
 plt.rcParams['figure.figsize'] = [7, 5]
 plt.rcParams['figure.dpi'] = 100
 </code></pre>
 <h2 id="example-data">Example data</h2>
 <p>The following sections will make use of some example data, provided by the <a href="https://earnestt1234.github.io/fed3/fed3/examples/index.html"><code>fed3.examples</code></a> package:</p>
-<pre><code class="python">feds = fed3.load_examples('justin')
+<pre><code class="language-python">feds = fed3.load_examples('justin')
 f = feds[0]
 </code></pre>
 <h2 id="basic-plotting">Basic plotting</h2>
@@ -47,7 +47,7 @@ f = feds[0]
 <p>The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
 This demonstrates the syntax that applies to almost all plotting functions: pass the data to be plotted as the first argument (the FEDFrame(s)) followed by any options.
 In this case, the <code>y</code> parameter specifies the variable to be plotted: </p>
-<pre><code class="python">fplot.line(f, y='pellets')
+<pre><code class="language-python">fplot.line(f, y='pellets')
 
 plt.show()
 </code></pre>
@@ -65,13 +65,13 @@ Within each dictionary, the key is the group label, and the value is the collect
 </ul>
 <h4 id="list-of-feds">List of FEDs</h4>
 <p>The following is an example of the second option - data for each FED are plotted as individual lines.</p>
-<pre><code class="python">fplot.line(feds, y='pellets')
+<pre><code class="language-python">fplot.line(feds, y='pellets')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_12_0.png"></p>
 <h4 id="grouping">Grouping</h4>
 <p>To create a group average, pass a dictionary indicating group membership:</p>
-<pre><code class="python">groups = {'A' : feds[0:3], 'B' : feds[3:]}
+<pre><code class="language-python">groups = {'A' : feds[0:3], 'B' : feds[3:]}
 
 fplot.line(groups, y='pellets')
 plt.show()
@@ -88,14 +88,14 @@ This is the default behavior of the <code>y='pellets'</code> metric (<a href="ht
 <p>There are options to tweak the behavior for grouping.
 <code>agg</code> sets the aggregation method for the grouped data, and <code>var</code> sets the measure of error.
 Furthermore, the <code>bins</code> parameter sets the resolution of temporal averaging:</p>
-<pre><code class="python">fplot.line(groups, y='pellets', bins='4H', agg='median')
+<pre><code class="language-python">fplot.line(groups, y='pellets', bins='4H', agg='median')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_16_0.png"></p>
 <h2 id="integrating-with-matplotlib">Integrating with matplotlib</h2>
 <p>Plotting with fed3 is all implemented through calls to <a href="https://matplotlib.org/">matplotlib</a>.
 Thus, you can make use of typical matplotlib routines to customize your plots:</p>
-<pre><code class="python">import matplotlib.pyplot as plt
+<pre><code class="language-python">import matplotlib.pyplot as plt
 
 fplot.scatter(f, y='rt')
 
@@ -108,7 +108,7 @@ plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_18_0.png"></p>
 <p>Most plots can also be directed to a given <a href="https://matplotlib.org/stable/api/axes_api.html">matplotlib axis</a>, using the <code>ax</code> argument:</p>
-<pre><code class="python"># create layout
+<pre><code class="language-python"># create layout
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
 # plot
@@ -119,7 +119,7 @@ plt.show()
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_20_0.png"></p>
 <p>This can also be used to plot different metrics from one FED on the same axis.
 Note that shading of dark periods will be repeated, if not specified:</p>
-<pre><code class="python"># create figure and axis
+<pre><code class="language-python"># create figure and axis
 fig = plt.figure()
 ax = plt.subplot()
 
@@ -132,13 +132,13 @@ plt.show()
 <h3 id="matplotlib-keywords">matplotlib keywords</h3>
 <p>Most plots also accept keyword arguments which are passed to drawing functions from matplotlib, allowing for more specific customizations.
 For example, <code><a title="fed3.plot.line" href="#fed3.plot.line">line()</a></code> passes arguments to <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html"><code>matplotlib.axes.Axes.plot</code></a>:</p>
-<pre><code class="python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
+<pre><code class="language-python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_24_0.png"></p>
 <p>When plotting multiple FEDs, specifying a single value for a keyword argument applies it to all FEDs.
 To specify particular styles for particular FEDs, dictionaries can be used:</p>
-<pre><code class="python">styles = {
+<pre><code class="language-python">styles = {
     feds[0].name : {'color': 'cyan'},
     feds[1].name : {'color': 'yellow'},
     feds[2].name : {'color': 'magenta'}
@@ -150,7 +150,7 @@ plt.show()
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_26_0.png"></p>
 <p>When plotting grouped data, the group names are used as keys instead of individual FED names.
 Also, depending on the plotting function, there may be specific arguments to manage keywords directed at different elements:</p>
-<pre><code class="python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
+<pre><code class="language-python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
            line_kwargs={'color':'black'}, error_kwargs={'color':'gray', 'alpha':0.8})
 plt.show()
 </code></pre>
@@ -165,7 +165,7 @@ Options are typically:</p>
 <li>'dataonly': similar to 'data', except the plot is not created</li>
 <li>'both': a tuple of the figure and data</li>
 </ul>
-<pre><code class="python">data = fplot.line(feds, y='cumulative_left_percent', output='data')
+<pre><code class="language-python">data = fplot.line(feds, y='cumulative_left_percent', output='data')
 plt.show()
 display(data)
 </code></pre>
