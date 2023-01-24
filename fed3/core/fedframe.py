@@ -73,8 +73,14 @@ class FEDFrame(pd.DataFrame):
     - pandas DataFrame: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
     - Subclassing pandas: https://pandas.pydata.org/docs/development/extending.html'''
 
+    # ---- Class variables
     _metadata = ['name', 'path', 'foreign_columns', 'missing_columns',
                  '_alignment', '_current_offset']
+
+    LR_POKE_METHOD_OPTIONS = ('from_columns', 'from_events')
+    LR_POKE_METHOD = 'from_columns'
+    L_POKE_EVENTS = ['Left', 'LeftShort', 'LeftWithPellet', 'LeftinTimeout', 'LeftDuringDispense']
+    R_POKE_EVENTS = ['Right', 'RightShort', 'RightWithPellet', 'RightinTimeout', 'RightDuringDispense']
 
     # ---- Properties
 
@@ -137,10 +143,18 @@ class FEDFrame(pd.DataFrame):
         return bp
 
     def _binary_poke_for_side(self, side):
-        col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
-        bp = self[col].diff().copy()
-        if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+        if self.LR_POKE_METHOD == 'from_columns':
+            col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
+            bp = self[col].diff().copy()
+            if not bp.empty:
+                bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+        elif self.LR_POKE_METHOD == 'from_events':
+            search = {'left': self.L_POKE_EVENTS, 'right': self.R_POKE_EVENTS}[side]
+            bp = self['Event'].isin(search).astype(int)
+        else:
+            raise ValueError(f'"{self.LR_POKE_METHOD}" is not recognized for '
+                             f'FEDFrame.LR_POKE_METHOD.  Should be one of '
+                             f'{FEDFrame.LR_POKE_METHOD_OPTIONS}.')
 
         return bp
 
@@ -164,8 +178,16 @@ class FEDFrame(pd.DataFrame):
         return bp
 
     def _cumulative_poke_for_side(self, side):
-        col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
-        cp = self[col]
+        if self.LR_POKE_METHOD == 'from_columns':
+            col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
+            cp = self[col]
+        elif self.LR_POKE_METHOD == 'from_events':
+            search = {'left': self.L_POKE_EVENTS, 'right': self.R_POKE_EVENTS}[side]
+            cp = self['Event'].isin(search).cumsum().astype(int)
+        else:
+            raise ValueError(f'"{self.LR_POKE_METHOD}" is not recognized for '
+                             f'FEDFrame.LR_POKE_METHOD.  Should be one of '
+                             f'{FEDFrame.LR_POKE_METHOD_OPTIONS}.')
 
         return cp
 
@@ -216,7 +238,9 @@ class FEDFrame(pd.DataFrame):
         self['Retrieval_Time'] = pd.to_numeric(self['Retrieval_Time'], errors='coerce')
 
 
-    def _load_init(self, name=None, path=None, deduplicate_index=None):
+    def _load_init(self, name=None, path=None, deduplicate_index=None,
+                   offset='1S', reset_counts=False,
+                   reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count')):
         '''
         Initialize FEDFrame attributes and apply some data cleaning.
 
@@ -244,10 +268,9 @@ class FEDFrame(pd.DataFrame):
             Name to give the FEDFrame. The default is None.
         path : str, optional
             Set a local data path for the data. The default is None.
-        deduplicate_index : str, optional
-            When passed, applies a method for handling duplicate timestamps.
-            Not passed by default.  See `FEDFrame.deduplicate_index()` for
-            allowable methods.
+        deduplicate_index, offset, reset_counts, reset_columns: optional
+            Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+            to remove duplicate timestamps as the data are loaded.
 
         Returns
         -------
@@ -261,7 +284,10 @@ class FEDFrame(pd.DataFrame):
         self._alignment = 'datetime'
         self._current_offset = pd.Timedelta(0)
         if deduplicate_index is not None:
-            self.deduplicate_index(method=deduplicate_index)
+            self.deduplicate_index(method=deduplicate_index,
+                                   offset=offset,
+                                   reset_counts=reset_counts,
+                                   reset_columns=reset_columns)
         if self.check_duplicated_index():
             warnings.warn("Index has duplicate values, which may prevent some "
                           "fed3 operations.  Use the deuplicate_index() method "
@@ -281,7 +307,9 @@ class FEDFrame(pd.DataFrame):
         '''
         return self.index.duplicated().any()
 
-    def deduplicate_index(self, method='keep_first', offset='1S'):
+    def deduplicate_index(self, method='keep_first', offset='1S',
+                          reset_counts=False,
+                          reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count')):
         '''
         Apply a method to remove duplicate timestamps from the data.
 
@@ -327,6 +355,12 @@ class FEDFrame(pd.DataFrame):
         offset : str, optional
             Pandas time offset string, only used when `method='offset'`.
             The default is `'1S'`.
+        reset_counts : bool, optional
+            Reset columns cumulative columns that may be altered
+            as a result of removing rows.  The default is False.  Note
+            that this alters the number of pokes/pellets!
+        reset_columns: bool, optional
+            Column names to reset when `reset_counts` is True.
 
         Raises
         ------
@@ -367,6 +401,11 @@ class FEDFrame(pd.DataFrame):
             s = pd.Series(self.index)
             s[s.duplicated()] = None
             self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit='seconds')
+
+        # column resetting
+        if reset_counts:
+            for column in reset_columns:
+                self.reset_cumulative_column(column)
 
     def determine_mode(self):
         '''
@@ -622,6 +661,26 @@ class FEDFrame(pd.DataFrame):
         else:
             events = np.where(self._binary_pellets(), 'Pellet', 'Poke')
         self['Event'] = events
+
+    def reset_cumulative_column(self, column):
+        '''
+        Reset a cumulative column (usually Left_Poke_Count, Right_Poke_Count,
+        or Pellet_Count) to be ascending integers.  This may be useful
+        when other operations cause rows to be removed.
+
+        Parameters
+        ----------
+        column : str
+            String column name
+
+        Returns
+        -------
+        None.
+
+        '''
+        reset, _ = pd.factorize(self[column])
+        reset += self[column].iloc[0]
+        self[column] = reset
 
     def set_alignment(self, alignment, inplace=True):
         '''

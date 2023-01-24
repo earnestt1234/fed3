@@ -100,7 +100,9 @@ def list_examples():
     return examples
 
 
-def load_examples(key, verbose=False):
+def load_examples(key, verbose=False, deduplicate_index=None, offset='1S',
+                  reset_counts=False,
+                  reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count')):
     '''
     Load the example data linked to a given key.
 
@@ -110,6 +112,9 @@ def load_examples(key, verbose=False):
         Example to load.
     verbose : bool
         Print status while loading
+    deduplicate_index, offset, reset_counts, reset_columns: optional
+        Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+        to remove duplicate timestamps as the data are loaded.
 
     Raises
     ------
@@ -138,7 +143,12 @@ def load_examples(key, verbose=False):
         if ext.lower() not in ['.csv', '.xlsx']: continue;
         vprint(f' - {file}...')
         fullfile = os.path.join(example_path, file)
-        examples.append(load(fullfile, deduplicate_index='keep_first'))
+        f = load(path=fullfile,
+                 deduplicate_index=deduplicate_index,
+                 offset=offset,
+                 reset_counts=reset_counts,
+                 reset_columns=reset_columns)
+        examples.append(f)
 
     return examples
 

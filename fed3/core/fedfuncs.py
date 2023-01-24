@@ -171,7 +171,8 @@ def determine_alignment(feds):
     return 'mixed' if len(alignments) > 1 else list(alignments)[0]
 
 def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True,
-         deduplicate_index=None):
+         deduplicate_index=None, offset='1S', reset_counts=False,
+         reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count')):
     '''
     Load FED3 data from a CSV/Excel file.  This is the typical
     recommended way for importing FED3 data.  Relies mostly
@@ -185,10 +186,9 @@ def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True,
         Timestamp column to use as index. The default is 'MM:DD:YYYY hh:mm:ss'.
     dropna : bool, optional
         Remove all empty rows. The default is True.
-    deduplicate_index : str, optional
-        Method for removing duplicate timestamps in the index.
-        The default is None (no index altering).  See
-        `fed3.core.FEDFrame.deduplicate_index()`.
+    deduplicate_index, offset, reset_counts, reset_columns: optional
+        Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+        to remove duplicate timestamps as the data are loaded.
 
     Returns
     -------
@@ -210,7 +210,12 @@ def load(path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True,
 
     name = os.path.basename(name)
     f = FEDFrame(feddata)
-    f._load_init(name=name, path=path, deduplicate_index=deduplicate_index)
+    f._load_init(name=name,
+                 path=path,
+                 deduplicate_index=deduplicate_index,
+                 offset=offset,
+                 reset_counts=reset_counts,
+                 reset_columns=reset_columns)
 
     return f
 
