@@ -103,7 +103,7 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_metric_df(feds=feds_dict,
+    AGGDATA, VARDATA = _create_group_metric_df(feds_dict=feds_dict,
                                                metric=metric,
                                                agg=agg,
                                                var=var,
@@ -169,7 +169,7 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
             if var == 'raw':
 
                 group_feds = feds_dict[col]
-                metric_df = _create_metric_df(feds=group_feds,
+                metric_df = _create_metric_df(feds_list=group_feds,
                                               metric=metric,
                                               bins=bins,
                                               origin=origin)

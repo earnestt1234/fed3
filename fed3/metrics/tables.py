@@ -55,7 +55,7 @@ def _bar_metric_df(feds_dict, metric, stat, normalize=None, agg='mean', var='std
 
     return out
 
-def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
+def _create_chronogram_df(feds_list, metric, bins='1H', origin_lightcycle=True,
                           reorder_index=True, relative_index=True):
 
     on = LIGHTCYCLE['on']
@@ -72,7 +72,7 @@ def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
     else:
         origin = 'start_day'
 
-    metric_df = _create_metric_df(feds, metric=metric, bins=bins, origin=origin)
+    metric_df = _create_metric_df(feds_list, metric=metric, bins=bins, origin=origin)
     bytime = metric_df.groupby(metric_df.index.time).mean()
 
     # handle reindexing things
@@ -92,12 +92,12 @@ def _create_chronogram_df(feds, metric, bins='1H', origin_lightcycle=True,
 
     return bytime
 
-def _create_group_chronogram_df(feds, metric, agg='mean', var='std', bins='1H',
+def _create_group_chronogram_df(feds_dict, metric, agg='mean', var='std', bins='1H',
                                 omit_na=False, origin_lightcycle=True,
                                 reorder_index=True, relative_index=True):
     all_agg = pd.DataFrame()
     all_var = pd.DataFrame()
-    for group, fedlist in feds.items():
+    for group, fedlist in feds_dict.items():
         metric_df = _create_chronogram_df(fedlist, metric=metric, bins=bins,
                                           origin_lightcycle=origin_lightcycle,
                                           reorder_index=reorder_index,
@@ -120,11 +120,11 @@ def _create_group_chronogram_df(feds, metric, agg='mean', var='std', bins='1H',
     return all_agg, all_var
 
 
-def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
+def _create_group_metric_df(feds_dict, metric, agg='mean', var='std', bins='1H',
                             origin='start', omit_na=False):
     all_agg = pd.DataFrame()
     all_var = pd.DataFrame()
-    for group, fedlist in feds.items():
+    for group, fedlist in feds_dict.items():
         metric_df = _create_metric_df(fedlist, metric=metric, bins=bins, origin=origin)
         if omit_na:
             metric_df = metric_df.dropna()
@@ -143,9 +143,9 @@ def _create_group_metric_df(feds, metric, agg='mean', var='std', bins='1H',
 
     return all_agg, all_var
 
-def _create_metric_df(feds, metric, bins=None, origin='start'):
+def _create_metric_df(feds_list, metric, bins=None, origin='start'):
     df = pd.DataFrame()
-    for fed in feds:
+    for fed in feds_list:
         y = metric(fed, bins=bins, origin=origin)
         y.name = fed.name
         df = df.join(y, how='outer')

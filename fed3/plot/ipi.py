@@ -58,7 +58,7 @@ def ipi(feds, logx=True, kde=True, mixed_align='raise', output='plot',
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    DATA = _create_metric_df(feds=feds_all, metric=metric)
+    DATA = _create_metric_df(feds_list=feds_all, metric=metric)
     if is_group:
         DATA = _stack_group_values(DATA, feds_dict)
 
