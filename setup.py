@@ -6,6 +6,8 @@ Setup for `fed3`.
 @author: Tom Earnest
 """
 
+from os import path
+
 from setuptools import find_packages, setup
 
 requirements = [
@@ -15,8 +17,14 @@ requirements = [
     'seaborn>=0.11'
     ]
 
+# read version
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'fed3', '_version.py'), encoding='utf-8') as f:
+    version = f.read().split('=')[1].strip('\'"')
+
+
 setup(name='fed3',
-      version='0.0.0',
+      version=version,
       description='A Python package for analyzing FED3 data.',
       url='https://github.com/earnestt1234/fed3',
       author='Tom Earnest',

@@ -10,6 +10,11 @@ def __warning_on_one_line(message, category, filename, lineno, file=None, line=N
 
 __warnings.formatwarning = __warning_on_one_line
 
+# version
+from ._version import v
+__version__ = v
+del v
+
 #imports for package namespace
 from fed3.core import (FEDFrame,
                        as_aligned,
