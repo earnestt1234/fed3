@@ -38,8 +38,23 @@ Created on Wed Feb  2 12:34:52 2022
 @author: earnestt1234
 &#34;&#34;&#34;
 
+from collections import defaultdict
+
 from matplotlib import colors
 import pandas as pd
+
+def _assign_plot_names(feds, name_ddict):
+    if isinstance(feds, pd.DataFrame):
+        feds = [feds]
+
+    for fed in feds:
+        count = name_ddict[fed.name]
+        if count == 0:
+            fed._plot_name = fed.name
+        else:
+            fed._plot_name = f&#39;{fed.name}_{count}&#39;
+
+        name_ddict[fed.name] += 1
 
 def _get_most_recent_color(ax, kind=&#39;line&#39;, default=&#39;gray&#39;):
 
@@ -72,30 +87,24 @@ def _get_return_value(FIG, DATA, output):
     else:
         raise ValueError(f&#39;output value &#34;{output}&#34; not recognized.&#39;)
 
-def _parse_feds(feds, raise_name_clash=True):
+def _parse_feds(feds):
+
+    name_ddict = defaultdict(int)
 
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
 
     if not isinstance(feds, dict):
-        _raise_name_clash(feds) if raise_name_clash else None
-        feds = {f.name : [f] for f in feds}
+        _assign_plot_names(feds=feds, name_ddict=name_ddict)
+        feds = {f._plot_name : [f] for f in feds}
 
-    for k, v in feds.items():
-        if not isinstance(v, list):
-            feds[k] = [v]
-
-    if raise_name_clash:
-        for l in feds.values():
-            _raise_name_clash(l)
+    else:
+        for k, v in feds.items():
+            if isinstance(v, pd.DataFrame):
+                feds[k] = [v]
+            _assign_plot_names(feds=v, name_ddict=name_ddict)
 
     return feds
-
-def _raise_name_clash(feds):
-
-    names_okay = len(set(f.name for f in feds)) == len(feds)
-    if not names_okay:
-        raise ValueError(&#34;Some FEDFrames passed have conflicting names; set the `name` attribute uniquely to plot.&#34;)
 
 def _process_plot_kwargs(kwargs, plot_labels):
 

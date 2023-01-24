@@ -39,6 +39,11 @@ def __warning_on_one_line(message, category, filename, lineno, file=None, line=N
 
 __warnings.formatwarning = __warning_on_one_line
 
+# version
+from ._version import v
+__version__ = v
+del v
+
 #imports for package namespace
 from fed3.core import (FEDFrame,
                        as_aligned,
@@ -428,7 +433,7 @@ keys which can be provided to <code><a title="fed3.load_examples" href="#fed3.lo
 </details>
 </dd>
 <dt id="fed3.load"><code class="name flex">
-<span>def <span class="ident">load</span></span>(<span>path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True, deduplicate_index=None)</span>
+<span>def <span class="ident">load</span></span>(<span>path, index_col='MM:DD:YYYY hh:mm:ss', dropna=True, deduplicate_index=None, offset='1S', reset_counts=False, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Load FED3 data from a CSV/Excel file.
@@ -444,11 +449,9 @@ on <code>pandas.read_csv()</code> and <code>pandas.read_excel()</code> for the p
 <dd>Timestamp column to use as index. The default is 'MM:DD:YYYY hh:mm:ss'.</dd>
 <dt><strong><code>dropna</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Remove all empty rows. The default is True.</dd>
-<dt><strong><code>deduplicate_index</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Method for removing duplicate timestamps in the index.
-The default is None (no index altering).
-See
-<code><a title="fed3.core.FEDFrame.deduplicate_index" href="core/index.html#fed3.core.FEDFrame.deduplicate_index">FEDFrame.deduplicate_index()</a></code>.</dd>
+<dt><strong><code>deduplicate_index</code></strong>, <strong><code>offset</code></strong>, <strong><code>reset_counts</code></strong>, <strong><code>reset_columns</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Arguments passed to <code><a title="fed3.FEDFrame.deduplicate_index" href="#fed3.FEDFrame.deduplicate_index">FEDFrame.deduplicate_index()</a></code>, used
+to remove duplicate timestamps as the data are loaded.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -460,7 +463,8 @@ See
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load(path, index_col=&#39;MM:DD:YYYY hh:mm:ss&#39;, dropna=True,
-         deduplicate_index=None):
+         deduplicate_index=None, offset=&#39;1S&#39;, reset_counts=False,
+         reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;)):
     &#39;&#39;&#39;
     Load FED3 data from a CSV/Excel file.  This is the typical
     recommended way for importing FED3 data.  Relies mostly
@@ -474,10 +478,9 @@ See
         Timestamp column to use as index. The default is &#39;MM:DD:YYYY hh:mm:ss&#39;.
     dropna : bool, optional
         Remove all empty rows. The default is True.
-    deduplicate_index : str, optional
-        Method for removing duplicate timestamps in the index.
-        The default is None (no index altering).  See
-        `fed3.core.FEDFrame.deduplicate_index()`.
+    deduplicate_index, offset, reset_counts, reset_columns: optional
+        Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+        to remove duplicate timestamps as the data are loaded.
 
     Returns
     -------
@@ -499,13 +502,18 @@ See
 
     name = os.path.basename(name)
     f = FEDFrame(feddata)
-    f._load_init(name=name, path=path, deduplicate_index=deduplicate_index)
+    f._load_init(name=name,
+                 path=path,
+                 deduplicate_index=deduplicate_index,
+                 offset=offset,
+                 reset_counts=reset_counts,
+                 reset_columns=reset_columns)
 
     return f</code></pre>
 </details>
 </dd>
 <dt id="fed3.load_examples"><code class="name flex">
-<span>def <span class="ident">load_examples</span></span>(<span>key, verbose=False)</span>
+<span>def <span class="ident">load_examples</span></span>(<span>key, verbose=False, deduplicate_index=None, offset='1S', reset_counts=False, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Load the example data linked to a given key.</p>
@@ -515,6 +523,9 @@ See
 <dd>Example to load.</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code></dt>
 <dd>Print status while loading</dd>
+<dt><strong><code>deduplicate_index</code></strong>, <strong><code>offset</code></strong>, <strong><code>reset_counts</code></strong>, <strong><code>reset_columns</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Arguments passed to <code><a title="fed3.FEDFrame.deduplicate_index" href="#fed3.FEDFrame.deduplicate_index">FEDFrame.deduplicate_index()</a></code>, used
+to remove duplicate timestamps as the data are loaded.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -530,7 +541,9 @@ See
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def load_examples(key, verbose=False):
+<pre><code class="python">def load_examples(key, verbose=False, deduplicate_index=None, offset=&#39;1S&#39;,
+                  reset_counts=False,
+                  reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;)):
     &#39;&#39;&#39;
     Load the example data linked to a given key.
 
@@ -540,6 +553,9 @@ See
         Example to load.
     verbose : bool
         Print status while loading
+    deduplicate_index, offset, reset_counts, reset_columns: optional
+        Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+        to remove duplicate timestamps as the data are loaded.
 
     Raises
     ------
@@ -568,7 +584,12 @@ See
         if ext.lower() not in [&#39;.csv&#39;, &#39;.xlsx&#39;]: continue;
         vprint(f&#39; - {file}...&#39;)
         fullfile = os.path.join(example_path, file)
-        examples.append(load(fullfile, deduplicate_index=&#39;keep_first&#39;))
+        f = load(path=fullfile,
+                 deduplicate_index=deduplicate_index,
+                 offset=offset,
+                 reset_counts=reset_counts,
+                 reset_columns=reset_columns)
+        examples.append(f)
 
     return examples</code></pre>
 </details>
@@ -831,8 +852,14 @@ get full FEDFrame functionality.</p>
     - pandas DataFrame: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
     - Subclassing pandas: https://pandas.pydata.org/docs/development/extending.html&#39;&#39;&#39;
 
+    # ---- Class variables
     _metadata = [&#39;name&#39;, &#39;path&#39;, &#39;foreign_columns&#39;, &#39;missing_columns&#39;,
                  &#39;_alignment&#39;, &#39;_current_offset&#39;]
+
+    LR_POKE_METHOD_OPTIONS = (&#39;from_columns&#39;, &#39;from_events&#39;)
+    LR_POKE_METHOD = &#39;from_columns&#39;
+    L_POKE_EVENTS = [&#39;Left&#39;, &#39;LeftShort&#39;, &#39;LeftWithPellet&#39;, &#39;LeftinTimeout&#39;, &#39;LeftDuringDispense&#39;]
+    R_POKE_EVENTS = [&#39;Right&#39;, &#39;RightShort&#39;, &#39;RightWithPellet&#39;, &#39;RightinTimeout&#39;, &#39;RightDuringDispense&#39;]
 
     # ---- Properties
 
@@ -895,10 +922,18 @@ get full FEDFrame functionality.</p>
         return bp
 
     def _binary_poke_for_side(self, side):
-        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
-        bp = self[col].diff().copy()
-        if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+        if self.LR_POKE_METHOD == &#39;from_columns&#39;:
+            col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+            bp = self[col].diff().copy()
+            if not bp.empty:
+                bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+        elif self.LR_POKE_METHOD == &#39;from_events&#39;:
+            search = {&#39;left&#39;: self.L_POKE_EVENTS, &#39;right&#39;: self.R_POKE_EVENTS}[side]
+            bp = self[&#39;Event&#39;].isin(search).astype(int)
+        else:
+            raise ValueError(f&#39;&#34;{self.LR_POKE_METHOD}&#34; is not recognized for &#39;
+                             f&#39;FEDFrame.LR_POKE_METHOD.  Should be one of &#39;
+                             f&#39;{FEDFrame.LR_POKE_METHOD_OPTIONS}.&#39;)
 
         return bp
 
@@ -922,8 +957,16 @@ get full FEDFrame functionality.</p>
         return bp
 
     def _cumulative_poke_for_side(self, side):
-        col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
-        cp = self[col]
+        if self.LR_POKE_METHOD == &#39;from_columns&#39;:
+            col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
+            cp = self[col]
+        elif self.LR_POKE_METHOD == &#39;from_events&#39;:
+            search = {&#39;left&#39;: self.L_POKE_EVENTS, &#39;right&#39;: self.R_POKE_EVENTS}[side]
+            cp = self[&#39;Event&#39;].isin(search).cumsum().astype(int)
+        else:
+            raise ValueError(f&#39;&#34;{self.LR_POKE_METHOD}&#34; is not recognized for &#39;
+                             f&#39;FEDFrame.LR_POKE_METHOD.  Should be one of &#39;
+                             f&#39;{FEDFrame.LR_POKE_METHOD_OPTIONS}.&#39;)
 
         return cp
 
@@ -974,7 +1017,9 @@ get full FEDFrame functionality.</p>
         self[&#39;Retrieval_Time&#39;] = pd.to_numeric(self[&#39;Retrieval_Time&#39;], errors=&#39;coerce&#39;)
 
 
-    def _load_init(self, name=None, path=None, deduplicate_index=None):
+    def _load_init(self, name=None, path=None, deduplicate_index=None,
+                   offset=&#39;1S&#39;, reset_counts=False,
+                   reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;)):
         &#39;&#39;&#39;
         Initialize FEDFrame attributes and apply some data cleaning.
 
@@ -1002,10 +1047,9 @@ get full FEDFrame functionality.</p>
             Name to give the FEDFrame. The default is None.
         path : str, optional
             Set a local data path for the data. The default is None.
-        deduplicate_index : str, optional
-            When passed, applies a method for handling duplicate timestamps.
-            Not passed by default.  See `FEDFrame.deduplicate_index()` for
-            allowable methods.
+        deduplicate_index, offset, reset_counts, reset_columns: optional
+            Arguments passed to `fed3.FEDFrame.deduplicate_index()`, used
+            to remove duplicate timestamps as the data are loaded.
 
         Returns
         -------
@@ -1019,7 +1063,10 @@ get full FEDFrame functionality.</p>
         self._alignment = &#39;datetime&#39;
         self._current_offset = pd.Timedelta(0)
         if deduplicate_index is not None:
-            self.deduplicate_index(method=deduplicate_index)
+            self.deduplicate_index(method=deduplicate_index,
+                                   offset=offset,
+                                   reset_counts=reset_counts,
+                                   reset_columns=reset_columns)
         if self.check_duplicated_index():
             warnings.warn(&#34;Index has duplicate values, which may prevent some &#34;
                           &#34;fed3 operations.  Use the deuplicate_index() method &#34;
@@ -1039,7 +1086,9 @@ get full FEDFrame functionality.</p>
         &#39;&#39;&#39;
         return self.index.duplicated().any()
 
-    def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+    def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;,
+                          reset_counts=False,
+                          reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;)):
         &#39;&#39;&#39;
         Apply a method to remove duplicate timestamps from the data.
 
@@ -1085,6 +1134,12 @@ get full FEDFrame functionality.</p>
         offset : str, optional
             Pandas time offset string, only used when `method=&#39;offset&#39;`.
             The default is `&#39;1S&#39;`.
+        reset_counts : bool, optional
+            Reset columns cumulative columns that may be altered
+            as a result of removing rows.  The default is False.  Note
+            that this alters the number of pokes/pellets!
+        reset_columns: bool, optional
+            Column names to reset when `reset_counts` is True.
 
         Raises
         ------
@@ -1125,6 +1180,11 @@ get full FEDFrame functionality.</p>
             s = pd.Series(self.index)
             s[s.duplicated()] = None
             self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)
+
+        # column resetting
+        if reset_counts:
+            for column in reset_columns:
+                self.reset_cumulative_column(column)
 
     def determine_mode(self):
         &#39;&#39;&#39;
@@ -1381,6 +1441,26 @@ get full FEDFrame functionality.</p>
             events = np.where(self._binary_pellets(), &#39;Pellet&#39;, &#39;Poke&#39;)
         self[&#39;Event&#39;] = events
 
+    def reset_cumulative_column(self, column):
+        &#39;&#39;&#39;
+        Reset a cumulative column (usually Left_Poke_Count, Right_Poke_Count,
+        or Pellet_Count) to be ascending integers.  This may be useful
+        when other operations cause rows to be removed.
+
+        Parameters
+        ----------
+        column : str
+            String column name
+
+        Returns
+        -------
+        None.
+
+        &#39;&#39;&#39;
+        reset, _ = pd.factorize(self[column])
+        reset += self[column].iloc[0]
+        self[column] = reset
+
     def set_alignment(self, alignment, inplace=True):
         &#39;&#39;&#39;
         Shift the timestamps of a FEDFrame to allow for comparisons with other data
@@ -1464,6 +1544,25 @@ get full FEDFrame functionality.</p>
 <li>pandas.core.indexing.IndexingMixin</li>
 <li>pandas.core.arraylike.OpsMixin</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="fed3.FEDFrame.LR_POKE_METHOD"><code class="name">var <span class="ident">LR_POKE_METHOD</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fed3.FEDFrame.LR_POKE_METHOD_OPTIONS"><code class="name">var <span class="ident">LR_POKE_METHOD_OPTIONS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fed3.FEDFrame.L_POKE_EVENTS"><code class="name">var <span class="ident">L_POKE_EVENTS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fed3.FEDFrame.R_POKE_EVENTS"><code class="name">var <span class="ident">R_POKE_EVENTS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="fed3.FEDFrame.columns"><code class="name">var <span class="ident">columns</span></code></dt>
@@ -1570,7 +1669,7 @@ def start_time(self):
 </details>
 </dd>
 <dt id="fed3.FEDFrame.deduplicate_index"><code class="name flex">
-<span>def <span class="ident">deduplicate_index</span></span>(<span>self, method='keep_first', offset='1S')</span>
+<span>def <span class="ident">deduplicate_index</span></span>(<span>self, method='keep_first', offset='1S', reset_counts=False, reset_columns=('Pellet_Count', 'Left_Poke_Count', 'Right_Poke_Count'))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Apply a method to remove duplicate timestamps from the data.</p>
@@ -1617,6 +1716,14 @@ length of the FEDFrame, while other options can reduce it.</p>
 <dt><strong><code>offset</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Pandas time offset string, only used when <code>method='offset'</code>.
 The default is <code>'1S'</code>.</dd>
+<dt><strong><code>reset_counts</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Reset columns cumulative columns that may be altered
+as a result of removing rows.
+The default is False.
+Note
+that this alters the number of pokes/pellets!</dd>
+<dt><strong><code>reset_columns</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Column names to reset when <code>reset_counts</code> is True.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -1630,7 +1737,9 @@ Data is modified in place.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;):
+<pre><code class="python">def deduplicate_index(self, method=&#39;keep_first&#39;, offset=&#39;1S&#39;,
+                      reset_counts=False,
+                      reset_columns=(&#39;Pellet_Count&#39;, &#39;Left_Poke_Count&#39;, &#39;Right_Poke_Count&#39;)):
     &#39;&#39;&#39;
     Apply a method to remove duplicate timestamps from the data.
 
@@ -1676,6 +1785,12 @@ Data is modified in place.</p></div>
     offset : str, optional
         Pandas time offset string, only used when `method=&#39;offset&#39;`.
         The default is `&#39;1S&#39;`.
+    reset_counts : bool, optional
+        Reset columns cumulative columns that may be altered
+        as a result of removing rows.  The default is False.  Note
+        that this alters the number of pokes/pellets!
+    reset_columns: bool, optional
+        Column names to reset when `reset_counts` is True.
 
     Raises
     ------
@@ -1715,7 +1830,12 @@ Data is modified in place.</p></div>
         t0 = self.index[0]
         s = pd.Series(self.index)
         s[s.duplicated()] = None
-        self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)</code></pre>
+        self.index = t0 + pd.to_timedelta((s - t0).dt.total_seconds().interpolate(), unit=&#39;seconds&#39;)
+
+    # column resetting
+    if reset_counts:
+        for column in reset_columns:
+            self.reset_cumulative_column(column)</code></pre>
 </details>
 </dd>
 <dt id="fed3.FEDFrame.determine_mode"><code class="name flex">
@@ -2240,6 +2360,46 @@ The default is True.</dd>
     self[&#39;Event&#39;] = events</code></pre>
 </details>
 </dd>
+<dt id="fed3.FEDFrame.reset_cumulative_column"><code class="name flex">
+<span>def <span class="ident">reset_cumulative_column</span></span>(<span>self, column)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset a cumulative column (usually Left_Poke_Count, Right_Poke_Count,
+or Pellet_Count) to be ascending integers.
+This may be useful
+when other operations cause rows to be removed.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>column</code></strong> :&ensp;<code>str</code></dt>
+<dd>String column name</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_cumulative_column(self, column):
+    &#39;&#39;&#39;
+    Reset a cumulative column (usually Left_Poke_Count, Right_Poke_Count,
+    or Pellet_Count) to be ascending integers.  This may be useful
+    when other operations cause rows to be removed.
+
+    Parameters
+    ----------
+    column : str
+        String column name
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
+    reset, _ = pd.factorize(self[column])
+    reset += self[column].iloc[0]
+    self[column] = reset</code></pre>
+</details>
+</dd>
 <dt id="fed3.FEDFrame.set_alignment"><code class="name flex">
 <span>def <span class="ident">set_alignment</span></span>(<span>self, alignment, inplace=True)</span>
 </code></dt>
@@ -2416,6 +2576,10 @@ returned with the new alignment.</dd>
 <li>
 <h4><code><a title="fed3.FEDFrame" href="#fed3.FEDFrame">FEDFrame</a></code></h4>
 <ul class="">
+<li><code><a title="fed3.FEDFrame.LR_POKE_METHOD" href="#fed3.FEDFrame.LR_POKE_METHOD">LR_POKE_METHOD</a></code></li>
+<li><code><a title="fed3.FEDFrame.LR_POKE_METHOD_OPTIONS" href="#fed3.FEDFrame.LR_POKE_METHOD_OPTIONS">LR_POKE_METHOD_OPTIONS</a></code></li>
+<li><code><a title="fed3.FEDFrame.L_POKE_EVENTS" href="#fed3.FEDFrame.L_POKE_EVENTS">L_POKE_EVENTS</a></code></li>
+<li><code><a title="fed3.FEDFrame.R_POKE_EVENTS" href="#fed3.FEDFrame.R_POKE_EVENTS">R_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.FEDFrame.check_duplicated_index" href="#fed3.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
 <li><code><a title="fed3.FEDFrame.columns" href="#fed3.FEDFrame.columns">columns</a></code></li>
 <li><code><a title="fed3.FEDFrame.deduplicate_index" href="#fed3.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
@@ -2432,6 +2596,7 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.FEDFrame.pellets" href="#fed3.FEDFrame.pellets">pellets</a></code></li>
 <li><code><a title="fed3.FEDFrame.pokes" href="#fed3.FEDFrame.pokes">pokes</a></code></li>
 <li><code><a title="fed3.FEDFrame.reassign_events" href="#fed3.FEDFrame.reassign_events">reassign_events</a></code></li>
+<li><code><a title="fed3.FEDFrame.reset_cumulative_column" href="#fed3.FEDFrame.reset_cumulative_column">reset_cumulative_column</a></code></li>
 <li><code><a title="fed3.FEDFrame.set_alignment" href="#fed3.FEDFrame.set_alignment">set_alignment</a></code></li>
 <li><code><a title="fed3.FEDFrame.start_time" href="#fed3.FEDFrame.start_time">start_time</a></code></li>
 </ul>

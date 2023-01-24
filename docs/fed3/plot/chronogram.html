@@ -40,6 +40,8 @@ Created on Tue Apr  5 17:40:10 2022
 
 __all__ = [&#39;chronogram_circle&#39;, &#39;chronogram_line&#39;, &#39;chronogram_spiny&#39;]
 
+from collections import defaultdict
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -51,10 +53,10 @@ from fed3.lightcycle import LIGHTCYCLE, time_to_float
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
-from fed3.plot.helpers import (_get_most_recent_color,
+from fed3.plot.helpers import (_assign_plot_names,
+                               _get_most_recent_color,
                                _get_return_value,
                                _parse_feds,
-                               _raise_name_clash,
                                _process_plot_kwargs)
 
 def chronogram_circle(feds, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mean&#39;, var=&#39;std&#39;,
@@ -83,7 +85,7 @@ def chronogram_circle(feds, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mea
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -148,7 +150,7 @@ def chronogram_circle(feds, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mea
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -207,7 +209,7 @@ def chronogram_line(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mean
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -264,7 +266,7 @@ def chronogram_line(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mean
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -296,17 +298,19 @@ def chronogram_line(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mean
 
 def _parse_feds_spiny_chronogram(feds, raise_name_clash=True):
 
+    name_ddict = defaultdict(int)
+
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
 
     if not isinstance(feds, dict):
-
-        _raise_name_clash(feds) if raise_name_clash else None
+        _assign_plot_names(feds=feds, name_ddict=name_ddict)
         feds = {&#39;group&#39; : feds}
-
-    if raise_name_clash:
-        for l in feds.values():
-            _raise_name_clash(l)
+    else:
+        for k, v in feds.items():
+            if isinstance(v, pd.DataFrame):
+                feds[k] = [v]
+            _assign_plot_names(feds=v, name_ddict=name_ddict)
 
     if len(feds) &gt; 1:
         raise ValueError(&#34;Spiny chronograms only plot the average values &#34;
@@ -345,7 +349,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    DATA, _ = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    DATA, _ = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                           agg=agg, var=None, origin_lightcycle=True,
                                           reorder_index=True, relative_index=True)
 
@@ -439,7 +443,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -504,7 +508,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -573,7 +577,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -630,7 +634,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -694,7 +698,7 @@ def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mea
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    DATA, _ = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    DATA, _ = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                           agg=agg, var=None, origin_lightcycle=True,
                                           reorder_index=True, relative_index=True)
 

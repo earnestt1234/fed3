@@ -545,7 +545,7 @@ __all__ = [&#39;bar&#39;,
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -610,7 +610,7 @@ __all__ = [&#39;bar&#39;,
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -679,7 +679,7 @@ __all__ = [&#39;bar&#39;,
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    AGGDATA, VARDATA = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                                    agg=agg, var=var, origin_lightcycle=True,
                                                    reorder_index=True, relative_index=True)
 
@@ -736,7 +736,7 @@ __all__ = [&#39;bar&#39;,
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_chronogram_df(feds=group_feds,
+                metric_df = _create_chronogram_df(feds_list=group_feds,
                                                   metric=metric,
                                                   bins=bins,
                                                   origin_lightcycle=True,
@@ -800,7 +800,7 @@ __all__ = [&#39;bar&#39;,
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    DATA, _ = _create_group_chronogram_df(feds=feds_dict, metric=metric, bins=bins,
+    DATA, _ = _create_group_chronogram_df(feds_dict=feds_dict, metric=metric, bins=bins,
                                           agg=agg, var=None, origin_lightcycle=True,
                                           reorder_index=True, relative_index=True)
 
@@ -883,7 +883,7 @@ __all__ = [&#39;bar&#39;,
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    DATA = _create_metric_df(feds=feds_all, metric=metric)
+    DATA = _create_metric_df(feds_list=feds_all, metric=metric)
     if is_group:
         DATA = _stack_group_values(DATA, feds_dict)
 

@@ -133,7 +133,7 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
     metric_obj = get_metric(y)
     metric = metric_obj.func
     metricname = metric_obj.nicename
-    AGGDATA, VARDATA = _create_group_metric_df(feds=feds_dict,
+    AGGDATA, VARDATA = _create_group_metric_df(feds_dict=feds_dict,
                                                metric=metric,
                                                agg=agg,
                                                var=var,
@@ -142,7 +142,7 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
                                                omit_na=omit_na)
 
     # create return data
-    if var is None:
+    if var is None or var == &#39;raw&#39;:
         DATA = AGGDATA
     else:
         lsuffix = f&#34;_{agg}&#34; if isinstance(agg, str) else &#34;_agg&#34;
@@ -199,7 +199,7 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
             if var == &#39;raw&#39;:
 
                 group_feds = feds_dict[col]
-                metric_df = _create_metric_df(feds=group_feds,
+                metric_df = _create_metric_df(feds_list=group_feds,
                                               metric=metric,
                                               bins=bins,
                                               origin=origin)
