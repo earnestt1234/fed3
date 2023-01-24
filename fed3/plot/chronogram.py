@@ -8,6 +8,8 @@ Created on Tue Apr  5 17:40:10 2022
 
 __all__ = ['chronogram_circle', 'chronogram_line', 'chronogram_spiny']
 
+from collections import defaultdict
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -19,10 +21,10 @@ from fed3.lightcycle import LIGHTCYCLE, time_to_float
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
-from fed3.plot.helpers import (_get_most_recent_color,
+from fed3.plot.helpers import (_assign_plot_names,
+                               _get_most_recent_color,
                                _get_return_value,
                                _parse_feds,
-                               _raise_name_clash,
                                _process_plot_kwargs)
 
 def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
@@ -264,17 +266,19 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
 
 def _parse_feds_spiny_chronogram(feds, raise_name_clash=True):
 
+    name_ddict = defaultdict(int)
+
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
 
     if not isinstance(feds, dict):
-
-        _raise_name_clash(feds) if raise_name_clash else None
+        _assign_plot_names(feds=feds, name_ddict=name_ddict)
         feds = {'group' : feds}
-
-    if raise_name_clash:
-        for l in feds.values():
-            _raise_name_clash(l)
+    else:
+        for k, v in feds.items():
+            if isinstance(v, pd.DataFrame):
+                feds[k] = [v]
+            _assign_plot_names(feds=v, name_ddict=name_ddict)
 
     if len(feds) > 1:
         raise ValueError("Spiny chronograms only plot the average values "

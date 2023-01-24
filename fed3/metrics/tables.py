@@ -147,7 +147,7 @@ def _create_metric_df(feds_list, metric, bins=None, origin='start'):
     df = pd.DataFrame()
     for fed in feds_list:
         y = metric(fed, bins=bins, origin=origin)
-        y.name = fed.name
+        y.name = getattr(fed, '_plot_name', fed.name)
         df = df.join(y, how='outer')
 
     return df
@@ -162,7 +162,7 @@ def _stack_group_values(metric_df, feds_dict):
 
         for fed in feds:
 
-            name = fed.name
+            name = getattr(fed, '_plot_name', fed.name)
             vals = metric_df[name].dropna().to_list()
             group_vals += vals
 

@@ -112,7 +112,7 @@ def _simple_plot(feds_dict, kind='line', y='pellets', bins='1H', agg='mean',
                                                omit_na=omit_na)
 
     # create return data
-    if var is None:
+    if var is None or var == 'raw':
         DATA = AGGDATA
     else:
         lsuffix = f"_{agg}" if isinstance(agg, str) else "_agg"
