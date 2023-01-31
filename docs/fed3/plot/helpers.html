@@ -41,6 +41,7 @@ Created on Wed Feb  2 12:34:52 2022
 from collections import defaultdict
 
 from matplotlib import colors
+import matplotlib.pyplot as plt
 import pandas as pd
 
 # ---- &#39;Private&#39;
@@ -146,6 +147,10 @@ def argh(args):
     &#39;&#39;&#39;
     return ArgHelper(args)
 
+def legend(*args, **kwargs):
+    &#39;&#39;&#39;Convenience method for calling `plt.legend()` to generate a legend&#39;&#39;&#39;
+    plt.legend(*args, **kwargs)
+
 class ArgHelper:
 
     def __init__(self, args):
@@ -205,6 +210,20 @@ a list of args will be passed to each curve in its entirety.</p>
     return ArgHelper(args)</code></pre>
 </details>
 </dd>
+<dt id="fed3.plot.helpers.legend"><code class="name flex">
+<span>def <span class="ident">legend</span></span>(<span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience method for calling <code>plt.legend()</code> to generate a legend</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def legend(*args, **kwargs):
+    &#39;&#39;&#39;Convenience method for calling `plt.legend()` to generate a legend&#39;&#39;&#39;
+    plt.legend(*args, **kwargs)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -262,6 +281,7 @@ a list of args will be passed to each curve in its entirety.</p>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="fed3.plot.helpers.argh" href="#fed3.plot.helpers.argh">argh</a></code></li>
+<li><code><a title="fed3.plot.helpers.legend" href="#fed3.plot.helpers.legend">legend</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

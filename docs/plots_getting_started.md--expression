@@ -170,7 +170,7 @@ plt.show()
     
 
 
-This can also be used to plot different metrics from one FED on the same axis.  Note that shading of dark periods will be repeated, if not specified:
+This can also be used to plot different metrics from one FED on the same axis:
 
 
 ```python
@@ -190,6 +190,10 @@ plt.show()
     
 
 
+Note that above, `shadedark=False` is specified for the first plot to prevent the dark periods from being drawn twice.  An alternative to this is to set the default behavior to not draw dark periods.  This can be done by setting `fed3.plot.OPTIONS['default_shadedark'] = False`.  You can then "opt in" to shading the darkness with the `shadedark` argument, or by calling `fed3.plot.shadedark.shade_darkness()`.
+
+There is also a similar option for the legend, `fed3.plot.OPTIONS['default_legend']`.
+
 ### matplotlib keywords
 
 Most plots also accept keyword arguments which are passed to drawing functions from matplotlib, allowing for more specific customizations.  For example, `fed3.plot.line()` passes arguments to [`matplotlib.axes.Axes.plot`](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html):
@@ -202,7 +206,7 @@ plt.show()
 
 
     
-![png](plots_getting_started_files/plots_getting_started_25_0.png)
+![png](plots_getting_started_files/plots_getting_started_26_0.png)
     
 
 
@@ -222,7 +226,7 @@ plt.show()
 
 
     
-![png](plots_getting_started_files/plots_getting_started_27_0.png)
+![png](plots_getting_started_files/plots_getting_started_28_0.png)
     
 
 
@@ -236,7 +240,7 @@ plt.show()
 
 
     
-![png](plots_getting_started_files/plots_getting_started_29_0.png)
+![png](plots_getting_started_files/plots_getting_started_30_0.png)
     
 
 
@@ -251,7 +255,7 @@ plt.show()
 
 
     
-![png](plots_getting_started_files/plots_getting_started_31_0.png)
+![png](plots_getting_started_files/plots_getting_started_32_0.png)
     
 
 
@@ -273,7 +277,7 @@ display(data)
 
 
     
-![png](plots_getting_started_files/plots_getting_started_34_0.png)
+![png](plots_getting_started_files/plots_getting_started_35_0.png)
     
 
 

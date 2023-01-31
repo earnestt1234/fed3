@@ -18,6 +18,7 @@ from fed3.metrics.core import get_metric
 from fed3.metrics.tables import (_create_metric_df,
                                  _stack_group_values)
 
+from fed3.plot import OPTIONS
 from fed3.plot.helpers import (_get_return_value, _parse_feds)
 
 def _plot_hist_data(ax, data, logx, kde, legend=True, **kwargs):
@@ -37,7 +38,7 @@ def _plot_hist_data(ax, data, logx, kde, legend=True, **kwargs):
     return ax.get_figure()
 
 def ipi(feds, logx=True, kde=True, mixed_align='raise', output='plot',
-        ax=None, legend=True, **kwargs):
+        ax=None, legend=None, **kwargs):
 
     # set the outputs
     FIG = None
@@ -61,6 +62,8 @@ def ipi(feds, logx=True, kde=True, mixed_align='raise', output='plot',
     DATA = _create_metric_df(feds_list=feds_all, metric=metric)
     if is_group:
         DATA = _stack_group_values(DATA, feds_dict)
+
+    legend = OPTIONS['default_legend'] if legend is None else legend
 
     # handle plot creation and returns
     if output in ['plot', 'data', 'both']:

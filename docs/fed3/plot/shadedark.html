@@ -38,29 +38,52 @@ Created on Sun May  9 15:26:30 2021
 @author: earnestt1234
 &#34;&#34;&#34;
 
-from fed3.lightcycle import lightcycle_tuples
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
-def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
-    &#34;&#34;&#34;
-    Shade the night periods of a matplotlib Axes with a datetime x-axis.
+from fed3.lightcycle import lightcycle_tuples, LIGHTCYCLE
+
+def shade_darkness(ax=None, min_date=None, max_date=None, lights_on=None, lights_off=None):
+    &#39;&#39;&#39;
+    Shade the night time periods with vertical bars on a datetime x-axis.
 
     Parameters
     ----------
-    ax : matplotlib.axes.Axes
-        Plot Axes.
-    min_date : datetime
-        Earliest date to shade.
-    max_date : datetime
-        Latest date to shade.
-    lights_on : int
-        Integer between 0 and 23 representing when the light cycle begins.
-    lights_off : int
-        Integer between 0 and 23 representing when the light cycle ends.
+    ax : matplotlib.axes.Axes, optional
+        Axes to shade. The default is None, in which case uses `plt.gca()`.
+    min_date : datetime, optional
+        Earliest date to shade. The default is None, in which case is inferred
+        from axis.
+    max_date : TYPE, optional
+        Latest date to shade. The default is None, in which case is inferred
+        from axis.
+    lights_on : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
+    lights_off : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
 
     Returns
     -------
     None.
-    &#34;&#34;&#34;
+
+    &#39;&#39;&#39;
+
+    if ax is None:
+        ax = plt.gca()
+
+    if min_date is None:
+        min_date, _ = mdates.num2date(ax.get_xlim())
+
+    if max_date is None:
+        _, max_date = mdates.num2date(ax.get_xlim())
+
+    if lights_on is None:
+        lights_on = LIGHTCYCLE[&#39;on&#39;]
+
+    if lights_off is None:
+        lights_off = LIGHTCYCLE[&#39;off&#39;]
 
     nights = lightcycle_tuples(start_date=min_date,
                                end_date=max_date,
@@ -85,22 +108,26 @@ def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.shadedark.shade_darkness"><code class="name flex">
-<span>def <span class="ident">shade_darkness</span></span>(<span>ax, min_date, max_date, lights_on, lights_off)</span>
+<span>def <span class="ident">shade_darkness</span></span>(<span>ax=None, min_date=None, max_date=None, lights_on=None, lights_off=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Shade the night periods of a matplotlib Axes with a datetime x-axis.</p>
+<div class="desc"><p>Shade the night time periods with vertical bars on a datetime x-axis.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib.axes.Axes</code></dt>
-<dd>Plot Axes.</dd>
-<dt><strong><code>min_date</code></strong> :&ensp;<code>datetime</code></dt>
-<dd>Earliest date to shade.</dd>
-<dt><strong><code>max_date</code></strong> :&ensp;<code>datetime</code></dt>
-<dd>Latest date to shade.</dd>
-<dt><strong><code>lights_on</code></strong> :&ensp;<code>int</code></dt>
-<dd>Integer between 0 and 23 representing when the light cycle begins.</dd>
-<dt><strong><code>lights_off</code></strong> :&ensp;<code>int</code></dt>
-<dd>Integer between 0 and 23 representing when the light cycle ends.</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib.axes.Axes</code>, optional</dt>
+<dd>Axes to shade. The default is None, in which case uses <code>plt.gca()</code>.</dd>
+<dt><strong><code>min_date</code></strong> :&ensp;<code>datetime</code>, optional</dt>
+<dd>Earliest date to shade. The default is None, in which case is inferred
+from axis.</dd>
+<dt><strong><code>max_date</code></strong> :&ensp;<code>TYPE</code>, optional</dt>
+<dd>Latest date to shade. The default is None, in which case is inferred
+from axis.</dd>
+<dt><strong><code>lights_on</code></strong> :&ensp;<code>datetime.time</code>, optional</dt>
+<dd>Time indicating beginning of light cycle. The default is None, in
+which case <code><a title="fed3.lightcycle.LIGHTCYCLE" href="../lightcycle.html#fed3.lightcycle.LIGHTCYCLE">LIGHTCYCLE</a></code> is used.</dd>
+<dt><strong><code>lights_off</code></strong> :&ensp;<code>datetime.time</code>, optional</dt>
+<dd>Time indicating beginning of light cycle. The default is None, in
+which case <code><a title="fed3.lightcycle.LIGHTCYCLE" href="../lightcycle.html#fed3.lightcycle.LIGHTCYCLE">LIGHTCYCLE</a></code> is used.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -108,27 +135,47 @@ def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shade_darkness(ax, min_date, max_date, lights_on, lights_off):
-    &#34;&#34;&#34;
-    Shade the night periods of a matplotlib Axes with a datetime x-axis.
+<pre><code class="python">def shade_darkness(ax=None, min_date=None, max_date=None, lights_on=None, lights_off=None):
+    &#39;&#39;&#39;
+    Shade the night time periods with vertical bars on a datetime x-axis.
 
     Parameters
     ----------
-    ax : matplotlib.axes.Axes
-        Plot Axes.
-    min_date : datetime
-        Earliest date to shade.
-    max_date : datetime
-        Latest date to shade.
-    lights_on : int
-        Integer between 0 and 23 representing when the light cycle begins.
-    lights_off : int
-        Integer between 0 and 23 representing when the light cycle ends.
+    ax : matplotlib.axes.Axes, optional
+        Axes to shade. The default is None, in which case uses `plt.gca()`.
+    min_date : datetime, optional
+        Earliest date to shade. The default is None, in which case is inferred
+        from axis.
+    max_date : TYPE, optional
+        Latest date to shade. The default is None, in which case is inferred
+        from axis.
+    lights_on : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
+    lights_off : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
 
     Returns
     -------
     None.
-    &#34;&#34;&#34;
+
+    &#39;&#39;&#39;
+
+    if ax is None:
+        ax = plt.gca()
+
+    if min_date is None:
+        min_date, _ = mdates.num2date(ax.get_xlim())
+
+    if max_date is None:
+        _, max_date = mdates.num2date(ax.get_xlim())
+
+    if lights_on is None:
+        lights_on = LIGHTCYCLE[&#39;on&#39;]
+
+    if lights_off is None:
+        lights_off = LIGHTCYCLE[&#39;off&#39;]
 
     nights = lightcycle_tuples(start_date=min_date,
                                end_date=max_date,

@@ -47,6 +47,7 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import _bar_metric_df
 
+from fed3.plot import OPTIONS
 from fed3.plot.helpers import (_get_most_recent_color,
                                _get_return_value,
                                _parse_feds,
@@ -89,7 +90,7 @@ def _jitter_ys(ys, xcenter, spread):
 
 def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
         mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
-        position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
+        position_labels=None, legend=None, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
@@ -193,6 +194,7 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
         if position_labels is not None:
             ax.set_xticklabels(position_labels)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend()
 
@@ -214,7 +216,7 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.barchart.bar"><code class="name flex">
-<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=None, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -224,7 +226,7 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 </summary>
 <pre><code class="python">def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
         mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
-        position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
+        position_labels=None, legend=None, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
@@ -328,6 +330,7 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
         if position_labels is not None:
             ax.set_xticklabels(position_labels)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend()
 

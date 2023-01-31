@@ -4,7 +4,11 @@
 .. include:: ../../docs/plots_getting_started.md
 '''
 
-#imports for package namespace
+# define options
+OPTIONS = {'default_shadedark': True,
+           'default_legend': True}
+
+# imports for package namespace
 
 from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
@@ -23,4 +27,5 @@ __all__ = ['argh',
            'line',
            'scatter',
            'shade_darkness']
+
 

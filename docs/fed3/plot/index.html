@@ -122,8 +122,7 @@ fplot.ipi(f, ax=ax2)
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_21_0.png"></p>
-<p>This can also be used to plot different metrics from one FED on the same axis.
-Note that shading of dark periods will be repeated, if not specified:</p>
+<p>This can also be used to plot different metrics from one FED on the same axis:</p>
 <pre><code class="python"># create figure and axis
 fig = plt.figure()
 ax = plt.subplot()
@@ -134,13 +133,18 @@ plt.ylabel('Pokes')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_23_0.png"></p>
+<p>Note that above, <code>shadedark=False</code> is specified for the first plot to prevent the dark periods from being drawn twice.
+An alternative to this is to set the default behavior to not draw dark periods.
+This can be done by setting <code>fed3.plot.OPTIONS['default_shadedark'] = False</code>.
+You can then "opt in" to shading the darkness with the <code><a title="fed3.plot.shadedark" href="shadedark.html">fed3.plot.shadedark</a></code> argument, or by calling <code><a title="fed3.plot.shadedark.shade_darkness" href="shadedark.html#fed3.plot.shadedark.shade_darkness">shade_darkness()</a></code>.</p>
+<p>There is also a similar option for the legend, <code>fed3.plot.OPTIONS['default_legend']</code>.</p>
 <h3 id="matplotlib-keywords">matplotlib keywords</h3>
 <p>Most plots also accept keyword arguments which are passed to drawing functions from matplotlib, allowing for more specific customizations.
 For example, <code><a title="fed3.plot.line" href="#fed3.plot.line">line()</a></code> passes arguments to <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html"><code>matplotlib.axes.Axes.plot</code></a>:</p>
 <pre><code class="python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_25_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_26_0.png"></p>
 <p>When plotting multiple FEDs, specifying a single value for a keyword argument applies it to all FEDs.
 To specify particular styles for particular FEDs, dictionaries can be used:</p>
 <pre><code class="python">styles = {
@@ -152,7 +156,7 @@ To specify particular styles for particular FEDs, dictionaries can be used:</p>
 fplot.line(feds[0:3], y='correct_pokes', lw=3, line_kwargs=styles)
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_27_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_28_0.png"></p>
 <p>The above method can be somewhat cumbersome to setup.
 One alternative that fed3 provides is the "argument helper", abbreviated with <code><a title="fed3.plot.argh" href="#fed3.plot.argh">argh()</a></code>.
 This can be used to pass a series of arguments to a series of curves being plotted.
@@ -160,14 +164,14 @@ To generate a similar plot as above, do:</p>
 <pre><code class="python">fplot.line(feds[0:3], y='error_pokes', lw=3, color=fplot.argh(['cyan', 'magenta', 'yellow']))
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_29_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_30_0.png"></p>
 <p>When plotting grouped data, the group names are used as keys instead of individual FED names.
 Also, depending on the plotting function, there may be specific arguments to manage keywords directed at different elements:</p>
 <pre><code class="python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
            line_kwargs={'color':'black'}, error_kwargs={'color':'gray', 'alpha':0.8})
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_31_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_32_0.png"></p>
 <h2 id="getting-plot-data">Getting plot data</h2>
 <p>Plotting functions from fed3 can also be used as jumping off points for analyses or other plotting code.
 Most functions have an <code>output</code> argument which determines the object returned.
@@ -182,7 +186,7 @@ Options are typically:</p>
 plt.show()
 display(data)
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_34_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_35_0.png"></p>
 <div>
 <style scoped>
 .dataframe tbody tr th:only-of-type {
@@ -333,12 +337,17 @@ text-align: right;
 .. include:: ../../docs/plots_getting_started.md
 &#39;&#39;&#39;
 
-#imports for package namespace
+# define options
+OPTIONS = {&#39;default_shadedark&#39;: True,
+           &#39;default_legend&#39;: True}
+
+# imports for package namespace
 
 from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
-from .helpers import argh
+from .helpers import argh, legend
 from .ipi import (ipi)
+from .shadedark import shade_darkness
 from .simple import (line, scatter)
 
 __all__ = [&#39;argh&#39;,
@@ -347,8 +356,10 @@ __all__ = [&#39;argh&#39;,
            &#39;chronogram_line&#39;,
            &#39;chronogram_spiny&#39;,
            &#39;ipi&#39;,
+           &#39;legend&#39;,
            &#39;line&#39;,
-           &#39;scatter&#39;]</code></pre>
+           &#39;scatter&#39;,
+           &#39;shade_darkness&#39;]</code></pre>
 </details>
 </section>
 <section>
@@ -433,7 +444,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </details>
 </dd>
 <dt id="fed3.plot.bar"><code class="name flex">
-<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=None, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -443,7 +454,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </summary>
 <pre><code class="python">def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
         mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
-        position_labels=None, legend=True, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
+        position_labels=None, legend=None, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
@@ -547,6 +558,7 @@ a list of args will be passed to each curve in its entirety.</p>
         if position_labels is not None:
             ax.set_xticklabels(position_labels)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend()
 
@@ -561,7 +573,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </details>
 </dd>
 <dt id="fed3.plot.chronogram_circle"><code class="name flex">
-<span>def <span class="ident">chronogram_circle</span></span>(<span>feds, y='pellets', bins='1H', agg='mean', var='std', mixed_align='raise', output='plot', shadedark=True, ax=None, legend=True, line_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">chronogram_circle</span></span>(<span>feds, y='pellets', bins='1H', agg='mean', var='std', mixed_align='raise', output='plot', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -571,7 +583,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </summary>
 <pre><code class="python">def chronogram_circle(feds, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mean&#39;, var=&#39;std&#39;,
                       mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-                      shadedark=True, ax=None, legend=True,
+                      shadedark=None, ax=None, legend=None,
                       line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
@@ -678,6 +690,7 @@ a list of args will be passed to each curve in its entirety.</p>
         ax.set_xticklabels([0, 6, 12, 18, None])
         ax.set_title(metricname, pad=10)
 
+        shadedark = OPTIONS[&#39;default_shadedark&#39;] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE[&#39;on&#39;], LIGHTCYCLE[&#39;off&#39;]
             on = time_to_float(on)
@@ -688,6 +701,7 @@ a list of args will be passed to each curve in its entirety.</p>
             ax.fill_between(np.linspace(theta, 2*np.pi, 100), 0, ax.get_rmax(),
                             color=&#39;gray&#39;,alpha=.2,zorder=0,label=&#39;lights off&#39;)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend()
 
@@ -695,7 +709,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </details>
 </dd>
 <dt id="fed3.plot.chronogram_line"><code class="name flex">
-<span>def <span class="ident">chronogram_line</span></span>(<span>feds, y='pellets', bins='15T', agg='mean', var='std', mixed_align='raise', output='plot', shadedark=True, ax=None, legend=True, line_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">chronogram_line</span></span>(<span>feds, y='pellets', bins='15T', agg='mean', var='std', mixed_align='raise', output='plot', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -705,7 +719,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </summary>
 <pre><code class="python">def chronogram_line(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mean&#39;, var=&#39;std&#39;,
                     mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-                    shadedark=True, ax=None, legend=True,
+                    shadedark=None, ax=None, legend=None,
                     line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
@@ -803,6 +817,7 @@ a list of args will be passed to each curve in its entirety.</p>
 
         ax.set_xticks([0, 6, 12, 18, 24])
 
+        shadedark = OPTIONS[&#39;default_shadedark&#39;] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE[&#39;on&#39;], LIGHTCYCLE[&#39;off&#39;]
             on = time_to_float(on)
@@ -811,6 +826,7 @@ a list of args will be passed to each curve in its entirety.</p>
             start = off - on
             ax.axvspan(start, 24, color=&#39;gray&#39;, alpha=.2, zorder=0, label=&#39;lights off&#39;)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend(bbox_to_anchor=(1,1), loc=&#39;upper left&#39;)
 
@@ -818,7 +834,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </details>
 </dd>
 <dt id="fed3.plot.chronogram_spiny"><code class="name flex">
-<span>def <span class="ident">chronogram_spiny</span></span>(<span>feds, y='pellets', bins='15T', agg='mean', mixed_align='raise', output='plot', shadedark=True, ax=None, legend=True, plot_quick=True, **kwargs)</span>
+<span>def <span class="ident">chronogram_spiny</span></span>(<span>feds, y='pellets', bins='15T', agg='mean', mixed_align='raise', output='plot', shadedark=None, ax=None, legend=None, plot_quick=True, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -828,7 +844,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </summary>
 <pre><code class="python">def chronogram_spiny(feds, y=&#39;pellets&#39;, bins=&#39;15T&#39;, agg=&#39;mean&#39;,
                      mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-                     shadedark=True, ax=None, legend=True,
+                     shadedark=None, ax=None, legend=None,
                      plot_quick=True, **kwargs):
 
     # handle parsing here, to only accept single groups
@@ -886,6 +902,7 @@ a list of args will be passed to each curve in its entirety.</p>
         ax.set_xticklabels([0, 6, 12, 18, None])
         ax.set_title(metricname, pad=10)
 
+        shadedark = OPTIONS[&#39;default_shadedark&#39;] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE[&#39;on&#39;], LIGHTCYCLE[&#39;off&#39;]
             on = time_to_float(on)
@@ -896,6 +913,7 @@ a list of args will be passed to each curve in its entirety.</p>
             ax.fill_between(np.linspace(theta, 2*np.pi, 100), 0, ax.get_rmax(),
                             color=&#39;gray&#39;,alpha=.2,zorder=0,label=&#39;lights off&#39;)
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend(bbox_to_anchor=(1,1), loc=&#39;upper left&#39;)
 
@@ -903,7 +921,7 @@ a list of args will be passed to each curve in its entirety.</p>
 </details>
 </dd>
 <dt id="fed3.plot.ipi"><code class="name flex">
-<span>def <span class="ident">ipi</span></span>(<span>feds, logx=True, kde=True, mixed_align='raise', output='plot', ax=None, legend=True, **kwargs)</span>
+<span>def <span class="ident">ipi</span></span>(<span>feds, logx=True, kde=True, mixed_align='raise', output='plot', ax=None, legend=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -912,7 +930,7 @@ a list of args will be passed to each curve in its entirety.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ipi(feds, logx=True, kde=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-        ax=None, legend=True, **kwargs):
+        ax=None, legend=None, **kwargs):
 
     # set the outputs
     FIG = None
@@ -937,6 +955,8 @@ a list of args will be passed to each curve in its entirety.</p>
     if is_group:
         DATA = _stack_group_values(DATA, feds_dict)
 
+    legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
+
     # handle plot creation and returns
     if output in [&#39;plot&#39;, &#39;data&#39;, &#39;both&#39;]:
 
@@ -955,8 +975,22 @@ a list of args will be passed to each curve in its entirety.</p>
     return _get_return_value(FIG=FIG, DATA=DATA, output=output)</code></pre>
 </details>
 </dd>
+<dt id="fed3.plot.legend"><code class="name flex">
+<span>def <span class="ident">legend</span></span>(<span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convenience method for calling <code>plt.legend()</code> to generate a legend</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def legend(*args, **kwargs):
+    &#39;&#39;&#39;Convenience method for calling `plt.legend()` to generate a legend&#39;&#39;&#39;
+    plt.legend(*args, **kwargs)</code></pre>
+</details>
+</dd>
 <dt id="fed3.plot.line"><code class="name flex">
-<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=True, ax=None, legend=True, line_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Create a line plot, with time on the x-axis and a variable
@@ -1023,14 +1057,16 @@ the first element being the Figure, and second element being the data.
 <dd>X-axis type to used for plotting. This is usually determined by the
 alignment of the FEDFrames, and should be handled by 'auto' (default).
 Other options are 'datetime', 'time', and 'elapsed'.</dd>
-<dt><strong><code>shadedark</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dt><strong><code>shadedark</code></strong> :&ensp;<code>bool</code> or <code>None</code>, optional</dt>
 <dd>When applicable based on the FEDFrame alignment, create shaded
-boxes indicating when the lights were off. The default is True.</dd>
+boxes indicating when the lights were off. The default is None,
+in which case follows <code>fed3.plot.OPTIONS['default_shadedark']</code>.</dd>
 <dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, optional</dt>
 <dd>Axes to direct the plotting to. The default is None, in which case
 <code>plt.gca()</code> is used.</dd>
-<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Create a legend. The default is True.</dd>
+<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code> or <code>None</code>, optional</dt>
+<dd>Create a legend. The default is None, in which case follows
+<code>fed3.plot.OPTIONS['default_legend']</code>.</dd>
 <dt><strong><code>line_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
 <dd>Dictionary for providing kwargs to matplotlib, specifically <code>ax.plot()</code>.
 - If the dictionary key corresponds to the name of a FEDFrame being plotted,
@@ -1065,7 +1101,7 @@ to all lines being plotted.</dd>
 </summary>
 <pre><code class="python">def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
          omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-         xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+         xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
          line_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;
     Create a line plot, with time on the x-axis and a variable
@@ -1122,14 +1158,16 @@ to all lines being plotted.</dd>
         X-axis type to used for plotting. This is usually determined by the
         alignment of the FEDFrames, and should be handled by &#39;auto&#39; (default).
         Other options are &#39;datetime&#39;, &#39;time&#39;, and &#39;elapsed&#39;.
-    shadedark : bool, optional
+    shadedark : bool or None, optional
         When applicable based on the FEDFrame alignment, create shaded
-        boxes indicating when the lights were off. The default is True.
+        boxes indicating when the lights were off. The default is None,
+        in which case follows `fed3.plot.OPTIONS[&#39;default_shadedark&#39;]`.
     ax : matplotlib Axes, optional
         Axes to direct the plotting to. The default is None, in which case
         `plt.gca()` is used.
-    legend : bool, optional
-        Create a legend. The default is True.
+    legend : bool or None, optional
+        Create a legend. The default is None, in which case follows
+        `fed3.plot.OPTIONS[&#39;default_legend&#39;]`.
     line_kwargs : dict-like, optional
         Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
         - If the dictionary key corresponds to the name of a FEDFrame being plotted,
@@ -1182,7 +1220,7 @@ to all lines being plotted.</dd>
 </details>
 </dd>
 <dt id="fed3.plot.scatter"><code class="name flex">
-<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=True, ax=None, legend=True, point_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, point_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1192,7 +1230,7 @@ to all lines being plotted.</dd>
 </summary>
 <pre><code class="python">def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
             omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-            xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+            xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
             point_kwargs=None, error_kwargs=None, **kwargs):
 
     feds_dict = _parse_feds(feds)
@@ -1216,6 +1254,91 @@ to all lines being plotted.</dd>
                         plot_kwargs=point_kwargs,
                         error_kwargs=error_kwargs,
                         **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="fed3.plot.shade_darkness"><code class="name flex">
+<span>def <span class="ident">shade_darkness</span></span>(<span>ax=None, min_date=None, max_date=None, lights_on=None, lights_off=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Shade the night time periods with vertical bars on a datetime x-axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib.axes.Axes</code>, optional</dt>
+<dd>Axes to shade. The default is None, in which case uses <code>plt.gca()</code>.</dd>
+<dt><strong><code>min_date</code></strong> :&ensp;<code>datetime</code>, optional</dt>
+<dd>Earliest date to shade. The default is None, in which case is inferred
+from axis.</dd>
+<dt><strong><code>max_date</code></strong> :&ensp;<code>TYPE</code>, optional</dt>
+<dd>Latest date to shade. The default is None, in which case is inferred
+from axis.</dd>
+<dt><strong><code>lights_on</code></strong> :&ensp;<code>datetime.time</code>, optional</dt>
+<dd>Time indicating beginning of light cycle. The default is None, in
+which case <code><a title="fed3.lightcycle.LIGHTCYCLE" href="../lightcycle.html#fed3.lightcycle.LIGHTCYCLE">LIGHTCYCLE</a></code> is used.</dd>
+<dt><strong><code>lights_off</code></strong> :&ensp;<code>datetime.time</code>, optional</dt>
+<dd>Time indicating beginning of light cycle. The default is None, in
+which case <code><a title="fed3.lightcycle.LIGHTCYCLE" href="../lightcycle.html#fed3.lightcycle.LIGHTCYCLE">LIGHTCYCLE</a></code> is used.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def shade_darkness(ax=None, min_date=None, max_date=None, lights_on=None, lights_off=None):
+    &#39;&#39;&#39;
+    Shade the night time periods with vertical bars on a datetime x-axis.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes, optional
+        Axes to shade. The default is None, in which case uses `plt.gca()`.
+    min_date : datetime, optional
+        Earliest date to shade. The default is None, in which case is inferred
+        from axis.
+    max_date : TYPE, optional
+        Latest date to shade. The default is None, in which case is inferred
+        from axis.
+    lights_on : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
+    lights_off : datetime.time, optional
+        Time indicating beginning of light cycle. The default is None, in
+        which case `fed3.lightcycle.LIGHTCYCLE` is used.
+
+    Returns
+    -------
+    None.
+
+    &#39;&#39;&#39;
+
+    if ax is None:
+        ax = plt.gca()
+
+    if min_date is None:
+        min_date, _ = mdates.num2date(ax.get_xlim())
+
+    if max_date is None:
+        _, max_date = mdates.num2date(ax.get_xlim())
+
+    if lights_on is None:
+        lights_on = LIGHTCYCLE[&#39;on&#39;]
+
+    if lights_off is None:
+        lights_off = LIGHTCYCLE[&#39;off&#39;]
+
+    nights = lightcycle_tuples(start_date=min_date,
+                               end_date=max_date,
+                               lights_on=lights_on,
+                               lights_off=lights_off,
+                               kind=&#39;nights&#39;)
+
+    for i, (start, end) in enumerate(nights):
+        ax.axvspan(start,
+                   end,
+                   color=&#39;gray&#39;,
+                   alpha=.2,
+                   label=&#39;_&#39;*i + &#39;lights off&#39;,
+                   zorder=0)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1272,8 +1395,10 @@ to all lines being plotted.</dd>
 <li><code><a title="fed3.plot.chronogram_line" href="#fed3.plot.chronogram_line">chronogram_line</a></code></li>
 <li><code><a title="fed3.plot.chronogram_spiny" href="#fed3.plot.chronogram_spiny">chronogram_spiny</a></code></li>
 <li><code><a title="fed3.plot.ipi" href="#fed3.plot.ipi">ipi</a></code></li>
+<li><code><a title="fed3.plot.legend" href="#fed3.plot.legend">legend</a></code></li>
 <li><code><a title="fed3.plot.line" href="#fed3.plot.line">line</a></code></li>
 <li><code><a title="fed3.plot.scatter" href="#fed3.plot.scatter">scatter</a></code></li>
+<li><code><a title="fed3.plot.shade_darkness" href="#fed3.plot.shade_darkness">shade_darkness</a></code></li>
 </ul>
 </li>
 </ul>

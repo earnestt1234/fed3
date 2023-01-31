@@ -17,6 +17,7 @@ from fed3.core.fedfuncs import screen_mixed_alignment
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import _bar_metric_df
 
+from fed3.plot import OPTIONS
 from fed3.plot.helpers import (_get_most_recent_color,
                                _get_return_value,
                                _parse_feds,
@@ -59,7 +60,7 @@ def _jitter_ys(ys, xcenter, spread):
 
 def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
         mixed_align='raise', show_individual=False, spread=0.3, positions=None,
-        position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None,
+        position_labels=None, legend=None, ax=None, output='plot', bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
 
     # parse inputs
@@ -163,6 +164,7 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
         if position_labels is not None:
             ax.set_xticklabels(position_labels)
 
+        legend = OPTIONS['default_legend'] if legend is None else legend
         if legend:
             ax.legend()
 

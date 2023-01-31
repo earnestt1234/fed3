@@ -4,7 +4,8 @@
 General code for helping with the light cycle for FED3 data.
 """
 
-__all__ = ['set_lightcycle']
+__all__ = ['set_lightcycle',
+           'LIGHTCYCLE']
 
 import datetime as dt
 

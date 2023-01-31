@@ -49,6 +49,7 @@ from fed3.metrics.tables import (_create_group_metric_df,  _create_metric_df,)
 
 from fed3.metrics.core import get_metric
 
+from fed3.plot import OPTIONS
 from fed3.plot.format_axis import FORMAT_XAXIS_OPTS
 from fed3.plot.helpers import (_get_most_recent_color,
                                _get_return_value,
@@ -97,7 +98,7 @@ def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
 
 def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mean&#39;,
                  var=&#39;std&#39;, omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-                 xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+                 xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
                  plot_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;Underlying method used by `line()` and `scatter()`.  Both
     these methods involve identical data processing - the only
@@ -208,11 +209,13 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
                     plotfunc(ax=ax, data=metric_df[col], **this_error_kwargs)
 
         # axis level formatting
+        shadedark = OPTIONS[&#39;default_shadedark&#39;] if shadedark is None else shadedark
         if shadedark:
             shade_darkness(ax, DATA.index.min(), DATA.index.max(),
                            lights_on=LIGHTCYCLE[&#39;on&#39;],
                            lights_off=LIGHTCYCLE[&#39;off&#39;])
 
+        legend = OPTIONS[&#39;default_legend&#39;] if legend is None else legend
         if legend:
             ax.legend()
 
@@ -225,7 +228,7 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
 
 def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
          omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-         xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+         xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
          line_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;
     Create a line plot, with time on the x-axis and a variable
@@ -282,14 +285,16 @@ def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&
         X-axis type to used for plotting. This is usually determined by the
         alignment of the FEDFrames, and should be handled by &#39;auto&#39; (default).
         Other options are &#39;datetime&#39;, &#39;time&#39;, and &#39;elapsed&#39;.
-    shadedark : bool, optional
+    shadedark : bool or None, optional
         When applicable based on the FEDFrame alignment, create shaded
-        boxes indicating when the lights were off. The default is True.
+        boxes indicating when the lights were off. The default is None,
+        in which case follows `fed3.plot.OPTIONS[&#39;default_shadedark&#39;]`.
     ax : matplotlib Axes, optional
         Axes to direct the plotting to. The default is None, in which case
         `plt.gca()` is used.
-    legend : bool, optional
-        Create a legend. The default is True.
+    legend : bool or None, optional
+        Create a legend. The default is None, in which case follows
+        `fed3.plot.OPTIONS[&#39;default_legend&#39;]`.
     line_kwargs : dict-like, optional
         Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
         - If the dictionary key corresponds to the name of a FEDFrame being plotted,
@@ -342,7 +347,7 @@ def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&
 
 def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
             omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-            xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+            xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
             point_kwargs=None, error_kwargs=None, **kwargs):
 
     feds_dict = _parse_feds(feds)
@@ -376,7 +381,7 @@ def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;s
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.simple.line"><code class="name flex">
-<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=True, ax=None, legend=True, line_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Create a line plot, with time on the x-axis and a variable
@@ -443,14 +448,16 @@ the first element being the Figure, and second element being the data.
 <dd>X-axis type to used for plotting. This is usually determined by the
 alignment of the FEDFrames, and should be handled by 'auto' (default).
 Other options are 'datetime', 'time', and 'elapsed'.</dd>
-<dt><strong><code>shadedark</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dt><strong><code>shadedark</code></strong> :&ensp;<code>bool</code> or <code>None</code>, optional</dt>
 <dd>When applicable based on the FEDFrame alignment, create shaded
-boxes indicating when the lights were off. The default is True.</dd>
+boxes indicating when the lights were off. The default is None,
+in which case follows <code>fed3.plot.OPTIONS['default_shadedark']</code>.</dd>
 <dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, optional</dt>
 <dd>Axes to direct the plotting to. The default is None, in which case
 <code>plt.gca()</code> is used.</dd>
-<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Create a legend. The default is True.</dd>
+<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code> or <code>None</code>, optional</dt>
+<dd>Create a legend. The default is None, in which case follows
+<code>fed3.plot.OPTIONS['default_legend']</code>.</dd>
 <dt><strong><code>line_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
 <dd>Dictionary for providing kwargs to matplotlib, specifically <code>ax.plot()</code>.
 - If the dictionary key corresponds to the name of a FEDFrame being plotted,
@@ -485,7 +492,7 @@ to all lines being plotted.</dd>
 </summary>
 <pre><code class="python">def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
          omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-         xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+         xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
          line_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;
     Create a line plot, with time on the x-axis and a variable
@@ -542,14 +549,16 @@ to all lines being plotted.</dd>
         X-axis type to used for plotting. This is usually determined by the
         alignment of the FEDFrames, and should be handled by &#39;auto&#39; (default).
         Other options are &#39;datetime&#39;, &#39;time&#39;, and &#39;elapsed&#39;.
-    shadedark : bool, optional
+    shadedark : bool or None, optional
         When applicable based on the FEDFrame alignment, create shaded
-        boxes indicating when the lights were off. The default is True.
+        boxes indicating when the lights were off. The default is None,
+        in which case follows `fed3.plot.OPTIONS[&#39;default_shadedark&#39;]`.
     ax : matplotlib Axes, optional
         Axes to direct the plotting to. The default is None, in which case
         `plt.gca()` is used.
-    legend : bool, optional
-        Create a legend. The default is True.
+    legend : bool or None, optional
+        Create a legend. The default is None, in which case follows
+        `fed3.plot.OPTIONS[&#39;default_legend&#39;]`.
     line_kwargs : dict-like, optional
         Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
         - If the dictionary key corresponds to the name of a FEDFrame being plotted,
@@ -602,7 +611,7 @@ to all lines being plotted.</dd>
 </details>
 </dd>
 <dt id="fed3.plot.simple.scatter"><code class="name flex">
-<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=True, ax=None, legend=True, point_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, point_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -612,7 +621,7 @@ to all lines being plotted.</dd>
 </summary>
 <pre><code class="python">def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
             omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
-            xaxis=&#39;auto&#39;, shadedark=True, ax=None, legend=True,
+            xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
             point_kwargs=None, error_kwargs=None, **kwargs):
 
     feds_dict = _parse_feds(feds)

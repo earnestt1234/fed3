@@ -21,6 +21,7 @@ from fed3.lightcycle import LIGHTCYCLE, time_to_float
 from fed3.metrics.core import get_metric
 from fed3.metrics.tables import (_create_chronogram_df, _create_group_chronogram_df)
 
+from fed3.plot import OPTIONS
 from fed3.plot.helpers import (_assign_plot_names,
                                _get_most_recent_color,
                                _get_return_value,
@@ -29,7 +30,7 @@ from fed3.plot.helpers import (_assign_plot_names,
 
 def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
                       mixed_align='raise', output='plot',
-                      shadedark=True, ax=None, legend=True,
+                      shadedark=None, ax=None, legend=None,
                       line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
@@ -136,6 +137,7 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
         ax.set_xticklabels([0, 6, 12, 18, None])
         ax.set_title(metricname, pad=10)
 
+        shadedark = OPTIONS['default_shadedark'] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
             on = time_to_float(on)
@@ -146,6 +148,7 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
             ax.fill_between(np.linspace(theta, 2*np.pi, 100), 0, ax.get_rmax(),
                             color='gray',alpha=.2,zorder=0,label='lights off')
 
+        legend = OPTIONS['default_legend'] if legend is None else legend
         if legend:
             ax.legend()
 
@@ -153,7 +156,7 @@ def chronogram_circle(feds, y='pellets', bins='1H', agg='mean', var='std',
 
 def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
                     mixed_align='raise', output='plot',
-                    shadedark=True, ax=None, legend=True,
+                    shadedark=None, ax=None, legend=None,
                     line_kwargs=None, error_kwargs=None, **kwargs):
 
     # parse input
@@ -251,6 +254,7 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
 
         ax.set_xticks([0, 6, 12, 18, 24])
 
+        shadedark = OPTIONS['default_shadedark'] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
             on = time_to_float(on)
@@ -259,6 +263,7 @@ def chronogram_line(feds, y='pellets', bins='15T', agg='mean', var='std',
             start = off - on
             ax.axvspan(start, 24, color='gray', alpha=.2, zorder=0, label='lights off')
 
+        legend = OPTIONS['default_legend'] if legend is None else legend
         if legend:
             ax.legend(bbox_to_anchor=(1,1), loc='upper left')
 
@@ -295,7 +300,7 @@ def _spine_data_trick(x, y):
 
 def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
                      mixed_align='raise', output='plot',
-                     shadedark=True, ax=None, legend=True,
+                     shadedark=None, ax=None, legend=None,
                      plot_quick=True, **kwargs):
 
     # handle parsing here, to only accept single groups
@@ -353,6 +358,7 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
         ax.set_xticklabels([0, 6, 12, 18, None])
         ax.set_title(metricname, pad=10)
 
+        shadedark = OPTIONS['default_shadedark'] if shadedark is None else shadedark
         if shadedark:
             on, off = LIGHTCYCLE['on'], LIGHTCYCLE['off']
             on = time_to_float(on)
@@ -363,6 +369,7 @@ def chronogram_spiny(feds, y='pellets', bins='15T', agg='mean',
             ax.fill_between(np.linspace(theta, 2*np.pi, 100), 0, ax.get_rmax(),
                             color='gray',alpha=.2,zorder=0,label='lights off')
 
+        legend = OPTIONS['default_legend'] if legend is None else legend
         if legend:
             ax.legend(bbox_to_anchor=(1,1), loc='upper left')
 
