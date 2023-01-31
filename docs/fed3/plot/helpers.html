@@ -43,6 +43,8 @@ from collections import defaultdict
 from matplotlib import colors
 import pandas as pd
 
+# ---- &#39;Private&#39;
+
 def _assign_plot_names(feds, name_ddict):
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
@@ -108,14 +110,49 @@ def _parse_feds(feds):
 
 def _process_plot_kwargs(kwargs, plot_labels):
 
-    all_kwargs = {k:v for k, v in kwargs.items() if k not in plot_labels}
-    output = {}
+    kwargs_for_all = {}
+    output = {name: {} for name in plot_labels}
+    for k, v in kwargs.items():
+        if isinstance(v, ArgHelper):
+            output.update(v.generate_kwargs(k, plot_labels))
+        elif k not in plot_labels:
+            kwargs_for_all[k] = v
+
     for lab in plot_labels:
-        output[lab] = all_kwargs.copy()
+        output[lab].update(kwargs_for_all.copy())
         if kwargs.get(lab):
             output[lab].update(kwargs[lab])
 
-    return output</code></pre>
+    return output
+
+# ---- Public
+
+def argh(args):
+    &#39;&#39;&#39;
+    argh = arg helper.  Use this to pass each argument in `args`
+    one at a time to each curve being plotted.  If not used,
+    a list of args will be passed to each curve in its entirety.
+
+    Parameters
+    ----------
+    args : list-like
+        Arguments to pass out.
+
+    Returns
+    -------
+    ArgHelper
+        Object for distributing the arguments.
+
+    &#39;&#39;&#39;
+    return ArgHelper(args)
+
+class ArgHelper:
+
+    def __init__(self, args):
+        self.args = args
+
+    def generate_kwargs(self, argname, plot_labels):
+        return {name: {argname: arg} for name, arg in zip(plot_labels, self.args)}</code></pre>
 </details>
 </section>
 <section>
@@ -123,8 +160,92 @@ def _process_plot_kwargs(kwargs, plot_labels):
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="fed3.plot.helpers.argh"><code class="name flex">
+<span>def <span class="ident">argh</span></span>(<span>args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>argh = arg helper.
+Use this to pass each argument in <code>args</code>
+one at a time to each curve being plotted.
+If not used,
+a list of args will be passed to each curve in its entirety.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>args</code></strong> :&ensp;<code>list-like</code></dt>
+<dd>Arguments to pass out.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="fed3.plot.helpers.ArgHelper" href="#fed3.plot.helpers.ArgHelper">ArgHelper</a></code></dt>
+<dd>Object for distributing the arguments.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argh(args):
+    &#39;&#39;&#39;
+    argh = arg helper.  Use this to pass each argument in `args`
+    one at a time to each curve being plotted.  If not used,
+    a list of args will be passed to each curve in its entirety.
+
+    Parameters
+    ----------
+    args : list-like
+        Arguments to pass out.
+
+    Returns
+    -------
+    ArgHelper
+        Object for distributing the arguments.
+
+    &#39;&#39;&#39;
+    return ArgHelper(args)</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="fed3.plot.helpers.ArgHelper"><code class="flex name class">
+<span>class <span class="ident">ArgHelper</span></span>
+<span>(</span><span>args)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArgHelper:
+
+    def __init__(self, args):
+        self.args = args
+
+    def generate_kwargs(self, argname, plot_labels):
+        return {name: {argname: arg} for name, arg in zip(plot_labels, self.args)}</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="fed3.plot.helpers.ArgHelper.generate_kwargs"><code class="name flex">
+<span>def <span class="ident">generate_kwargs</span></span>(<span>self, argname, plot_labels)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_kwargs(self, argname, plot_labels):
+    return {name: {argname: arg} for name, arg in zip(plot_labels, self.args)}</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -136,6 +257,21 @@ def _process_plot_kwargs(kwargs, plot_labels):
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="fed3.plot" href="index.html">fed3.plot</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="fed3.plot.helpers.argh" href="#fed3.plot.helpers.argh">argh</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fed3.plot.helpers.ArgHelper" href="#fed3.plot.helpers.ArgHelper">ArgHelper</a></code></h4>
+<ul class="">
+<li><code><a title="fed3.plot.helpers.ArgHelper.generate_kwargs" href="#fed3.plot.helpers.ArgHelper.generate_kwargs">generate_kwargs</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

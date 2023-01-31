@@ -65,6 +65,8 @@ def bar(feds, y='pellets', stat='max', normalize=None, agg='mean', var='std',
     # parse inputs
     feds_dict = _parse_feds(feds)
     not_group = all(len(f) == 1 for f in feds_dict.values())
+    if not_group:
+        var = None
 
     # set the outputs
     FIG = None

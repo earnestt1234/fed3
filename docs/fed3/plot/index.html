@@ -26,18 +26,18 @@
 <h2 id="import-fed3plot">Import <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code></h2>
 <p>The plotting package within fed3, <code><a title="fed3.plot" href="#fed3.plot">fed3.plot</a></code> is not imported by default.
 Make an explicit call to import it:</p>
-<pre><code class="language-python">import fed3
+<pre><code class="python">import fed3
 import fed3.plot as fplot
 </code></pre>
 <p>For the purposes of this documentation, matplotlib will be used to set the default figure size.</p>
-<pre><code class="language-python">import matplotlib.pyplot as plt
+<pre><code class="python">import matplotlib.pyplot as plt
 
 plt.rcParams['figure.figsize'] = [7, 5]
 plt.rcParams['figure.dpi'] = 100
 </code></pre>
 <h2 id="example-data">Example data</h2>
 <p>The following sections will make use of some example data, provided by the <a href="https://earnestt1234.github.io/fed3/fed3/examples/index.html"><code>fed3.examples</code></a> package:</p>
-<pre><code class="language-python">feds = fed3.load_examples('justin')
+<pre><code class="python">feds = fed3.load_examples('justin', deduplicate_index='offset', offset='1s')
 f = feds[0]
 </code></pre>
 <h2 id="basic-plotting">Basic plotting</h2>
@@ -47,7 +47,7 @@ f = feds[0]
 <p>The simplest plot is the <a href="https://earnestt1234.github.io/fed3/fed3/plot/simple.html#fed3.plot.simple.line">line plot</a>, which plots a variable of interest over time.
 This demonstrates the syntax that applies to almost all plotting functions: pass the data to be plotted as the first argument (the FEDFrame(s)) followed by any options.
 In this case, the <code>y</code> parameter specifies the variable to be plotted: </p>
-<pre><code class="language-python">fplot.line(f, y='pellets')
+<pre><code class="python">fplot.line(f, y='pellets')
 
 plt.show()
 </code></pre>
@@ -65,18 +65,23 @@ Within each dictionary, the key is the group label, and the value is the collect
 </ul>
 <h4 id="list-of-feds">List of FEDs</h4>
 <p>The following is an example of the second option - data for each FED are plotted as individual lines.</p>
-<pre><code class="language-python">fplot.line(feds, y='pellets')
+<pre><code class="python">fplot.line(feds, y='pellets')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_12_0.png"></p>
 <h4 id="grouping">Grouping</h4>
 <p>To create a group average, pass a dictionary indicating group membership:</p>
-<pre><code class="language-python">groups = {'A' : feds[0:3], 'B' : feds[3:]}
+<pre><code class="python">groups = {'A' : feds[0:3], 'B' : feds[3:]}
 
 fplot.line(groups, y='pellets')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_14_0.png"></p>
+<pre><code class="python">bp = feds[0]['Pellet_Count'].diff().copy()
+feds[0].event_type(bp.index[0])
+</code></pre>
+<pre><code>'Poke'
+</code></pre>
 <p>A few things have changed in the above plot:</p>
 <ul>
 <li><strong>There are two curves plotted only</strong>; one for each member of the dictionary passed.
@@ -88,14 +93,14 @@ This is the default behavior of the <code>y='pellets'</code> metric (<a href="ht
 <p>There are options to tweak the behavior for grouping.
 <code>agg</code> sets the aggregation method for the grouped data, and <code>var</code> sets the measure of error.
 Furthermore, the <code>bins</code> parameter sets the resolution of temporal averaging:</p>
-<pre><code class="language-python">fplot.line(groups, y='pellets', bins='4H', agg='median')
+<pre><code class="python">fplot.line(groups, y='pellets', bins='4H', agg='median')
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_16_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_17_0.png"></p>
 <h2 id="integrating-with-matplotlib">Integrating with matplotlib</h2>
 <p>Plotting with fed3 is all implemented through calls to <a href="https://matplotlib.org/">matplotlib</a>.
 Thus, you can make use of typical matplotlib routines to customize your plots:</p>
-<pre><code class="language-python">import matplotlib.pyplot as plt
+<pre><code class="python">import matplotlib.pyplot as plt
 
 fplot.scatter(f, y='rt')
 
@@ -106,9 +111,9 @@ plt.axhline(20, color='red', linestyle='dashed')
 
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_18_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_19_0.png"></p>
 <p>Most plots can also be directed to a given <a href="https://matplotlib.org/stable/api/axes_api.html">matplotlib axis</a>, using the <code>ax</code> argument:</p>
-<pre><code class="language-python"># create layout
+<pre><code class="python"># create layout
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
 # plot
@@ -116,10 +121,10 @@ fplot.line(f, y='pellets', ax=ax1)
 fplot.ipi(f, ax=ax2)
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_20_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_21_0.png"></p>
 <p>This can also be used to plot different metrics from one FED on the same axis.
 Note that shading of dark periods will be repeated, if not specified:</p>
-<pre><code class="language-python"># create figure and axis
+<pre><code class="python"># create figure and axis
 fig = plt.figure()
 ax = plt.subplot()
 
@@ -128,17 +133,17 @@ fplot.line(f, y='right_pokes', ax=ax, label='Right')
 plt.ylabel('Pokes')
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_22_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_23_0.png"></p>
 <h3 id="matplotlib-keywords">matplotlib keywords</h3>
 <p>Most plots also accept keyword arguments which are passed to drawing functions from matplotlib, allowing for more specific customizations.
 For example, <code><a title="fed3.plot.line" href="#fed3.plot.line">line()</a></code> passes arguments to <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html"><code>matplotlib.axes.Axes.plot</code></a>:</p>
-<pre><code class="language-python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
+<pre><code class="python">fplot.line(f, y='correct_pokes', color='green', linestyle='dashed')
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_24_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_25_0.png"></p>
 <p>When plotting multiple FEDs, specifying a single value for a keyword argument applies it to all FEDs.
 To specify particular styles for particular FEDs, dictionaries can be used:</p>
-<pre><code class="language-python">styles = {
+<pre><code class="python">styles = {
     feds[0].name : {'color': 'cyan'},
     feds[1].name : {'color': 'yellow'},
     feds[2].name : {'color': 'magenta'}
@@ -147,14 +152,22 @@ To specify particular styles for particular FEDs, dictionaries can be used:</p>
 fplot.line(feds[0:3], y='correct_pokes', lw=3, line_kwargs=styles)
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_26_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_27_0.png"></p>
+<p>The above method can be somewhat cumbersome to setup.
+One alternative that fed3 provides is the "argument helper", abbreviated with <code><a title="fed3.plot.argh" href="#fed3.plot.argh">argh()</a></code>.
+This can be used to pass a series of arguments to a series of curves being plotted.
+To generate a similar plot as above, do:</p>
+<pre><code class="python">fplot.line(feds[0:3], y='error_pokes', lw=3, color=fplot.argh(['cyan', 'magenta', 'yellow']))
+plt.show()
+</code></pre>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_29_0.png"></p>
 <p>When plotting grouped data, the group names are used as keys instead of individual FED names.
 Also, depending on the plotting function, there may be specific arguments to manage keywords directed at different elements:</p>
-<pre><code class="language-python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
+<pre><code class="python">fplot.line({'A': feds[0:3]}, y='correct_pokes', bins='4H',
            line_kwargs={'color':'black'}, error_kwargs={'color':'gray', 'alpha':0.8})
 plt.show()
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_28_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_31_0.png"></p>
 <h2 id="getting-plot-data">Getting plot data</h2>
 <p>Plotting functions from fed3 can also be used as jumping off points for analyses or other plotting code.
 Most functions have an <code>output</code> argument which determines the object returned.
@@ -165,11 +178,11 @@ Options are typically:</p>
 <li>'dataonly': similar to 'data', except the plot is not created</li>
 <li>'both': a tuple of the figure and data</li>
 </ul>
-<pre><code class="language-python">data = fplot.line(feds, y='cumulative_left_percent', output='data')
+<pre><code class="python">data = fplot.line(feds, y='cumulative_left_percent', output='data')
 plt.show()
 display(data)
 </code></pre>
-<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_31_0.png"></p>
+<p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_getting_started/plots_getting_started_34_0.png"></p>
 <div>
 <style scoped>
 .dataframe tbody tr th:only-of-type {
@@ -193,16 +206,6 @@ text-align: right;
 <th>FED5Cat</th>
 <th>FED6Cat</th>
 <th>FED7Cat</th>
-</tr>
-<tr>
-<th>MM:DD:YYYY hh:mm:ss</th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
 </tr>
 </thead>
 <tbody>
@@ -318,7 +321,7 @@ text-align: right;
 </tr>
 </tbody>
 </table>
-<p>45488 rows × 7 columns</p>
+<p>54806 rows × 7 columns</p>
 </div>
 <details class="source">
 <summary>
@@ -334,10 +337,12 @@ text-align: right;
 
 from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
+from .helpers import argh
 from .ipi import (ipi)
 from .simple import (line, scatter)
 
-__all__ = [&#39;bar&#39;,
+__all__ = [&#39;argh&#39;,
+           &#39;bar&#39;,
            &#39;chronogram_circle&#39;,
            &#39;chronogram_line&#39;,
            &#39;chronogram_spiny&#39;,
@@ -384,6 +389,49 @@ __all__ = [&#39;bar&#39;,
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="fed3.plot.argh"><code class="name flex">
+<span>def <span class="ident">argh</span></span>(<span>args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>argh = arg helper.
+Use this to pass each argument in <code>args</code>
+one at a time to each curve being plotted.
+If not used,
+a list of args will be passed to each curve in its entirety.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>args</code></strong> :&ensp;<code>list-like</code></dt>
+<dd>Arguments to pass out.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ArgHelper</code></dt>
+<dd>Object for distributing the arguments.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argh(args):
+    &#39;&#39;&#39;
+    argh = arg helper.  Use this to pass each argument in `args`
+    one at a time to each curve being plotted.  If not used,
+    a list of args will be passed to each curve in its entirety.
+
+    Parameters
+    ----------
+    args : list-like
+        Arguments to pass out.
+
+    Returns
+    -------
+    ArgHelper
+        Object for distributing the arguments.
+
+    &#39;&#39;&#39;
+    return ArgHelper(args)</code></pre>
+</details>
+</dd>
 <dt id="fed3.plot.bar"><code class="name flex">
 <span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=True, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
@@ -401,6 +449,8 @@ __all__ = [&#39;bar&#39;,
     # parse inputs
     feds_dict = _parse_feds(feds)
     not_group = all(len(f) == 1 for f in feds_dict.values())
+    if not_group:
+        var = None
 
     # set the outputs
     FIG = None
@@ -1216,6 +1266,7 @@ to all lines being plotted.</dd>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
+<li><code><a title="fed3.plot.argh" href="#fed3.plot.argh">argh</a></code></li>
 <li><code><a title="fed3.plot.bar" href="#fed3.plot.bar">bar</a></code></li>
 <li><code><a title="fed3.plot.chronogram_circle" href="#fed3.plot.chronogram_circle">chronogram_circle</a></code></li>
 <li><code><a title="fed3.plot.chronogram_line" href="#fed3.plot.chronogram_line">chronogram_line</a></code></li>

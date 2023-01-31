@@ -11,6 +11,8 @@ from collections import defaultdict
 from matplotlib import colors
 import pandas as pd
 
+# ---- 'Private'
+
 def _assign_plot_names(feds, name_ddict):
     if isinstance(feds, pd.DataFrame):
         feds = [feds]
@@ -76,11 +78,46 @@ def _parse_feds(feds):
 
 def _process_plot_kwargs(kwargs, plot_labels):
 
-    all_kwargs = {k:v for k, v in kwargs.items() if k not in plot_labels}
-    output = {}
+    kwargs_for_all = {}
+    output = {name: {} for name in plot_labels}
+    for k, v in kwargs.items():
+        if isinstance(v, ArgHelper):
+            output.update(v.generate_kwargs(k, plot_labels))
+        elif k not in plot_labels:
+            kwargs_for_all[k] = v
+
     for lab in plot_labels:
-        output[lab] = all_kwargs.copy()
+        output[lab].update(kwargs_for_all.copy())
         if kwargs.get(lab):
             output[lab].update(kwargs[lab])
 
     return output
+
+# ---- Public
+
+def argh(args):
+    '''
+    argh = arg helper.  Use this to pass each argument in `args`
+    one at a time to each curve being plotted.  If not used,
+    a list of args will be passed to each curve in its entirety.
+
+    Parameters
+    ----------
+    args : list-like
+        Arguments to pass out.
+
+    Returns
+    -------
+    ArgHelper
+        Object for distributing the arguments.
+
+    '''
+    return ArgHelper(args)
+
+class ArgHelper:
+
+    def __init__(self, args):
+        self.args = args
+
+    def generate_kwargs(self, argname, plot_labels):
+        return {name: {argname: arg} for name, arg in zip(plot_labels, self.args)}

@@ -95,6 +95,8 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
     # parse inputs
     feds_dict = _parse_feds(feds)
     not_group = all(len(f) == 1 for f in feds_dict.values())
+    if not_group:
+        var = None
 
     # set the outputs
     FIG = None
@@ -228,6 +230,8 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
     # parse inputs
     feds_dict = _parse_feds(feds)
     not_group = all(len(f) == 1 for f in feds_dict.values())
+    if not_group:
+        var = None
 
     # set the outputs
     FIG = None

@@ -122,15 +122,15 @@ def lightcycle_tuples(start_date, end_date, lights_on, lights_off, kind=&#39;nig
     if kind not in [&#39;days&#39;, &#39;nights&#39;]:
         raise ValueError(f&#34;`kind` must be &#39;nights&#39; or &#39;days&#39;, not {kind}&#34;)
 
+    if pdconvert:
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+
     result = []
     t = start_date
     day = pd.Timedelta(&#39;24H&#39;)
 
     lookfor = &#39;on&#39; if kind == &#39;days&#39; else &#39;off&#39;
-
-    if pdconvert:
-        start_date = pd.to_datetime(start_date)
-        end_date = pd.to_datetime(end_date)
 
     while True:
 
@@ -165,7 +165,9 @@ def lightcycle_tuples(start_date, end_date, lights_on, lights_off, kind=&#39;nig
 
     result = list(zip(result[::2], result[1::2]))
 
-    return result</code></pre>
+    return result
+
+# def shade_dark(axis)</code></pre>
 </details>
 </section>
 <section>

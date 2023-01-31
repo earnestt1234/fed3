@@ -8,10 +8,12 @@
 
 from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
+from .helpers import argh
 from .ipi import (ipi)
 from .simple import (line, scatter)
 
-__all__ = ['bar',
+__all__ = ['argh',
+           'bar',
            'chronogram_circle',
            'chronogram_line',
            'chronogram_spiny',

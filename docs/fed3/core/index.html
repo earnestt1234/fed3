@@ -1280,10 +1280,6 @@ get full FEDFrame functionality.</p>
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="fed3.core.FEDFrame.columns"><code class="name">var <span class="ident">columns</span></code></dt>
-<dd>
-<div class="desc"><p>The column labels of the DataFrame.</p></div>
-</dd>
 <dt id="fed3.core.FEDFrame.duration"><code class="name">var <span class="ident">duration</span></code></dt>
 <dd>
 <div class="desc"><p>Time delta of last timestamp and first timestamp.</p></div>
@@ -1335,10 +1331,6 @@ def fedmode(self):
     &#39;&#39;&#39;FED3 operating mode for this data.&#39;&#39;&#39;
     return self.determine_mode()</code></pre>
 </details>
-</dd>
-<dt id="fed3.core.FEDFrame.index"><code class="name">var <span class="ident">index</span></code></dt>
-<dd>
-<div class="desc"><p>The index (row labels) of the DataFrame.</p></div>
 </dd>
 <dt id="fed3.core.FEDFrame.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
 <dd>
@@ -2293,7 +2285,6 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.FEDFrame.L_POKE_EVENTS" href="#fed3.core.FEDFrame.L_POKE_EVENTS">L_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.R_POKE_EVENTS" href="#fed3.core.FEDFrame.R_POKE_EVENTS">R_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.check_duplicated_index" href="#fed3.core.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
-<li><code><a title="fed3.core.FEDFrame.columns" href="#fed3.core.FEDFrame.columns">columns</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.deduplicate_index" href="#fed3.core.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.determine_mode" href="#fed3.core.FEDFrame.determine_mode">determine_mode</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.duration" href="#fed3.core.FEDFrame.duration">duration</a></code></li>
@@ -2301,7 +2292,6 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.FEDFrame.event_type" href="#fed3.core.FEDFrame.event_type">event_type</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.events" href="#fed3.core.FEDFrame.events">events</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.fedmode" href="#fed3.core.FEDFrame.fedmode">fedmode</a></code></li>
-<li><code><a title="fed3.core.FEDFrame.index" href="#fed3.core.FEDFrame.index">index</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.interpellet_intervals" href="#fed3.core.FEDFrame.interpellet_intervals">interpellet_intervals</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.ipi" href="#fed3.core.FEDFrame.ipi">ipi</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.meals" href="#fed3.core.FEDFrame.meals">meals</a></code></li>

@@ -1574,10 +1574,6 @@ get full FEDFrame functionality.</p>
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="fed3.core.fedframe.FEDFrame.columns"><code class="name">var <span class="ident">columns</span></code></dt>
-<dd>
-<div class="desc"><p>The column labels of the DataFrame.</p></div>
-</dd>
 <dt id="fed3.core.fedframe.FEDFrame.duration"><code class="name">var <span class="ident">duration</span></code></dt>
 <dd>
 <div class="desc"><p>Time delta of last timestamp and first timestamp.</p></div>
@@ -1630,10 +1626,6 @@ def fedmode(self):
     return self.determine_mode()</code></pre>
 </details>
 </dd>
-<dt id="fed3.core.fedframe.FEDFrame.index"><code class="name">var <span class="ident">index</span></code></dt>
-<dd>
-<div class="desc"><p>The index (row labels) of the DataFrame.</p></div>
-</dd>
 <dt id="fed3.core.fedframe.FEDFrame.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
 <dd>
 <div class="desc"><p>First timestamp in file.</p></div>
@@ -1663,7 +1655,7 @@ to convert into FEDFrame data.
 The following demonstrates this
 use case, but note that <strong>it is not recommended</strong>
 (use <code><a title="fed3.core.load" href="index.html#fed3.core.load">load()</a></code> instead):</p>
-<pre><code class="language-python">import fed3
+<pre><code class="python">import fed3
 import pandas as pd
 
 data = pd.read_csv(&quot;/some/file.csv&quot;)
@@ -2591,7 +2583,6 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.fedframe.FEDFrame.R_POKE_EVENTS" href="#fed3.core.fedframe.FEDFrame.R_POKE_EVENTS">R_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame._load_init" href="#fed3.core.fedframe.FEDFrame._load_init">_load_init</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.check_duplicated_index" href="#fed3.core.fedframe.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
-<li><code><a title="fed3.core.fedframe.FEDFrame.columns" href="#fed3.core.fedframe.FEDFrame.columns">columns</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.deduplicate_index" href="#fed3.core.fedframe.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.determine_mode" href="#fed3.core.fedframe.FEDFrame.determine_mode">determine_mode</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.duration" href="#fed3.core.fedframe.FEDFrame.duration">duration</a></code></li>
@@ -2599,7 +2590,6 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.fedframe.FEDFrame.event_type" href="#fed3.core.fedframe.FEDFrame.event_type">event_type</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.events" href="#fed3.core.fedframe.FEDFrame.events">events</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.fedmode" href="#fed3.core.fedframe.FEDFrame.fedmode">fedmode</a></code></li>
-<li><code><a title="fed3.core.fedframe.FEDFrame.index" href="#fed3.core.fedframe.FEDFrame.index">index</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.interpellet_intervals" href="#fed3.core.fedframe.FEDFrame.interpellet_intervals">interpellet_intervals</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.meals" href="#fed3.core.fedframe.FEDFrame.meals">meals</a></code></li>
 <li><code><a title="fed3.core.fedframe.FEDFrame.pellets" href="#fed3.core.fedframe.FEDFrame.pellets">pellets</a></code></li>
