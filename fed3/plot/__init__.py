@@ -8,8 +8,9 @@
 
 from .barchart import bar
 from .chronogram import (chronogram_circle, chronogram_line, chronogram_spiny)
-from .helpers import argh
+from .helpers import argh, legend
 from .ipi import (ipi)
+from .shadedark import shade_darkness
 from .simple import (line, scatter)
 
 __all__ = ['argh',
@@ -18,6 +19,8 @@ __all__ = ['argh',
            'chronogram_line',
            'chronogram_spiny',
            'ipi',
+           'legend',
            'line',
-           'scatter']
+           'scatter',
+           'shade_darkness']
 

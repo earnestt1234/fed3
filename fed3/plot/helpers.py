@@ -9,6 +9,7 @@ Created on Wed Feb  2 12:34:52 2022
 from collections import defaultdict
 
 from matplotlib import colors
+import matplotlib.pyplot as plt
 import pandas as pd
 
 # ---- 'Private'
@@ -113,6 +114,10 @@ def argh(args):
 
     '''
     return ArgHelper(args)
+
+def legend(*args, **kwargs):
+    '''Convenience method for calling `plt.legend()` to generate a legend'''
+    plt.legend(*args, **kwargs)
 
 class ArgHelper:
 
