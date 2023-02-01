@@ -8,7 +8,7 @@
 # This needs to have access to the following tools:
 #  - jupyter nbconvert
 #  - git
-#  - gsed (gnu-sed)
+#  - sed
 #  - pdoc
 
 # NOTE: This is currently only geared towards generating the documentation
@@ -19,7 +19,7 @@
 # Check Dependencies
 # # # # # # # # # # # # # #
 
-SOFTWARE_NEEDED="jupyter git gsed pdoc"
+SOFTWARE_NEEDED="jupyter git sed pdoc"
 
 for tool in $SOFTWARE_NEEDED
 do
@@ -68,6 +68,15 @@ fi
 IMG_DIR=${MAIN_DIR}/img
 DOCS_DIR=${MAIN_DIR}/docs
 
+# example notebook
+IPYNB_NAME='plots_getting_started.ipynb'
+SHORTNAME=$(basename $IPYNB_NAME .ipynb)
+IPYNB="${DOCS_DIR}/${IPYNB_NAME}"
+
+# conversion outputs
+MARKDOWN=${DOCS_DIR}/${SHORTNAME}.md
+IPYNB_FILES_DIR=${DOCS_DIR}/${SHORTNAME}_files
+
 # git branch
 IS_GIT=$(git rev-parse --is-inside-work-tree)
 if [[ $IS_GIT == 'true' ]]
@@ -79,9 +88,6 @@ fi
 
 # Online repo for retrieving images
 URL_IMG_DIR="https://raw.githubusercontent.com/earnestt1234/fed3/${BRANCH}/img"
-
-# notebooks to convert
-NOTEBOOKS=$(ls ${DOCS_DIR}/*.ipynb)
 
 # # # # # # # # # # # # # #
 # Report
@@ -95,73 +101,45 @@ echo ""
 echo "VARIABLES"
 echo "---------"
 echo "MAIN_DIR: ${MAIN_DIR}"
+echo "IPYNB: ${IPYNB}"
+echo "MARKDOWN: ${MARKDOWN}"
 echo "IPYNB_FILES_DIR: ${IPYNB_FILES_DIR}"
 echo "BRANCH: ${BRANCH}"
 echo "URL_IMG_DIR: ${URL_IMG_DIR}"
-echo "NOTEBOOKS:"
-for i in ${NOTEBOOKS}
-do
-	echo "  - ${i}"
-done
 
 # # # # # # # # # # # # # #
-# Main Loop
-# # # # # # # # # # # # # # 
-
-for IPYNB in ${NOTEBOOKS}
-do
-	IPYNB_NAME=$(basename $IPYNB)
-	SHORTNAME=$(basename $IPYNB_NAME .ipynb)
-	MARKDOWN=${DOCS_DIR}/${SHORTNAME}.md
-	IPYNB_FILES_DIR=${DOCS_DIR}/${SHORTNAME}_files
-
-	echo ""
-	echo "CONVERTING NOTEBOOK"
-	echo "-------------------"
-	
-	echo ""
-	echo "FILES:"
-	echo "  - $IPYNB"
-	echo "  - $IPYNB_NAME"
-	echo "  - $SHORTNAME"
-	echo "  - $MARKDOWN"
-	echo "  - $IPYNB_FILES_DIR"
-
-	# # # # # # # # # # # # # #
-	# Notebook > Markdown
-	# # # # # # # # # # # # # # 
-
-	echo ""
-	echo " * * * Running notebook > markdown conversion * * * "
-	jupyter nbconvert $IPYNB --to markdown
-	echo " * * * End                                    * * * "
-
-	echo ""
-	echo " * * * Copying images to target directory     * * * "
-	IMG_DESTINATION=${IMG_DIR}/${SHORTNAME}
-	mkdir -p $IMG_DESTINATION
-	cp $IPYNB_FILES_DIR/* $IMG_DESTINATION
-	echo " * * * End                                    * * * "
-
-	echo ""
-	echo " * * * Replacing markdown links               * * * "
-	FINAL_URL=${URL_IMG_DIR}/${SHORTNAME}
-	SEARCH=${SHORTNAME}_files
-	REPLACE=${FINAL_URL}
-	gsed -i --expression="s@${SEARCH}@${REPLACE}@" $MARKDOWN
-	echo " * * * End                                    * * * "
-
-	# cleanup - remove original files
-	rm ${IPYNB_FILES_DIR}/*
-	rmdir ${IPYNB_FILES_DIR}
-
-done
-
-# # # # # # # # # # # # # #
-# PDOC
+# Notebook > Markdown
 # # # # # # # # # # # # # # 
 
 echo ""
-echo "RUNNING PDOC"
-echo "------------"
+echo " * * * Running notebook > markdown conversion * * * "
+jupyter nbconvert $IPYNB --to markdown
+echo " * * * End                                    * * * "
+
+echo ""
+echo " * * * Copying images to target directory     * * * "
+IMG_DESTINATION=${IMG_DIR}/${SHORTNAME}
+mkdir -p $IMG_DESTINATION
+cp $IPYNB_FILES_DIR/* $IMG_DESTINATION
+echo " * * * End                                    * * * "
+
+echo ""
+echo " * * * Replacing markdown links               * * * "
+FINAL_URL=${URL_IMG_DIR}/${SHORTNAME}
+SEARCH=${SHORTNAME}_files
+REPLACE=${FINAL_URL}
+sed -i --expression "s@${SEARCH}@${REPLACE}@" $MARKDOWN
+echo " * * * End                                    * * * "
+
+# cleanup - remove original files
+rm ${IPYNB_FILES_DIR}/*
+rmdir ${IPYNB_FILES_DIR}
+
+# # # # # # # # # # # # # #
+# Pdoc
+# # # # # # # # # # # # # # 
+
+echo ""
+echo " * * * Starting pdoc                          * * * "
 pdoc --html -o docs fed3 --force
+echo " * * * End                                    * * * "

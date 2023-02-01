@@ -54,6 +54,7 @@ from fed3.plot.helpers import (_get_most_recent_color,
                                _process_plot_kwargs)
 
 def _assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0.75):
+    &#39;&#39;&#39;Determine placement of bars from a dicionary of FEDs to be plotted.&#39;&#39;&#39;
 
     if positions_arg is None:
         positions_arg = np.arange(len(feds_dict))
@@ -80,6 +81,7 @@ def _assign_bar_positions_widths(feds_dict, positions_arg=None, position_width=0
     return centers, positions, bar_widths
 
 def _jitter_ys(ys, xcenter, spread):
+    &#39;&#39;&#39;Create jitter in x for raw data being plotted in a bar chart.&#39;&#39;&#39;
 
     xs = np.random.uniform(0, spread/2, size=len(ys))
     half = int(len(ys)/2)
@@ -92,6 +94,121 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
         mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=None, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
+    &#39;&#39;&#39;
+    Create a vertical bar chart.
+
+    Parameters
+    ----------
+    feds : FEDFrame, list-like, or dict
+        FED3 data to be plotted.
+
+        - **FEDFrame**: A single line is plotted for this object
+        - **list-like**: If a collection of FEDFrames is passed,
+        an individual line is plotted for every FEDFrame within `feds`
+        - **dict**: If a `dict` is passed, the data are treated as being
+        grouped, and average lines are plotted.  The dict should have
+        group labels as keys, and FEDFrame objects as values.  Note that
+        the values can be either single FEDFrame objects or list-like collections
+        of them.  Though if all the values of the `dict` are single FEDFrame
+        objects, the data will be treated as if there are no groups.
+
+    y : str, optional
+        Metric to plot on y-axis. See `fed3.metrics` or `fed3.metrics.list_metrics()`
+        for available options.  The default is &#39;pellets&#39;.
+    stat : str or callable, optional
+        Function used to collapse time series data to a point value.
+        The default is &#39;max&#39;.  With `y=&#39;pellets&#39;`, the maximum of the pellet
+        count is plotted.  Other common options would be &#39;mean&#39; or
+        &#39;median&#39;.
+    normalize : str, optional
+        Normalize the values plotted to a time window. The default is None,
+        in which case no normalization is done.  For example, using &#39;1H&#39;
+        would divide the metric being plotted by the number of hours of
+        the FEDFrame.
+    agg : str or callable, optional
+        How to aggregate the point values being plotted from different FEDs
+        when grouping data. The default is &#39;mean&#39;.  Only relevant when
+        grouped data are being plotted.
+    var : str or callable, optional
+        How to show the variation around the bar.  The default is &#39;std&#39;.
+    mixed_align : str, optional
+        Protocol when encountering FEDFrames with mixed aligment being plotted.
+        The default is &#39;raise&#39;.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
+        for options.
+    show_individual : bool, optional
+        When grouping data, show each individual FED&#39;s data as a point floating
+        around the bar. The default is False.
+    spread : float, optional
+        Parameter for controling the spread of points when using `show_individual`.
+        The default is 0.3.
+    positions : list of int, optional
+        List of integers which can be used to determine the position &amp; grouping
+        of bars being plotted. The default is None.  Positions should have a length
+        equal to the number of bars, and should only contain ascending integers.
+        Bars with the same integer label will be grouped side by side.  For example,
+        a group of 4 bars could be grouped into sets of 2 with
+        `positions=[0, 0, 1, 1]`.  `positions=[0, 1, 2, 3]` would evenly
+        space bars (this is the default behavior, set when `None` is passed.)
+    position_labels : list of str, optional
+        Labels for each position of bars being plotted. The default is None.
+    legend : bool or None, optional
+        Create a legend. The default is None, in which case follows
+        `fed3.plot.OPTIONS[&#39;default_legend&#39;]`.
+    ax : matplotlib Axes, optional
+        Axes to direct the plotting to. The default is None, in which case
+        `plt.gca()` is used.
+    output : str, optional
+        Specify function behavior and return value. The default is &#39;plot&#39;.
+
+        - **plot**: Plot is created and the matplotlib Figure is returned.
+        - **data**: Plot is created, and underlying processed data are returned
+        (as a pandas DataFrame).
+        - **both**: Plot is created, and the return value is a 2-tuple with
+        the first element being the Figure, and second element being the data.
+        - **dataonly**: Plot is NOT created; only the processed data are returned.
+        - anything else: a `ValueError` is raised.
+
+    bar_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.bar()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.bar()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.bar()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+
+    error_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.errorbar()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.errorbar()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.errorbar()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+
+    scatter_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.scatter()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.scatter()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.scatter()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    **kwargs : dict-like
+        Keyword arguments passed to `ax.bar()`.
+
+    Returns
+    -------
+    variable
+        Dependent on parameter `output`.
+
+    &#39;&#39;&#39;
 
     # parse inputs
     feds_dict = _parse_feds(feds)
@@ -219,7 +336,145 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
 <span>def <span class="ident">bar</span></span>(<span>feds, y='pellets', stat='max', normalize=None, agg='mean', var='std', mixed_align='raise', show_individual=False, spread=0.3, positions=None, position_labels=None, legend=None, ax=None, output='plot', bar_kwargs=None, error_kwargs=None, scatter_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Create a vertical bar chart.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>feds</code></strong> :&ensp;<code>FEDFrame, list-like,</code> or <code>dict</code></dt>
+<dd>
+<p>FED3 data to be plotted.</p>
+<ul>
+<li><strong>FEDFrame</strong>: A single line is plotted for this object</li>
+<li><strong>list-like</strong>: If a collection of FEDFrames is passed,
+an individual line is plotted for every FEDFrame within <code>feds</code></li>
+<li><strong>dict</strong>: If a <code>dict</code> is passed, the data are treated as being
+grouped, and average lines are plotted.
+The dict should have
+group labels as keys, and FEDFrame objects as values.
+Note that
+the values can be either single FEDFrame objects or list-like collections
+of them.
+Though if all the values of the <code>dict</code> are single FEDFrame
+objects, the data will be treated as if there are no groups.</li>
+</ul>
+</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Metric to plot on y-axis. See <code><a title="fed3.metrics" href="../metrics/index.html">fed3.metrics</a></code> or <code><a title="fed3.metrics.list_metrics" href="../metrics/index.html#fed3.metrics.list_metrics">list_metrics()</a></code>
+for available options.
+The default is 'pellets'.</dd>
+<dt><strong><code>stat</code></strong> :&ensp;<code>str</code> or <code>callable</code>, optional</dt>
+<dd>Function used to collapse time series data to a point value.
+The default is 'max'.
+With <code>y='pellets'</code>, the maximum of the pellet
+count is plotted.
+Other common options would be 'mean' or
+'median'.</dd>
+<dt><strong><code>normalize</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Normalize the values plotted to a time window. The default is None,
+in which case no normalization is done.
+For example, using '1H'
+would divide the metric being plotted by the number of hours of
+the FEDFrame.</dd>
+<dt><strong><code>agg</code></strong> :&ensp;<code>str</code> or <code>callable</code>, optional</dt>
+<dd>How to aggregate the point values being plotted from different FEDs
+when grouping data. The default is 'mean'.
+Only relevant when
+grouped data are being plotted.</dd>
+<dt><strong><code>var</code></strong> :&ensp;<code>str</code> or <code>callable</code>, optional</dt>
+<dd>How to show the variation around the bar.
+The default is 'std'.</dd>
+<dt><strong><code>mixed_align</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Protocol when encountering FEDFrames with mixed aligment being plotted.
+The default is 'raise'.
+See <code><a title="fed3.core.fedfuncs.screen_mixed_alignment" href="../core/fedfuncs.html#fed3.core.fedfuncs.screen_mixed_alignment">screen_mixed_alignment()</a></code>
+for options.</dd>
+<dt><strong><code>show_individual</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>When grouping data, show each individual FED's data as a point floating
+around the bar. The default is False.</dd>
+<dt><strong><code>spread</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Parameter for controling the spread of points when using <code>show_individual</code>.
+The default is 0.3.</dd>
+<dt><strong><code>positions</code></strong> :&ensp;<code>list</code> of <code>int</code>, optional</dt>
+<dd>List of integers which can be used to determine the position &amp; grouping
+of bars being plotted. The default is None.
+Positions should have a length
+equal to the number of bars, and should only contain ascending integers.
+Bars with the same integer label will be grouped side by side.
+For example,
+a group of 4 bars could be grouped into sets of 2 with
+<code>positions=[0, 0, 1, 1]</code>.
+<code>positions=[0, 1, 2, 3]</code> would evenly
+space bars (this is the default behavior, set when <code>None</code> is passed.)</dd>
+<dt><strong><code>position_labels</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>Labels for each position of bars being plotted. The default is None.</dd>
+<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code> or <code>None</code>, optional</dt>
+<dd>Create a legend. The default is None, in which case follows
+<code>fed3.plot.OPTIONS['default_legend']</code>.</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, optional</dt>
+<dd>Axes to direct the plotting to. The default is None, in which case
+<code>plt.gca()</code> is used.</dd>
+<dt><strong><code>output</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>
+<p>Specify function behavior and return value. The default is 'plot'.</p>
+<ul>
+<li><strong>plot</strong>: Plot is created and the matplotlib Figure is returned.</li>
+<li><strong>data</strong>: Plot is created, and underlying processed data are returned
+(as a pandas DataFrame).</li>
+<li><strong>both</strong>: Plot is created, and the return value is a 2-tuple with
+the first element being the Figure, and second element being the data.</li>
+<li><strong>dataonly</strong>: Plot is NOT created; only the processed data are returned.</li>
+<li>anything else: a <code>ValueError</code> is raised.</li>
+</ul>
+</dd>
+<dt><strong><code>bar_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
+<dd>
+<p>Dictionary for providing kwargs to matplotlib, specifically <code>ax.bar()</code>.</p>
+<ul>
+<li>If the dictionary key corresponds to the name of a FEDFrame being plotted,
+or the name of a group of FEDFrames being plotted, then the value
+should be another dictionary mapping keyword arguments for <code>ax.bar()</code>
+to their values.</li>
+<li>Otherwise, the keys are assumed to be keywords arguments for <code>ax.bar()</code>,
+and values are the argument values.
+In this case, the kwargs are applied
+to all lines being plotted.</li>
+</ul>
+</dd>
+<dt><strong><code>error_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
+<dd>
+<p>Dictionary for providing kwargs to matplotlib, specifically <code>ax.errorbar()</code>.</p>
+<ul>
+<li>If the dictionary key corresponds to the name of a FEDFrame being plotted,
+or the name of a group of FEDFrames being plotted, then the value
+should be another dictionary mapping keyword arguments for <code>ax.errorbar()</code>
+to their values.</li>
+<li>Otherwise, the keys are assumed to be keywords arguments for <code>ax.errorbar()</code>,
+and values are the argument values.
+In this case, the kwargs are applied
+to all lines being plotted.</li>
+</ul>
+</dd>
+<dt><strong><code>scatter_kwargs</code></strong> :&ensp;<code>dict-like</code>, optional</dt>
+<dd>
+<p>Dictionary for providing kwargs to matplotlib, specifically <code>ax.scatter()</code>.</p>
+<ul>
+<li>If the dictionary key corresponds to the name of a FEDFrame being plotted,
+or the name of a group of FEDFrames being plotted, then the value
+should be another dictionary mapping keyword arguments for <code>ax.scatter()</code>
+to their values.</li>
+<li>Otherwise, the keys are assumed to be keywords arguments for <code>ax.scatter()</code>,
+and values are the argument values.
+In this case, the kwargs are applied
+to all lines being plotted.</li>
+</ul>
+</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict-like</code></dt>
+<dd>Keyword arguments passed to <code>ax.bar()</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>variable</code></dt>
+<dd>Dependent on parameter <code>output</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -228,6 +483,121 @@ def bar(feds, y=&#39;pellets&#39;, stat=&#39;max&#39;, normalize=None, agg=&#39;
         mixed_align=&#39;raise&#39;, show_individual=False, spread=0.3, positions=None,
         position_labels=None, legend=None, ax=None, output=&#39;plot&#39;, bar_kwargs=None,
         error_kwargs=None, scatter_kwargs=None, **kwargs):
+    &#39;&#39;&#39;
+    Create a vertical bar chart.
+
+    Parameters
+    ----------
+    feds : FEDFrame, list-like, or dict
+        FED3 data to be plotted.
+
+        - **FEDFrame**: A single line is plotted for this object
+        - **list-like**: If a collection of FEDFrames is passed,
+        an individual line is plotted for every FEDFrame within `feds`
+        - **dict**: If a `dict` is passed, the data are treated as being
+        grouped, and average lines are plotted.  The dict should have
+        group labels as keys, and FEDFrame objects as values.  Note that
+        the values can be either single FEDFrame objects or list-like collections
+        of them.  Though if all the values of the `dict` are single FEDFrame
+        objects, the data will be treated as if there are no groups.
+
+    y : str, optional
+        Metric to plot on y-axis. See `fed3.metrics` or `fed3.metrics.list_metrics()`
+        for available options.  The default is &#39;pellets&#39;.
+    stat : str or callable, optional
+        Function used to collapse time series data to a point value.
+        The default is &#39;max&#39;.  With `y=&#39;pellets&#39;`, the maximum of the pellet
+        count is plotted.  Other common options would be &#39;mean&#39; or
+        &#39;median&#39;.
+    normalize : str, optional
+        Normalize the values plotted to a time window. The default is None,
+        in which case no normalization is done.  For example, using &#39;1H&#39;
+        would divide the metric being plotted by the number of hours of
+        the FEDFrame.
+    agg : str or callable, optional
+        How to aggregate the point values being plotted from different FEDs
+        when grouping data. The default is &#39;mean&#39;.  Only relevant when
+        grouped data are being plotted.
+    var : str or callable, optional
+        How to show the variation around the bar.  The default is &#39;std&#39;.
+    mixed_align : str, optional
+        Protocol when encountering FEDFrames with mixed aligment being plotted.
+        The default is &#39;raise&#39;.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
+        for options.
+    show_individual : bool, optional
+        When grouping data, show each individual FED&#39;s data as a point floating
+        around the bar. The default is False.
+    spread : float, optional
+        Parameter for controling the spread of points when using `show_individual`.
+        The default is 0.3.
+    positions : list of int, optional
+        List of integers which can be used to determine the position &amp; grouping
+        of bars being plotted. The default is None.  Positions should have a length
+        equal to the number of bars, and should only contain ascending integers.
+        Bars with the same integer label will be grouped side by side.  For example,
+        a group of 4 bars could be grouped into sets of 2 with
+        `positions=[0, 0, 1, 1]`.  `positions=[0, 1, 2, 3]` would evenly
+        space bars (this is the default behavior, set when `None` is passed.)
+    position_labels : list of str, optional
+        Labels for each position of bars being plotted. The default is None.
+    legend : bool or None, optional
+        Create a legend. The default is None, in which case follows
+        `fed3.plot.OPTIONS[&#39;default_legend&#39;]`.
+    ax : matplotlib Axes, optional
+        Axes to direct the plotting to. The default is None, in which case
+        `plt.gca()` is used.
+    output : str, optional
+        Specify function behavior and return value. The default is &#39;plot&#39;.
+
+        - **plot**: Plot is created and the matplotlib Figure is returned.
+        - **data**: Plot is created, and underlying processed data are returned
+        (as a pandas DataFrame).
+        - **both**: Plot is created, and the return value is a 2-tuple with
+        the first element being the Figure, and second element being the data.
+        - **dataonly**: Plot is NOT created; only the processed data are returned.
+        - anything else: a `ValueError` is raised.
+
+    bar_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.bar()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.bar()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.bar()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+
+    error_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.errorbar()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.errorbar()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.errorbar()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+
+    scatter_kwargs : dict-like, optional
+        Dictionary for providing kwargs to matplotlib, specifically `ax.scatter()`.
+
+        - If the dictionary key corresponds to the name of a FEDFrame being plotted,
+        or the name of a group of FEDFrames being plotted, then the value
+        should be another dictionary mapping keyword arguments for `ax.scatter()`
+        to their values.
+        - Otherwise, the keys are assumed to be keywords arguments for `ax.scatter()`,
+        and values are the argument values.  In this case, the kwargs are applied
+        to all lines being plotted.
+    **kwargs : dict-like
+        Keyword arguments passed to `ax.bar()`.
+
+    Returns
+    -------
+    variable
+        Dependent on parameter `output`.
+
+    &#39;&#39;&#39;
 
     # parse inputs
     feds_dict = _parse_feds(feds)
