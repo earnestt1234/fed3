@@ -208,6 +208,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
     ----------
     feds : FEDFrame, list-like, or dict
         FED3 data to be plotted.
+
         - **FEDFrame**: A single line is plotted for this object
         - **list-like**: If a collection of FEDFrames is passed,
         an individual line is plotted for every FEDFrame within `feds`
@@ -217,6 +218,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         the values can be either single FEDFrame objects or list-like collections
         of them.  Though if all the values of the `dict` are single FEDFrame
         objects, the data will be treated as if there are no groups.
+
     y : str, optional
         Metric to plot on y-axis. See `fed3.metrics` or `fed3.metrics.list_metrics()`
         for available options.  The default is 'pellets'.
@@ -244,6 +246,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         for options.
     output : str, optional
         Specify function behavior and return value. The default is 'plot'.
+
         - **plot**: Plot is created and the matplotlib Figure is returned.
         - **data**: Plot is created, and underlying processed data are returned
         (as a pandas DataFrame).
@@ -251,6 +254,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         the first element being the Figure, and second element being the data.
         - **dataonly**: Plot is NOT created; only the processed data are returned.
         - anything else: a `ValueError` is raised.
+
     xaxis : str, optional
         X-axis type to used for plotting. This is usually determined by the
         alignment of the FEDFrames, and should be handled by 'auto' (default).
@@ -267,6 +271,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         `fed3.plot.OPTIONS['default_legend']`.
     line_kwargs : dict-like, optional
         Dictionary for providing kwargs to matplotlib, specifically `ax.plot()`.
+
         - If the dictionary key corresponds to the name of a FEDFrame being plotted,
         or the name of a group of FEDFrames being plotted, then the value
         should be another dictionary mapping keyword arguments for `ax.plot()`
@@ -274,8 +279,10 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         - Otherwise, the keys are assumed to be keywords arguments for `ax.plot()`,
         and values are the argument values.  In this case, the kwargs are applied
         to all lines being plotted.
+
     error_kwargs : dict-like, optional
         Dictionary for providing kwargs to matplotlib, specifically `ax.fill_between()`.
+
         - If the dictionary key corresponds to the name of a FEDFrame being plotted,
         or the name of a group of FEDFrames being plotted, then the value
         should be another dictionary mapping keyword arguments for `ax.fill_between()`
@@ -283,6 +290,7 @@ def line(feds, y='pellets', bins=None, agg='mean', var='std',
         - Otherwise, the keys are assumed to be keywords arguments for `ax.fill_between()`,
         and values are the argument values.  In this case, the kwargs are applied
         to all lines being plotted.
+
     **kwargs : dict-like
         Passed to updated `line_kwargs`.
 
