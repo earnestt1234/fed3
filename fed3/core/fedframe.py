@@ -138,7 +138,7 @@ class FEDFrame(pd.DataFrame):
     def _binary_pellets(self):
         bp = self['Pellet_Count'].diff().copy()
         if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]) == 'Pellet')
+            bp.iloc[0] = int(self._first_event_type() == 'pellet')
 
         return bp
 
@@ -147,7 +147,7 @@ class FEDFrame(pd.DataFrame):
             col = {'left': 'Left_Poke_Count', 'right': 'Right_Poke_Count'}[side]
             bp = self[col].diff().copy()
             if not bp.empty:
-                bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+                bp.iloc[0] = int(self._first_event_type() == side)
         elif self.LR_POKE_METHOD == 'from_events':
             search = {'left': self.L_POKE_EVENTS, 'right': self.R_POKE_EVENTS}[side]
             bp = self['Event'].isin(search).astype(int)
@@ -210,6 +210,22 @@ class FEDFrame(pd.DataFrame):
             cp = bp.cumsum()
 
         return cp
+
+    def _first_event_type(self):
+        '''
+        Get the type of event for the first entry.  Special case implementation
+        of `event_type()`.  Returns either "pellet", "left", "right", or "unknown".
+        '''
+        ts = self.index[0]
+        left = self.loc[ts, 'Left_Poke_Count'] == 1
+        right = self.loc[ts, 'Right_Poke_Count'] == 1
+        pellet = self.loc[ts, 'Pellet_Count'] == 1
+
+        if sum([left, right, pellet]) != 1:
+            return 'unknown'
+
+        ans = ['left', 'right', 'pellet'][[left, right, pellet].index(True)]
+        return ans
 
     def _fix_column_names(self):
         '''
@@ -436,22 +452,24 @@ class FEDFrame(pd.DataFrame):
                 mode = str(column[0])
         return mode
 
-    def event_type(self, timestamp, poke_side=True):
+    def event_type(self, timestamp):
         '''
         Return the type of a given timestamp within the data (pellet or poke).
+
+        TODO
+        Currently, this only reads the Event column, and throws an error if not
+        present.  In the future, this may implement more logic to determine the
+        type of an event.
 
         Parameters
         ----------
         timestamp : str, `pandas.Timestamp`
             timestamp to query.
-        poke_side : bool, optional
-            When True (default), will try to return `'Left'` or `'Right'`
-            when the event is a poke.
 
         Raises
         ------
         Exception
-            Fails when the type can't automatically be determined.
+            Fails when the Event column isn't present.
 
         Returns
         -------
@@ -462,20 +480,7 @@ class FEDFrame(pd.DataFrame):
         if 'Event' in self.columns:
             return self.loc[timestamp, 'Event']
         else:
-            pellet = self.loc[timestamp, 'Pellet_Count'] == 0
-            left = self.loc[timestamp, 'Left_Poke_Count'] == 0
-            right = self.loc[timestamp, 'Right_Poke_Count'] == 0
-            if sum((pellet, left, right)) == 2:
-                if pellet:
-                    return 'Pellet'
-                if left:
-                    return 'Left' if poke_side else 'Poke'
-                if right:
-                    return 'Right' if poke_side else 'Poke'
-            else:
-                raise Exception('Cannot determine event for timestamp with '
-                                'no "Event" column and multiple non-zero '
-                                'entries for pellets and pokes.')
+            raise Exception('Missing "Event" column.')
 
     def interpellet_intervals(self, check_concat=True, condense=False):
         '''
