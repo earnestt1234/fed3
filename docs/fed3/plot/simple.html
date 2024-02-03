@@ -97,7 +97,7 @@ def _plot_timeseries_errorbars(ax, aggdata, vardata, **kwargs):
 # ---- common function for scatter / line
 
 def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;1H&#39;, agg=&#39;mean&#39;,
-                 var=&#39;std&#39;, omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+                 var=&#39;std&#39;, omit_na=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
                  xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
                  plot_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;Underlying method used by `line()` and `scatter()`.  Both
@@ -227,7 +227,7 @@ def _simple_plot(feds_dict, kind=&#39;line&#39;, y=&#39;pellets&#39;, bins=&#39;
 # ---- public plotting functions
 
 def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-         omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+         omit_na=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
          xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
          line_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;
@@ -269,7 +269,7 @@ def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&
     omit_na : bool, optional
         When True, omits bins in a group where at least one FEDFrame has
         missing data. Only relevant when grouped data are being plotted.
-        The default is False.
+        The default is True.
     mixed_align : str, optional
         Protocol when encountering FEDFrames with mixed aligment being plotted.
         The default is &#39;raise&#39;.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
@@ -354,7 +354,7 @@ def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&
                         **kwargs)
 
 def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-            omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+            omit_na=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
             xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
             point_kwargs=None, error_kwargs=None, **kwargs):
 
@@ -389,7 +389,7 @@ def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;s
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fed3.plot.simple.line"><code class="name flex">
-<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">line</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=True, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, line_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Create a line plot, with time on the x-axis and a variable
@@ -441,7 +441,7 @@ Only relevant when grouped data are being plotted. The default is 'std'.</dd>
 <dt><strong><code>omit_na</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>When True, omits bins in a group where at least one FEDFrame has
 missing data. Only relevant when grouped data are being plotted.
-The default is False.</dd>
+The default is True.</dd>
 <dt><strong><code>mixed_align</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Protocol when encountering FEDFrames with mixed aligment being plotted.
 The default is 'raise'.
@@ -515,7 +515,7 @@ to all lines being plotted.</li>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def line(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-         omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+         omit_na=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
          xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
          line_kwargs=None, error_kwargs=None, **kwargs):
     &#39;&#39;&#39;
@@ -557,7 +557,7 @@ to all lines being plotted.</li>
     omit_na : bool, optional
         When True, omits bins in a group where at least one FEDFrame has
         missing data. Only relevant when grouped data are being plotted.
-        The default is False.
+        The default is True.
     mixed_align : str, optional
         Protocol when encountering FEDFrames with mixed aligment being plotted.
         The default is &#39;raise&#39;.  See `fed3.core.fedfuncs.screen_mixed_alignment()`
@@ -643,7 +643,7 @@ to all lines being plotted.</li>
 </details>
 </dd>
 <dt id="fed3.plot.simple.scatter"><code class="name flex">
-<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=False, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, point_kwargs=None, error_kwargs=None, **kwargs)</span>
+<span>def <span class="ident">scatter</span></span>(<span>feds, y='pellets', bins=None, agg='mean', var='std', omit_na=True, mixed_align='raise', output='plot', xaxis='auto', shadedark=None, ax=None, legend=None, point_kwargs=None, error_kwargs=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -652,7 +652,7 @@ to all lines being plotted.</li>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def scatter(feds, y=&#39;pellets&#39;, bins=None, agg=&#39;mean&#39;, var=&#39;std&#39;,
-            omit_na=False, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
+            omit_na=True, mixed_align=&#39;raise&#39;, output=&#39;plot&#39;,
             xaxis=&#39;auto&#39;, shadedark=None, ax=None, legend=None,
             point_kwargs=None, error_kwargs=None, **kwargs):
 

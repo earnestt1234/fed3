@@ -632,7 +632,7 @@ get full FEDFrame functionality.</p>
     def _binary_pellets(self):
         bp = self[&#39;Pellet_Count&#39;].diff().copy()
         if not bp.empty:
-            bp.iloc[0] = int(self.event_type(bp.index[0]) == &#39;Pellet&#39;)
+            bp.iloc[0] = int(self._first_event_type() == &#39;pellet&#39;)
 
         return bp
 
@@ -641,7 +641,7 @@ get full FEDFrame functionality.</p>
             col = {&#39;left&#39;: &#39;Left_Poke_Count&#39;, &#39;right&#39;: &#39;Right_Poke_Count&#39;}[side]
             bp = self[col].diff().copy()
             if not bp.empty:
-                bp.iloc[0] = int(self.event_type(bp.index[0]).lower() == side)
+                bp.iloc[0] = int(self._first_event_type() == side)
         elif self.LR_POKE_METHOD == &#39;from_events&#39;:
             search = {&#39;left&#39;: self.L_POKE_EVENTS, &#39;right&#39;: self.R_POKE_EVENTS}[side]
             bp = self[&#39;Event&#39;].isin(search).astype(int)
@@ -704,6 +704,22 @@ get full FEDFrame functionality.</p>
             cp = bp.cumsum()
 
         return cp
+
+    def _first_event_type(self):
+        &#39;&#39;&#39;
+        Get the type of event for the first entry.  Special case implementation
+        of `event_type()`.  Returns either &#34;pellet&#34;, &#34;left&#34;, &#34;right&#34;, or &#34;unknown&#34;.
+        &#39;&#39;&#39;
+        ts = self.index[0]
+        left = self.loc[ts, &#39;Left_Poke_Count&#39;] == 1
+        right = self.loc[ts, &#39;Right_Poke_Count&#39;] == 1
+        pellet = self.loc[ts, &#39;Pellet_Count&#39;] == 1
+
+        if sum([left, right, pellet]) != 1:
+            return &#39;unknown&#39;
+
+        ans = [&#39;left&#39;, &#39;right&#39;, &#39;pellet&#39;][[left, right, pellet].index(True)]
+        return ans
 
     def _fix_column_names(self):
         &#39;&#39;&#39;
@@ -930,22 +946,24 @@ get full FEDFrame functionality.</p>
                 mode = str(column[0])
         return mode
 
-    def event_type(self, timestamp, poke_side=True):
+    def event_type(self, timestamp):
         &#39;&#39;&#39;
         Return the type of a given timestamp within the data (pellet or poke).
+
+        TODO
+        Currently, this only reads the Event column, and throws an error if not
+        present.  In the future, this may implement more logic to determine the
+        type of an event.
 
         Parameters
         ----------
         timestamp : str, `pandas.Timestamp`
             timestamp to query.
-        poke_side : bool, optional
-            When True (default), will try to return `&#39;Left&#39;` or `&#39;Right&#39;`
-            when the event is a poke.
 
         Raises
         ------
         Exception
-            Fails when the type can&#39;t automatically be determined.
+            Fails when the Event column isn&#39;t present.
 
         Returns
         -------
@@ -956,20 +974,7 @@ get full FEDFrame functionality.</p>
         if &#39;Event&#39; in self.columns:
             return self.loc[timestamp, &#39;Event&#39;]
         else:
-            pellet = self.loc[timestamp, &#39;Pellet_Count&#39;] == 0
-            left = self.loc[timestamp, &#39;Left_Poke_Count&#39;] == 0
-            right = self.loc[timestamp, &#39;Right_Poke_Count&#39;] == 0
-            if sum((pellet, left, right)) == 2:
-                if pellet:
-                    return &#39;Pellet&#39;
-                if left:
-                    return &#39;Left&#39; if poke_side else &#39;Poke&#39;
-                if right:
-                    return &#39;Right&#39; if poke_side else &#39;Poke&#39;
-            else:
-                raise Exception(&#39;Cannot determine event for timestamp with &#39;
-                                &#39;no &#34;Event&#34; column and multiple non-zero &#39;
-                                &#39;entries for pellets and pokes.&#39;)
+            raise Exception(&#39;Missing &#34;Event&#34; column.&#39;)
 
     def interpellet_intervals(self, check_concat=True, condense=False):
         &#39;&#39;&#39;
@@ -1280,6 +1285,10 @@ get full FEDFrame functionality.</p>
 </dl>
 <h3>Instance variables</h3>
 <dl>
+<dt id="fed3.core.FEDFrame.columns"><code class="name">var <span class="ident">columns</span></code></dt>
+<dd>
+<div class="desc"><p>The column labels of the DataFrame.</p></div>
+</dd>
 <dt id="fed3.core.FEDFrame.duration"><code class="name">var <span class="ident">duration</span></code></dt>
 <dd>
 <div class="desc"><p>Time delta of last timestamp and first timestamp.</p></div>
@@ -1331,6 +1340,10 @@ def fedmode(self):
     &#39;&#39;&#39;FED3 operating mode for this data.&#39;&#39;&#39;
     return self.determine_mode()</code></pre>
 </details>
+</dd>
+<dt id="fed3.core.FEDFrame.index"><code class="name">var <span class="ident">index</span></code></dt>
+<dd>
+<div class="desc"><p>The index (row labels) of the DataFrame.</p></div>
 </dd>
 <dt id="fed3.core.FEDFrame.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
 <dd>
@@ -1594,22 +1607,24 @@ to be problems for custom programs or particular FED software versions.</p>
 </details>
 </dd>
 <dt id="fed3.core.FEDFrame.event_type"><code class="name flex">
-<span>def <span class="ident">event_type</span></span>(<span>self, timestamp, poke_side=True)</span>
+<span>def <span class="ident">event_type</span></span>(<span>self, timestamp)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return the type of a given timestamp within the data (pellet or poke).</p>
+<p>TODO
+Currently, this only reads the Event column, and throws an error if not
+present.
+In the future, this may implement more logic to determine the
+type of an event.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>timestamp</code></strong> :&ensp;<code>str, </code>pandas.Timestamp``</dt>
 <dd>timestamp to query.</dd>
-<dt><strong><code>poke_side</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>When True (default), will try to return <code>'Left'</code> or <code>'Right'</code>
-when the event is a poke.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>Exception</code></dt>
-<dd>Fails when the type can't automatically be determined.</dd>
+<dd>Fails when the Event column isn't present.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1620,22 +1635,24 @@ when the event is a poke.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def event_type(self, timestamp, poke_side=True):
+<pre><code class="python">def event_type(self, timestamp):
     &#39;&#39;&#39;
     Return the type of a given timestamp within the data (pellet or poke).
+
+    TODO
+    Currently, this only reads the Event column, and throws an error if not
+    present.  In the future, this may implement more logic to determine the
+    type of an event.
 
     Parameters
     ----------
     timestamp : str, `pandas.Timestamp`
         timestamp to query.
-    poke_side : bool, optional
-        When True (default), will try to return `&#39;Left&#39;` or `&#39;Right&#39;`
-        when the event is a poke.
 
     Raises
     ------
     Exception
-        Fails when the type can&#39;t automatically be determined.
+        Fails when the Event column isn&#39;t present.
 
     Returns
     -------
@@ -1646,20 +1663,7 @@ when the event is a poke.</dd>
     if &#39;Event&#39; in self.columns:
         return self.loc[timestamp, &#39;Event&#39;]
     else:
-        pellet = self.loc[timestamp, &#39;Pellet_Count&#39;] == 0
-        left = self.loc[timestamp, &#39;Left_Poke_Count&#39;] == 0
-        right = self.loc[timestamp, &#39;Right_Poke_Count&#39;] == 0
-        if sum((pellet, left, right)) == 2:
-            if pellet:
-                return &#39;Pellet&#39;
-            if left:
-                return &#39;Left&#39; if poke_side else &#39;Poke&#39;
-            if right:
-                return &#39;Right&#39; if poke_side else &#39;Poke&#39;
-        else:
-            raise Exception(&#39;Cannot determine event for timestamp with &#39;
-                            &#39;no &#34;Event&#34; column and multiple non-zero &#39;
-                            &#39;entries for pellets and pokes.&#39;)</code></pre>
+        raise Exception(&#39;Missing &#34;Event&#34; column.&#39;)</code></pre>
 </details>
 </dd>
 <dt id="fed3.core.FEDFrame.interpellet_intervals"><code class="name flex">
@@ -2285,6 +2289,7 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.FEDFrame.L_POKE_EVENTS" href="#fed3.core.FEDFrame.L_POKE_EVENTS">L_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.R_POKE_EVENTS" href="#fed3.core.FEDFrame.R_POKE_EVENTS">R_POKE_EVENTS</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.check_duplicated_index" href="#fed3.core.FEDFrame.check_duplicated_index">check_duplicated_index</a></code></li>
+<li><code><a title="fed3.core.FEDFrame.columns" href="#fed3.core.FEDFrame.columns">columns</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.deduplicate_index" href="#fed3.core.FEDFrame.deduplicate_index">deduplicate_index</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.determine_mode" href="#fed3.core.FEDFrame.determine_mode">determine_mode</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.duration" href="#fed3.core.FEDFrame.duration">duration</a></code></li>
@@ -2292,6 +2297,7 @@ returned with the new alignment.</dd>
 <li><code><a title="fed3.core.FEDFrame.event_type" href="#fed3.core.FEDFrame.event_type">event_type</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.events" href="#fed3.core.FEDFrame.events">events</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.fedmode" href="#fed3.core.FEDFrame.fedmode">fedmode</a></code></li>
+<li><code><a title="fed3.core.FEDFrame.index" href="#fed3.core.FEDFrame.index">index</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.interpellet_intervals" href="#fed3.core.FEDFrame.interpellet_intervals">interpellet_intervals</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.ipi" href="#fed3.core.FEDFrame.ipi">ipi</a></code></li>
 <li><code><a title="fed3.core.FEDFrame.meals" href="#fed3.core.FEDFrame.meals">meals</a></code></li>

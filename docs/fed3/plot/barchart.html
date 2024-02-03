@@ -25,13 +25,13 @@
 <h1 id="bar-charts">Bar charts</h1>
 <p>The barchart module (<code>fed3.plot.barchart.py</code>) creates bar plots from FED3 data. Some example bar plots are demonstrated below.
 We will start by loading fed3 and some data:</p>
-<pre><code class="python">import fed3
+<pre><code class="language-python">import fed3
 import fed3.plot as fplot
 
 feds = fed3.load_examples('fr1', deduplicate_index='offset', offset='1s')
 </code></pre>
 <p>Some basic plotting parameters are also set for the purposes of documentation:</p>
-<pre><code class="python">%matplotlib inline
+<pre><code class="language-python">%matplotlib inline
 import matplotlib.pyplot as plt
 
 plt.rcParams['figure.figsize'] = [4, 5]
@@ -40,11 +40,11 @@ plt.rcParams['figure.dpi'] = 100
 <h2 id="basic-bar-charts">Basic bar charts</h2>
 <p>The simplest bar plots show a value of interest (<code>y</code>) for one or more FEDFrames.
 This defaults to being a measure of pellets earned:</p>
-<pre><code class="python">fig = fplot.bar(feds)
+<pre><code class="language-python">fig = fplot.bar(feds)
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_barchart/plots_barchart_6_0.png"></p>
 <p>Commands from matplotlib can be used to clean up the figure:</p>
-<pre><code class="python"># define some custom colors
+<pre><code class="language-python"># define some custom colors
 colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
 
 # replot, removing the legend so it can be explicitly placed
@@ -63,7 +63,7 @@ See <code><a title="fed3.metrics" href="../metrics/index.html">fed3.metrics</a><
 The default is 'max', other typical options would be 'mean' or 'median'.
 - <code>normalize</code>: A time delta can be provided to normalize the values so they are on a per-unit-time scale.
 This can be useful when FEDs are recorded for different lengths of time.</p>
-<pre><code class="python"># pokes are normalize to be per hour
+<pre><code class="language-python"># pokes are normalize to be per hour
 fig = fplot.bar(feds, y='pokes', normalize='1H', legend=False)
 fig.autofmt_xdate()
 plt.show()
@@ -74,14 +74,14 @@ plt.show()
 This is somewhat limited, but should be usable for many simple bar plots.
 The primary argument is <code>positions</code>.
 This argument accepts a list with one integer for each bar being plotted - bars receiving the same integer will be placed side-by-side:</p>
-<pre><code class="python">positions = [0, 0, 0, 1, 1, 1, 1]
+<pre><code class="language-python">positions = [0, 0, 0, 1, 1, 1, 1]
 
 fig = fplot.bar(feds, y='ipi', stat='mean', positions=positions, legend=False)
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_barchart/plots_barchart_12_0.png"></p>
 <p>There is also a <code>position_labels</code> function which can be used to label each group:</p>
-<pre><code class="python">positions = [0, 0, 1, 1, 2, 2, 2]
+<pre><code class="language-python">positions = [0, 0, 1, 1, 2, 2, 2]
 position_labels = ['A', 'B', 'C']
 
 fig = fplot.bar(feds,y='motor', stat='max',
@@ -94,26 +94,26 @@ plt.show()
 <h2 id="grouping-data">Grouping data</h2>
 <p>Dictionaries can be used to place FEDFrames into named groups.
 In this case, their data are aggregated into a single bar:</p>
-<pre><code class="python">grouped = {'Control': feds[:3], 'Treatment': feds[3:]}
+<pre><code class="language-python">grouped = {'Control': feds[:3], 'Treatment': feds[3:]}
 
 fig = fplot.bar(grouped, y='pellets', stat='max')
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_barchart/plots_barchart_16_0.png"></p>
 <p>A few extra arguments control the grouping of data.
 <code>agg</code> determines the function for aggregating the point values computed for each FEDFrame in the group, while <code>var</code> determines the metric to include in the error bars.</p>
-<pre><code class="python">fig = fplot.bar(grouped, y='pellets', stat='max', agg='median')
+<pre><code class="language-python">fig = fplot.bar(grouped, y='pellets', stat='max', agg='median')
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_barchart/plots_barchart_18_0.png"></p>
 <p>Note the difference between <code>stat</code> and <code>agg</code>: <code>stat</code> determines how a time series metric derived from each FEDFrame is converted into a single value, while <code>agg</code> determines how those single values are converted into a single bar.
 <code>agg</code> is only relevant when grouping data.</p>
 <p>Instead of (or in addition to) the error bars, the <code>show_individual</code> argument can plot each FEDFrame's datum as a single point floating around the bar (with a little random jitter, as determined by <code>spread</code>):</p>
-<pre><code class="python">fig = fplot.bar(grouped, y='pellets', stat='max', agg='median', var=None, show_individual=True)
+<pre><code class="language-python">fig = fplot.bar(grouped, y='pellets', stat='max', agg='median', var=None, show_individual=True)
 plt.show()
 </code></pre>
 <p><img alt="png" src="https://raw.githubusercontent.com/earnestt1234/fed3/main/img/plots_barchart/plots_barchart_20_0.png"></p>
 <p>The <code>positions</code> argument can also be used to control the placement of grouped data:</p>
-<pre><code class="python"># this uses a trick:
+<pre><code class="language-python"># this uses a trick:
 # labels starting with an underscore are not included in the legend by matplotlib
 groups2 = {'Saline': feds[0:2], 'Drug': feds[2:4], '_Saline': feds[4:6], '_Drug': feds[6:]}
 positions = [0, 0, 1, 1]
