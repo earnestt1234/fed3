@@ -11,7 +11,7 @@ from os import path
 from setuptools import find_packages, setup
 
 requirements = [
-    'numpy>=1.2'
+    'numpy>=1.2',
     'matplotlib>=3.4',
     'pandas>=1.3',
     'seaborn>=0.11'
